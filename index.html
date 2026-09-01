@@ -146,6 +146,11 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
       <span class="step">📝 論文生成</span><span class="arr">↺</span>
     </div>
     <div data-aeid style="margin-top:14px;max-width:620px"></div>
+    <div id="aeParity" style="margin-top:10px;max-width:620px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);border-radius:12px;padding:10px 14px;font-size:13px;color:#fff">
+      🚦 <b>學號分流</b>:單號 → 主站|雙號 → 備援站
+      <button id="aeParityBtn" type="button" style="margin-left:10px;background:#fff;color:#4338ca;font-weight:700;border:0;border-radius:8px;padding:6px 14px;cursor:pointer">依我的學號分流 →</button>
+      <span id="aeParityMsg" style="margin-left:8px;opacity:.95"></span>
+    </div>
     <div class="cta">
       <a href="https://pjkuo.github.io/AI-empower-platform/">開始做專題 →</a>
       <a class='ghost' href='ioc.html'>進入 IOC 課程</a>
@@ -280,5 +285,31 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
     本站所有頁面皆為靜態網頁、零後端；評量與統計資料保存在你自己的瀏覽器，除非主動匯出不會離開裝置。
   </footer>
 </main>
+<script>
+/* AE Parity — 學號單雙號分流:單號 → 主站(Netlify)、雙號 → 備援站(GitHub Pages);分流結果釘選(ae.route.v2) */
+(function(){
+"use strict";
+var NL='https://ai-empower-hub.netlify.app', GH='https://pjkuo.github.io/ai-empower';
+var here=(location.hostname==='pjkuo.github.io')?'gh':'nl';
+var btn=document.getElementById('aeParityBtn'), msg=document.getElementById('aeParityMsg');
+if(!btn) return;
+function sidOf(){ try{ var v=JSON.parse(localStorage.getItem('ae.identity.v1')||'null'); return v&&v.sid?String(v.sid):''; }catch(e){ return ''; } }
+function hint(){ var d=sidOf().replace(/\D/g,''); if(!d){ msg.textContent=''; return; }
+  var odd=(+d.charAt(d.length-1))%2===1;
+  msg.textContent='(你的學號 '+d+' 是'+(odd?'單':'雙')+'號 → '+(odd?'主站':'備援站')+')'; }
+hint();
+document.addEventListener('ae:identity',hint);
+btn.addEventListener('click',function(){
+  var d=sidOf().replace(/\D/g,'');
+  if(!d){ msg.textContent='請先在上方「我是誰」小卡填學號後 4 碼'; return; }
+  var odd=(+d.charAt(d.length-1))%2===1, want=odd?'nl':'gh';
+  try{ localStorage.setItem('ae.route.v2',want); }catch(e){}
+  var label=(odd?'單':'雙')+'號 → '+(odd?'主站':'備援站');
+  if(want===here){ msg.textContent='✓ '+label+':你已在正確平台'; return; }
+  msg.textContent=label+',轉往中…';
+  location.href=(want==='gh'?GH:NL)+'/?r='+want;
+});
+})();
+</script>
 </body>
 </html>
