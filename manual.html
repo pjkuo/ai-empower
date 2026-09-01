@@ -52,10 +52,10 @@
     <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
       <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
     <div class="navlinks">
-      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
-      <a href='/presurvey'>課前評量</a><a href='/console'>教師工作台</a>
+      <a href="./">入口</a><a href='ioc.html'>IOC 課程</a>
+      <a href='presurvey.html'>課前評量</a><a href='console.html'>教師工作台</a>
       
-      <a aria-current='page' href='/manual'>手冊</a>
+      <a aria-current='page' href='manual.html'>手冊</a>
     </div>
   </div>
 </nav>
@@ -103,10 +103,10 @@
       <table>
         <tr><th>頁面</th><th>用途</th><th>主要對象</th></tr>
         <tr><td><a href="./" style="color:var(--accent)">入口</a></td><td>總覽與導流：連接所有教學平台</td><td>所有人</td></tr>
-        <tr><td><a href='/ioc' style='color:var(--accent)'>IOC 課程</a></td><td>計算機概論模擬平台（12 模組）</td><td>學生</td></tr>
-        <tr><td><a href='/presurvey' style='color:var(--accent)'>課前評量</a></td><td>27 題六向度起點調查＋教師儀表板</td><td>學生／教師</td></tr>
-        <tr><td><a href='/stats' style='color:var(--accent)'>統計分析</a></td><td>配對 t、效果量、信度、圖表</td><td>教師／研究者</td></tr>
-        <tr><td><a href='/paper' style='color:var(--accent)'>論文生成</a></td><td>七節論文草稿＋HOTL 審查</td><td>教師／研究者</td></tr>
+        <tr><td><a href='ioc.html' style='color:var(--accent)'>IOC 課程</a></td><td>計算機概論模擬平台（12 模組）</td><td>學生</td></tr>
+        <tr><td><a href='presurvey.html' style='color:var(--accent)'>課前評量</a></td><td>27 題六向度起點調查＋教師儀表板</td><td>學生／教師</td></tr>
+        <tr><td><a href='stats.html' style='color:var(--accent)'>統計分析</a></td><td>配對 t、效果量、信度、圖表</td><td>教師／研究者</td></tr>
+        <tr><td><a href='paper.html' style='color:var(--accent)'>論文生成</a></td><td>七節論文草稿＋HOTL 審查</td><td>教師／研究者</td></tr>
       </table>
       <img src="assets/img/01-portal-hero.jpg" alt="入口首頁" loading="lazy">
       <p class="cap">入口首頁：教學研究迴圈（專題創作 → 課程模擬 → 評量回饋 → 統計分析 → 論文生成）</p>
@@ -150,7 +150,7 @@
 
       <h2 id="s3">3　教師研究者篇：統計分析工作台</h2>
       <h3 id="s31">3.1　課前評量教師儀表板</h3>
-      <p>開啟<a href='/presurvey-teacher' style='color:var(--accent)'>教師儀表板</a>，把學生回覆碼整段貼入（可一次貼整個 LINE 對話，系統自動撈出所有 <code>PS1.</code> 碼），或匯入 JSON／CSV。同裝置作答的紀錄會自動納入。</p>
+      <p>開啟<a href='presurvey-teacher.html' style='color:var(--accent)'>教師儀表板</a>，把學生回覆碼整段貼入（可一次貼整個 LINE 對話，系統自動撈出所有 <code>PS1.</code> 碼），或匯入 JSON／CSV。同裝置作答的紀錄會自動納入。</p>
       <table>
         <tr><th>區塊</th><th>內容</th></tr>
         <tr><td>總覽</td><td>人數、準備度 R 平均與 SD、起步／穩健／進階三群比例、建議教學模式（基礎鞏固／分層差異化／加速專題／標準節奏）與總體解釋</td></tr>
@@ -169,7 +169,7 @@
       <p>把 4C 評量（或任何前後測 Likert 資料）變成可發表等級的統計結果：自動配對、配對 t、Cohen’s dz（Hedges gz）、95% CI、Cronbach’s α 與比較圖。統計引擎已對照 SciPy 驗證（最大誤差 4.4×10⁻¹⁵）。</p>
       <ol>
         <li>從 4C 評量平台「前端資料區 → 匯出 JSON」取得檔案。</li>
-        <li>回到<a href='/stats' style='color:var(--accent)'>統計工作台</a>，把檔案<b>直接拖進頁面</b>或貼上內容，按「解析並分析」。</li>
+        <li>回到<a href='stats.html' style='color:var(--accent)'>統計工作台</a>，把檔案<b>直接拖進頁面</b>或貼上內容，按「解析並分析」。</li>
         <li>第一次可先按「🧪 示範資料」看輸出樣貌。</li>
       </ol>
       <img src="assets/img/05-stats-result.jpg" alt="統計結果" loading="lazy">
@@ -183,7 +183,7 @@
       <p>配對失敗時，結果卡會列出「僅完成單次施測」的學號清單，可據此催收。分析完成後點「📝 帶著這份資料前往論文生成」，資料自動交接、免重複貼上。</p>
 
       <h3 id="s32">3.2　教師工作台：總覽＋統計＋論文（單一頁面、密碼進入）</h3>
-      <p>開啟<a href='/console' style='color:var(--accent)'>教師工作台</a>，輸入教師密碼（由雲端驗證，不存於裝置）後有四個分頁：教師總覽、課前評量儀表板、統計分析、論文生成；右上顯示雲端連線狀態，「另開」可把目前分頁獨立開成新視窗。教師總覽（可 60 秒自動更新）把雲端裡所有平台的評量集中在一頁：</p>
+      <p>開啟<a href='console.html' style='color:var(--accent)'>教師工作台</a>，輸入教師密碼（由雲端驗證，不存於裝置）後有四個分頁：教師總覽、課前評量儀表板、統計分析、論文生成；右上顯示雲端連線狀態，「另開」可把目前分頁獨立開成新視窗。教師總覽（可 60 秒自動更新）把雲端裡所有平台的評量集中在一頁：</p>
       <table>
         <tr><th>區塊</th><th>內容</th></tr>
         <tr><td>即時動態</td><td>今日筆數、本週活躍人數、14 天無活動人數、近 14 天每日作答圖、最新 40 筆動態</td></tr>
