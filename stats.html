@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>統計分析工作台｜AI 賦能教學 Hub</title>
+<meta name="description" content="匯入 4C 評量或運算思維量表資料，一鍵計算配對 t 檢定、Cohen's dz、95% 信賴區間與 Cronbach's α，含前後測比較圖與 CSV 匯出。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/stats.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="統計分析工作台｜AI 賦能教學 Hub">
+<meta property="og:description" content="配對 t、Cohen's dz、95% CI、Cronbach's α，純前端即時計算。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+.layout{display:grid;grid-template-columns:340px 1fr;gap:var(--gap);align-items:start;margin-top:16px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:8px}
+.stat{background:var(--soft);border-radius:10px;padding:10px 12px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--primary);font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted)}
+.chart{margin-top:14px;overflow-x:auto}
+.sig{font-weight:800;color:var(--ok)}
+.ns{color:var(--muted)}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a><a aria-current='page' href='/console'>教師工作台</a>
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="layout">
+    <!-- ===== 左：資料輸入 ===== -->
+    <div class="card noprint">
+      <h2>1️⃣ 匯入資料</h2>
+      <p class="sub">支援 4C 評量平台匯出的 JSON、運算思維歷史 JSON、<a href='/presurvey-teacher' style='color:var(--accent);font-weight:700'>課前評量儀表板</a>送來的 T＋C 前後測，或含 sid／stage 欄的 CSV。</p>
+      <label class="fld" for="dataIn">貼上 JSON / CSV</label>
+      <textarea id="dataIn" class="mono" rows="8" placeholder='[{"sid":"2345","stage":"前測","scores":[3,3,4,…]}, …]'></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn btn-primary" id="btnParse">解析並分析</button>
+        <button class="btn btn-ghost" id="btnFile">📂 讀取檔案</button>
+        <button class="btn btn-ghost" id="btnDemo">🧪 示範資料</button>
+        <input type="file" id="fileIn" accept=".json,.csv,.txt" style="display:none">
+      </div>
+      <label class="fld" for="scheme">量表結構</label>
+      <select id="scheme">
+        <option value="auto">自動判斷</option>
+        <option value="fourc">4C 核心素養（12 題＋4 題教學效能）</option>
+        <option value="ct">運算思維（16 題）</option>
+        <option value="presurvey">課前評量 T＋C（11 題，0/1）</option>
+        <option value="generic">自訂量表（整體平均）</option>
+      </select>
+      <div class="msg" id="inMsg"></div>
+      <p class="hint">・同一學號同一階段有多筆時，取時間最新的一筆。<br>
+        ・題項有缺漏的紀錄整筆排除（listwise）。<br>
+        ・資料只在你的瀏覽器裡計算，不會上傳。</p>
+    </div>
+
+    <!-- ===== 右：結果 ===== -->
+    <div>
+      <div class="card" id="resultCard" style="display:none">
+        <h2>2️⃣ 分析結果 <span class="en" id="schemeName"></span></h2>
+        <div class="summary" id="summary"></div>
+
+        <h2 style="margin-top:18px;font-size:14px">配對樣本 t 檢定（前測 → 後測）</h2>
+        <div style="overflow-x:auto"><table class="data" id="tTable"></table></div>
+        <p class="hint" id="alphaLine"></p>
+
+        <div class="chart" id="chart"></div>
+
+        <div class="noprint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+          <button class="btn btn-ghost" id="btnCsv">⬇️ 下載結果 CSV</button>
+          <button class="btn btn-ghost" id="btnPrint">🖨 列印 / 存 PDF</button>
+          <button class="btn btn-primary" id="btnToPaper">📝 帶著這份資料前往論文生成 →</button>
+        </div>
+      </div>
+      <div class="card" id="emptyCard">
+        <h2>還沒有資料</h2>
+        <p class="sub">在左側貼上評量資料（或先按「示範資料」看看輸出長什麼樣子）。<br>
+          4C 評量平台的「前端資料區 → 匯出 JSON」檔案可直接整份貼入。</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">統計方法：配對樣本 t 檢定（雙尾）、Cohen's dz（Hedges 校正 gz 併列）、95% CI、Cronbach's α（依施測階段分別估計）。<br>
+    數值引擎已對照 SciPy 驗證（最大誤差 &lt; 1e-6，詳見 repo 的 tests/verify-stats.md）。</footer>
+</main>
+
+<script src="assets/stats-engine.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var lastAnalysis=null, lastRecords=null;
+
+function msg(t,cls){ var m=$('inMsg'); m.textContent=t; m.className='msg show '+cls; }
+
+function run(){
+  var parsed=AE.parseRecords($('dataIn').value);
+  if(!parsed.records.length){ msg((parsed.errors[0]||'解析不到任何紀錄'),'err'); return; }
+  var key=$('scheme').value;
+  if(key==='auto') key=AE.guessScheme(parsed.records);
+  var a=AE.analyse(parsed.records,key);
+  lastAnalysis=a; lastRecords=parsed.records;
+  render(a);
+  var warn=parsed.errors.length?('；'+parsed.errors.length+' 筆略過（'+parsed.errors[0]+'…）'):'';
+  msg('✓ 讀入 '+parsed.records.length+' 筆，配對成功 '+a.pairs+' 人'+warn, parsed.errors.length?'warn':'ok');
+  try{ localStorage.setItem(AE.DATASET_KEY, JSON.stringify({savedAt:new Date().toISOString(), schemeKey:key, raw:$('dataIn').value})); }catch(e){}
+}
+
+function starOf(p){ return p<.001?'***':p<.01?'**':p<.05?'*':''; }
+
+function render(a){
+  $('emptyCard').style.display='none';
+  $('resultCard').style.display='block';
+  $('schemeName').textContent=a.scheme.name;
+
+  $('summary').innerHTML=
+    '<div class="stat"><b>'+a.pairs+'</b><span>成功配對（人）</span></div>'+
+    '<div class="stat"><b>'+a.nPre+'</b><span>前測有效樣本</span></div>'+
+    '<div class="stat"><b>'+a.nPost+'</b><span>後測有效樣本</span></div>'+
+    '<div class="stat"><b>'+(a.preOnly+a.postOnly)+'</b><span>無法配對（人）</span></div>';
+
+  var rows='<thead><tr><th>分析單位</th><th class="num">n</th><th class="num">前測 M (SD)</th><th class="num">後測 M (SD)</th>'+
+    '<th class="num">t(df)</th><th class="num">p</th><th class="num">dz [95% CI]</th><th class="num">gz</th><th>效果量</th></tr></thead><tbody>';
+  a.results.forEach(function(r){
+    var t=r.test;
+    if(!t){ rows+='<tr><td>'+r.unit.name+'</td><td colspan="8" class="ns">配對數不足</td></tr>'; return; }
+    var sig=t.p<.05;
+    rows+='<tr><td><b>'+r.unit.name+'</b> <span class="ns" style="font-size:10.5px">'+r.unit.en+'</span></td>'+
+      '<td class="num">'+t.n+'</td>'+
+      '<td class="num">'+AE.fnum(t.preMean)+' ('+AE.fnum(t.preSD)+')</td>'+
+      '<td class="num">'+AE.fnum(t.postMean)+' ('+AE.fnum(t.postSD)+')</td>'+
+      '<td class="num">'+AE.fnum(t.t)+'('+t.df+')</td>'+
+      '<td class="num '+(sig?'sig':'ns')+'">'+AE.fp(t.p).replace('p ','')+starOf(t.p)+'</td>'+
+      '<td class="num">'+AE.fnum(t.dz)+' ['+AE.fnum(t.dzCiLow)+', '+AE.fnum(t.dzCiHigh)+']</td>'+
+      '<td class="num">'+AE.fnum(t.gz)+'</td>'+
+      '<td>'+AE.magnitude(t.dz,'zh')+'</td></tr>';
+  });
+  rows+='</tbody>';
+  $('tTable').innerHTML=rows;
+
+  var alphaTxt=[];
+  if(a.alphaPre) alphaTxt.push('前測 '+AE.falpha(a.alphaPre.alpha)+'（k='+a.alphaPre.k+', n='+a.alphaPre.n+'）');
+  if(a.alphaPost) alphaTxt.push('後測 '+AE.falpha(a.alphaPost.alpha)+'（k='+a.alphaPost.k+', n='+a.alphaPost.n+'）');
+  $('alphaLine').innerHTML='📐 量表信度（Cronbach’s α，listwise）：'+(alphaTxt.join('；')||'樣本不足')+'。* p&lt;.05　** p&lt;.01　*** p&lt;.001';
+
+  drawChart(a);
+}
+
+/* 前後測比較長條圖（SVG，附 95% CI 誤差線） */
+function drawChart(a){
+  var rs=a.results.filter(function(r){return r.test;});
+  if(!rs.length){ $('chart').innerHTML=''; return; }
+  var W=Math.max(460, rs.length*130+80), H=290, pl=46, pb=44, pt=18;
+  var innerW=W-pl-20, innerH=H-pt-pb;
+  var rg=a.scheme.range||[1,5], lo0=rg[0], hi0=rg[1], step=(hi0-lo0)/4;
+  var y=function(v){ return pt+innerH-(v-lo0)/(hi0-lo0)*innerH; };   // Likert 1–5 或 0–1 答對率
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" role="img" aria-label="前後測平均比較圖" style="font-family:inherit">';
+  for(var g=0;g<=4;g++){ var gv=lo0+step*g;
+    s+='<line x1="'+pl+'" y1="'+y(gv)+'" x2="'+(W-14)+'" y2="'+y(gv)+'" stroke="#E5E7EB"/>'+
+       '<text x="'+(pl-8)+'" y="'+(y(gv)+4)+'" text-anchor="end" font-size="11" fill="#6B7280">'+(step<1?gv.toFixed(2):gv)+'</text>';
+  }
+  var bw=34, gap2=8;
+  rs.forEach(function(r,i){
+    var t=r.test;
+    var cx=pl+30+i*(innerW/rs.length);
+    // pre
+    s+='<rect x="'+cx+'" y="'+y(t.preMean)+'" width="'+bw+'" height="'+(y(lo0)-y(t.preMean))+'" rx="4" fill="#93C5FD"/>';
+    // post
+    s+='<rect x="'+(cx+bw+gap2)+'" y="'+y(t.postMean)+'" width="'+bw+'" height="'+(y(lo0)-y(t.postMean))+'" rx="4" fill="#1E3A8A"/>';
+    // CI 誤差線畫在後測長條上（平均差 CI 轉換為後測位置僅供視覺參考 → 改用平均±1SD 更直觀？沿用 CI of mean diff 掛後測會誤導。
+    //   這裡畫「後測平均 ± t·SE(後測)」的 95% CI）
+    var sePost=t.postSD/Math.sqrt(t.n), tc=AE.tCritical(0.05,t.df);
+    var hi=y(Math.min(hi0,t.postMean+tc*sePost)), lo=y(Math.max(lo0,t.postMean-tc*sePost));
+    var mx=cx+bw+gap2+bw/2;
+    s+='<line x1="'+mx+'" y1="'+hi+'" x2="'+mx+'" y2="'+lo+'" stroke="#0F2B6E" stroke-width="2"/>'+
+       '<line x1="'+(mx-5)+'" y1="'+hi+'" x2="'+(mx+5)+'" y2="'+hi+'" stroke="#0F2B6E" stroke-width="2"/>'+
+       '<line x1="'+(mx-5)+'" y1="'+lo+'" x2="'+(mx+5)+'" y2="'+lo+'" stroke="#0F2B6E" stroke-width="2"/>';
+    s+='<text x="'+(cx+bw+gap2/2)+'" y="'+(H-pb+18)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">'+r.unit.name+'</text>';
+    var st=starOf(t.p);
+    if(st) s+='<text x="'+(cx+bw+gap2/2)+'" y="'+(Math.min(y(t.preMean),y(t.postMean))-8)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#059669">'+st+'</text>';
+  });
+  s+='<rect x="'+pl+'" y="'+(H-16)+'" width="10" height="10" rx="2" fill="#93C5FD"/><text x="'+(pl+15)+'" y="'+(H-7)+'" font-size="11" fill="#374151">前測</text>'+
+     '<rect x="'+(pl+56)+'" y="'+(H-16)+'" width="10" height="10" rx="2" fill="#1E3A8A"/><text x="'+(pl+71)+'" y="'+(H-7)+'" font-size="11" fill="#374151">後測（誤差線＝95% CI）</text>';
+  s+='</svg>';
+  $('chart').innerHTML=s;
+}
+
+function toCSV(){
+  if(!lastAnalysis) return;
+  var a=lastAnalysis;
+  var head=['分析單位','n','前測M','前測SD','後測M','後測SD','平均差','t','df','p','dz','dz_CI低','dz_CI高','gz','效果量'];
+  var lines=[head.join(',')];
+  a.results.forEach(function(r){
+    var t=r.test; if(!t) return;
+    lines.push([r.unit.name,t.n,AE.fnum(t.preMean,4),AE.fnum(t.preSD,4),AE.fnum(t.postMean,4),AE.fnum(t.postSD,4),
+      AE.fnum(t.meanDiff,4),AE.fnum(t.t,4),t.df,AE.fnum(t.p,6),AE.fnum(t.dz,4),
+      AE.fnum(t.dzCiLow,4),AE.fnum(t.dzCiHigh,4),AE.fnum(t.gz,4),AE.magnitude(t.dz,'zh')].join(','));
+  });
+  if(a.alphaPre) lines.push('Cronbach_alpha_前測,'+AE.fnum(a.alphaPre.alpha,4));
+  if(a.alphaPost) lines.push('Cronbach_alpha_後測,'+AE.fnum(a.alphaPost.alpha,4));
+  var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var u=URL.createObjectURL(blob), el=document.createElement('a');
+  el.href=u; el.download='統計分析結果.csv'; document.body.appendChild(el); el.click();
+  setTimeout(function(){URL.revokeObjectURL(u); el.remove();},0);
+}
+
+$('btnParse').addEventListener('click',run);
+$('btnDemo').addEventListener('click',function(){ $('dataIn').value=AE.demoData(); run(); });
+$('btnFile').addEventListener('click',function(){ $('fileIn').click(); });
+$('fileIn').addEventListener('change',function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=function(){ $('dataIn').value=rd.result; run(); };
+  rd.readAsText(f,'utf-8');
+});
+$('btnCsv').addEventListener('click',toCSV);
+$('btnPrint').addEventListener('click',function(){window.print();});
+$('btnToPaper').addEventListener('click',function(){ location.href='paper.html#from-stats'; });
+
+/* 若 paper.html 曾存過資料，回來時自動帶回 */
+try{
+  var saved=JSON.parse(localStorage.getItem(AE.DATASET_KEY)||'null');
+  if(saved&&saved.raw){ $('dataIn').value=saved.raw; if(saved.schemeKey) $('scheme').value=saved.schemeKey; run(); }
+}catch(e){}
+})();
+</script>
+</body>
+</html>

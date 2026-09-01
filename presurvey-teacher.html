@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課前評量 教師儀表板｜AI 賦能教學 Hub</title>
+<meta name="description" content="貼入學生回覆碼或匯入 JSON／CSV，即時統計準備度分群、六向度平均、各班差異、12 條判準建議與 18 週逐週進度調整。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/presurvey-teacher.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script>
+/* 教師頁面門禁：未經教師工作台（console.html）驗證者一律導回；密碼只存 sessionStorage，關閉分頁即失效 */
+(function(){ if(window.top!==window.self || /[?&]embed=1/.test(location.search)) return; try{ if(sessionStorage.getItem("ae.teacher.gate")==="1") return; }catch(e){} location.replace("console.html#"+(/presurvey-teacher/.test(location.pathname)?"presurvey":"teacher")); })();
+</script>
+<style>
+.layout{display:grid;grid-template-columns:330px 1fr;gap:var(--gap);align-items:start;margin-top:16px}
+@media(max-width:960px){.layout{grid-template-columns:1fr}}
+.side{position:sticky;top:64px}
+@media(max-width:960px){.side{position:static}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px;text-align:center}
+.kpi b{display:block;font-size:22px;color:var(--primary);font-variant-numeric:tabular-nums}
+.kpi span{font-size:11px;color:var(--muted)}
+.kpi.lv b{color:var(--c)}
+.card+.card{margin-top:var(--gap)}
+.bars{display:grid;gap:8px;margin-top:8px}
+.bar{display:grid;grid-template-columns:120px 1fr 46px;align-items:center;gap:10px;font-size:12.5px}
+.bar .tr{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--c,var(--accent));border-radius:6px}
+.bar b{text-align:right;font-variant-numeric:tabular-nums}
+.mode{display:flex;gap:12px;align-items:center;background:var(--accent-soft);border-radius:12px;padding:12px 14px;margin-top:8px}
+.mode .n{font-size:18px;font-weight:800;color:var(--primary);white-space:nowrap}
+.mode p{font-size:12.5px}
+.interp{font-size:13px;line-height:1.8;background:var(--soft);border-left:4px solid var(--primary);border-radius:8px;padding:10px 14px;margin-top:8px}
+.hits{list-style:none;margin-top:8px;display:grid;gap:7px}
+.hits li{font-size:12.5px;line-height:1.6;padding:8px 12px;border-radius:9px;background:var(--warn-bg);border-left:4px solid var(--warn)}
+.hits li b{font-family:var(--mono);font-size:11px;margin-right:6px;color:var(--warn)}
+.hits li.ok{background:var(--ok-bg);border-left-color:var(--ok)}
+.weeks td.adj{color:#92400E;font-weight:700}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;margin-top:8px}
+.qb{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:12px}
+.qb .t{font-weight:700;line-height:1.45;margin-bottom:6px;color:var(--ink)}
+.qb .t small{color:var(--muted);font-weight:600;font-family:var(--mono);margin-right:4px}
+.qb .row{display:grid;grid-template-columns:1fr 70px 34px;gap:6px;align-items:center;margin:2px 0;font-size:11.5px}
+.qb .row .tr{height:8px;background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.qb .row .tr i{display:block;height:100%;background:var(--accent)}
+.qb .row.ans i{background:var(--ok)}
+.qb .row.ans span{font-weight:800;color:var(--ok)}
+.cr{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.cr div{border-radius:10px;padding:9px 10px;font-size:11.5px;line-height:1.4;color:#fff}
+.cr div b{display:block;font-size:20px}
+.cr .r{background:var(--err)}.cr .o{background:var(--warn)}.cr .g{background:var(--ok)}
+.exp{columns:2;column-gap:18px;font-size:12.5px;line-height:1.7}
+.exp li{break-inside:avoid;margin-left:16px}
+@media(max-width:640px){.exp{columns:1}}
+.tag.lv{color:#fff}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.sticky-tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+table.data td.sm{font-size:11px;color:var(--muted)}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:10px;text-align:center;font-size:12px;color:var(--muted);margin-top:8px;transition:.15s}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+@media print{.side,.toolbar,.sticky-tb{display:none!important}.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
+      <a aria-current='page' href='/presurvey'>課前評量</a><a aria-current='page' href='/console'>教師工作台</a>
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="layout">
+    <!-- ===== 左：資料輸入 ===== -->
+    <div class="side">
+      <div class="card noprint" style="margin-bottom:var(--gap);border-top:3px solid var(--eco)">
+        <h2>☁ 雲端資料庫 <span class="en" id="cloudState">檢查中…</span></h2>
+        <p class="sub">與 4C 評量、即時測驗共用同一份試算表（kind=presurvey）。輸入教師碼即可拉回全班作答。</p>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end">
+          <div><label class="fld" for="tcode" style="margin-top:0">教師碼</label><input type="password" id="tcode" placeholder="教師碼（已從工作台登入者可留空）" autocomplete="off"></div>
+          <button class="btn btn-primary" id="btnPull" style="height:36px">⟳ 從雲端載入</button>
+        </div>
+        <label style="display:flex;gap:6px;align-items:center;font-size:12px;margin-top:8px;cursor:pointer"><input type="checkbox" id="autoRefresh"> 每 15 秒自動更新（課堂即時看）</label>
+        <div class="msg" id="cloudMsg"></div>
+        <details style="margin-top:8px;font-size:11.5px;color:var(--muted)"><summary style="cursor:pointer">進階：雲端網址</summary>
+          <input type="text" id="cloudUrl" placeholder="https://script.google.com/macros/s/…/exec" style="margin-top:6px;font-size:11px">
+          <div class="toolbar"><button class="btn btn-ghost" id="btnSaveUrl" style="font-size:11.5px;padding:5px 10px">儲存到此瀏覽器</button><button class="btn btn-ghost" id="btnPing" style="font-size:11.5px;padding:5px 10px">測試連線</button></div>
+          <p style="margin-top:6px">正式設定請改各頁 <code>&lt;meta name="cc-cloud-url"&gt;</code>；這裡只覆寫本機。</p>
+        </details>
+      </div>
+      <div class="card noprint">
+        <h2>🧑‍🏫 教師儀表板 <span class="en">Pre-survey Console</span></h2>
+        <p class="sub">把學生交來的回覆碼整段貼進來（可一次貼整個 LINE 對話），或匯入 JSON／CSV。</p>
+        <label class="fld" for="codeIn">貼上回覆碼 / JSON / CSV</label>
+        <textarea id="codeIn" class="mono" rows="6" placeholder="PS1.eyJ2IjoyLC…&#10;PS1.eyJ2IjoyLC…"></textarea>
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btnAdd">➕ 加入</button>
+          <button class="btn btn-ghost" id="btnFile">📂 讀取檔案</button>
+          <input type="file" id="fileIn" accept=".json,.csv,.txt" multiple style="display:none">
+        </div>
+        <div class="drop" id="drop">或把 JSON／CSV 檔拖到這裡</div>
+        <div class="msg" id="inMsg"></div>
+        <label class="fld" for="clsSel">檢視班級</label>
+        <select id="clsSel"><option value="">全部班級</option></select>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="btnDemo">🧪 載入示範資料（40 筆）</button>
+          <button class="btn btn-err" id="btnReset">🗑 清空</button>
+        </div>
+        <p class="hint">・同裝置作答的學生紀錄會自動納入。<br>・同學號同階段重複時取最新一筆。<br>・未設定雲端時資料只在你的瀏覽器。</p>
+        <label class="fld">學生作答連結</label>
+        <div class="code" style="font-size:11px;font-family:var(--mono);word-break:break-all;background:var(--soft);border-radius:8px;padding:8px" id="linkBox"></div>
+        <div class="toolbar"><button class="btn btn-ghost" id="btnLinkPre">📎 複製課前連結</button><button class="btn btn-ghost" id="btnLinkPost">📎 複製期末複測連結</button></div>
+      </div>
+    </div>
+
+    <!-- ===== 右：結果 ===== -->
+    <div id="out">
+      <div class="card empty" id="emptyCard">
+        <h2 style="justify-content:center">還沒有資料</h2>
+        <p class="sub">左側貼入回覆碼，或先按「載入示範資料」看看儀表板長什麼樣子。</p>
+      </div>
+      <div id="dash" style="display:none">
+        <div class="sticky-tb noprint">
+          <button class="btn btn-ghost" id="btnJson">⬇️ 匯出 JSON</button>
+          <button class="btn btn-ghost" id="btnCsv">⬇️ 匯出 CSV（含向度分數與分群）</button>
+          <button class="btn btn-ghost" id="btnPrint">🖨 列印 / 存 PDF</button>
+          <button class="btn btn-primary" id="btnStats">📈 帶到統計工作台（T＋C 前後測）→</button>
+        </div>
+
+        <div class="card">
+          <h2>總覽 <span class="en" id="scopeName"></span></h2>
+          <div class="kpis" id="kpis"></div>
+          <div class="mode" id="mode"></div>
+          <div class="interp" id="interp"></div>
+        </div>
+
+        <div class="card">
+          <h2>五向度平均 <span class="en">0–100</span></h2>
+          <div class="bars" id="dimBars"></div>
+          <h2 style="margin-top:16px;font-size:14px">各班準備度</h2>
+          <div style="overflow-x:auto"><table class="data" id="clsTable"></table></div>
+        </div>
+
+        <div class="card">
+          <h2>具體建議 <span class="en">12 條判準</span></h2>
+          <ul class="hits" id="hits"></ul>
+        </div>
+
+        <div class="card" id="weekCard">
+          <h2>18 週逐週進度調整 <span class="en" id="weekScope"></span></h2>
+          <p class="sub" id="weekHint"></p>
+          <div style="overflow-x:auto"><table class="data weeks" id="weekTable"></table></div>
+        </div>
+
+        <div class="card">
+          <h2>有正解題答對率 <span class="en">T 運算思維・C 電腦常識</span></h2>
+          <div class="cr" id="correct"></div>
+          <p class="hint">紅 &lt; 50%・橘 50–74%・綠 ≥ 75%。低於 50% 的題目對應的概念建議在前 4 週優先處理。</p>
+        </div>
+
+        <div class="card">
+          <h2>學習偏好與 AI 使用分布</h2>
+          <div class="qgrid" id="prefGrid"></div>
+        </div>
+
+        <div class="card">
+          <h2>所有題目分布</h2>
+          <div class="qgrid" id="allGrid"></div>
+        </div>
+
+        <div class="card">
+          <h2>學生期望與擔心 <span class="en" id="expN"></span></h2>
+          <ul class="exp" id="expList"></ul>
+        </div>
+
+        <div class="card" id="crossCard" style="display:none">
+          <h2>跨評量對照 <span class="en">同一學號在雲端的其他評量</span></h2>
+          <p class="sub">課前準備度與後續 4C 評量、即時測驗、期末考的平均得分率並列；只顯示雲端有資料的項目。</p>
+          <div style="overflow-x:auto"><table class="data" id="crossTable"></table></div>
+          <p class="hint" id="crossHint"></p>
+        </div>
+
+        <div class="card">
+          <h2>逐人清單 <span class="en" id="listN"></span></h2>
+          <div style="overflow-x:auto"><table class="data" id="stuTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">國立屏東科技大學 資訊管理系 · AI 賦能教學 Hub · 課前評量教師儀表板 v2</footer>
+</main>
+
+<script src="assets/presurvey-questions.js?v=20260831"></script>
+<script src="assets/stats-engine.js"></script>
+<script src="assets/cloud.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var records=[];
+
+function msg(t,c){ var m=$("inMsg"); m.textContent=t; m.className="msg show "+c; }
+function load(){ try{ records=JSON.parse(localStorage.getItem(PS.TEACHER_KEY)||"[]"); }catch(e){ records=[]; }
+  try{ var own=JSON.parse(localStorage.getItem(PS.STORE_KEY)||"[]"); merge(own); }catch(e){} }
+function save(){ try{ localStorage.setItem(PS.TEACHER_KEY,JSON.stringify(records)); }catch(e){} }
+/* 同 sid+stage 取最新 */
+function merge(list){
+  var added=0;
+  list.forEach(function(r){
+    if(!r||!r.ans||!r.sid) return;
+    r.stage=r.stage||"pre";
+    var i=records.findIndex(function(x){return x.sid===r.sid&&(x.stage||"pre")===r.stage&&(x.cls||"")===(r.cls||"");});
+    if(i<0){ records.push(r); added++; }
+    else if(String(r.ts||"")>=String(records[i].ts||"")){ records[i]=r; }
+  });
+  return added;
+}
+function ingest(text){
+  var list=[], codes=PS.extractCodes(text), bad=0;
+  codes.forEach(function(c){ try{ list.push(PS.decodeResponse(c)); }catch(e){ bad++; } });
+  if(!codes.length){
+    var t=text.trim();
+    if(t[0]==="["||t[0]==="{"){ try{ var j=JSON.parse(t); list=Array.isArray(j)?j:[j]; }catch(e){ msg("JSON 解析失敗："+e.message,"err"); return; } }
+    else if(t){ list=PS.fromCSV(t); }
+  }
+  if(!list.length){ msg("找不到任何回覆碼或紀錄。","err"); return; }
+  var added=merge(list); save(); render();
+  msg("✓ 讀到 "+list.length+" 筆，新增 "+added+" 筆，更新 "+(list.length-added-bad)+" 筆"+(bad?("，"+bad+" 筆回覆碼損毀"):"")+"。目前共 "+records.length+" 筆。",bad?"warn":"ok");
+  $("codeIn").value="";
+}
+
+/* ---------- 渲染 ---------- */
+function scope(){ var c=$("clsSel").value; return c?records.filter(function(r){return r.cls===c;}):records; }
+function refreshClassSel(){
+  var cur=$("clsSel").value, set={}; records.forEach(function(r){ set[r.cls||"未填"]=1; });
+  $("clsSel").innerHTML='<option value="">全部班級</option>'+Object.keys(set).sort().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join("");
+  $("clsSel").value=cur;
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function pct(a,b){ return b?Math.round(a/b*100):0; }
+
+function render(){
+  refreshClassSel();
+  var pre=scope().filter(function(r){return (r.stage||"pre")==="pre";});
+  if(!records.length){ $("emptyCard").style.display="block"; $("dash").style.display="none"; return; }
+  $("emptyCard").style.display="none"; $("dash").style.display="block";
+  var s=PS.aggregate(pre), cls=$("clsSel").value;
+  $("scopeName").textContent=(cls||"全部班級")+"・課前作答 "+s.n+" 份"+(scope().length-pre.length?("・期末複測 "+(scope().length-pre.length)+" 份"):"");
+
+  var L=PS.LEVELS;
+  $("kpis").innerHTML=
+    '<div class="kpi"><b>'+s.n+'</b><span>有效作答</span></div>'+
+    '<div class="kpi"><b>'+s.R.mean+'</b><span>準備度 R 平均</span></div>'+
+    '<div class="kpi"><b>'+s.R.sd+'</b><span>標準差</span></div>'+
+    ["starter","steady","advanced"].map(function(k){ return '<div class="kpi lv" style="--c:'+L[k].color+'"><b>'+s.levelPct[k]+'%</b><span>'+L[k].name+'（'+s.levelCnt[k]+' 人）</span></div>'; }).join("");
+  var agreed=s.scored.filter(function(x){return consensusSids[x.rec.sid+"|"+(x.rec.cls||"")];}).length;
+  $("mode").innerHTML='<div class="n">建議教學模式<br>'+s.modeInfo.name+'</div><p>'+s.modeInfo.desc+(Object.keys(consensusSids).length?'<br><b style="color:var(--ok)">🤝 師生共識：'+agreed+' / '+s.n+' 位學生已確認看過上課方式</b>':'')+'</p>';
+  $("interp").textContent=s.interpretation;
+
+  $("dimBars").innerHTML=PS.DIMS.filter(function(d){return d.weight;}).map(function(d){
+    return '<div class="bar" style="--c:'+d.color+'"><span>'+d.name+' <small style="color:var(--muted)">'+Math.round(d.weight*100)+'%</small></span><div class="tr"><i style="width:'+s.dimMean[d.key]+'%"></i></div><b>'+s.dimMean[d.key]+'</b></div>';
+  }).join("");
+
+  var all=PS.aggregate(records.filter(function(r){return (r.stage||"pre")==="pre";}));
+  var ct='<thead><tr><th>班級</th><th class="num">人數</th><th class="num">R 平均</th><th class="num">SD</th><th class="num">起步</th><th class="num">穩健</th><th class="num">進階</th></tr></thead><tbody>';
+  Object.keys(all.byClass).sort().forEach(function(c){ var b=all.byClass[c];
+    ct+='<tr'+(c===cls?' style="background:var(--accent-soft)"':'')+'><td><b>'+esc(c)+'</b></td><td class="num">'+b.n+'</td><td class="num">'+b.mean+'</td><td class="num">'+b.sd+'</td><td class="num">'+pct(b.lv.starter,b.n)+'%</td><td class="num">'+pct(b.lv.steady,b.n)+'%</td><td class="num">'+pct(b.lv.advanced,b.n)+'%</td></tr>'; });
+  $("clsTable").innerHTML=ct+"</tbody>";
+
+  $("hits").innerHTML=s.hits.length?s.hits.map(function(h){return '<li><b>'+h.id+'</b>'+esc(h.text)+'</li>';}).join(""):'<li class="ok">未觸發任何判準——依標準節奏進行即可。</li>';
+
+  $("weekScope").textContent=cls||"全部班級";
+  $("weekHint").textContent=cls?"依「"+cls+"」觸發的判準自動調整；未標示者維持原進度。":"選單選取單一班級可得到該班專屬調整；目前顯示全體合併結果。";
+  var wt='<thead><tr><th class="num">週</th><th>基準進度</th><th>依判準調整</th></tr></thead><tbody>';
+  s.weekly.forEach(function(w){ wt+='<tr><td class="num">'+w.w+'</td><td>'+w.base+'</td><td class="adj">'+(w.adj.length?esc(w.adj.join("；")):'<span style="color:var(--dim);font-weight:400">—</span>')+'</td></tr>'; });
+  $("weekTable").innerHTML=wt+"</tbody>";
+
+  $("correct").innerHTML=PS.ANSWER_ITEMS.map(function(q){ var c=s.correct[q.id], k=c<50?"r":c<75?"o":"g";
+    return '<div class="'+k+'" title="'+esc(q.text)+'"><b>'+c+'%</b>'+q.id+'　'+esc(q.text.slice(0,22))+'…</div>'; }).join("");
+
+  $("prefGrid").innerHTML=PS.QUESTIONS.filter(function(q){return (q.dim==="L"||q.dim==="A")&&q.type!=="text";}).map(function(q){return qbox(q,s);}).join("");
+  $("allGrid").innerHTML=PS.QUESTIONS.filter(function(q){return q.type!=="text";}).map(function(q){return qbox(q,s);}).join("");
+
+  var exp=s.dist.L4||[]; $("expN").textContent=exp.length+" 則";
+  $("expList").innerHTML=exp.length?exp.map(function(t){return "<li>"+esc(t)+"</li>";}).join(""):"<li>尚無填答</li>";
+
+  renderCross(s);
+  $("listN").textContent=s.n+" 人";
+  var st='<thead><tr><th>學號後4碼</th><th>班級</th><th class="num">D</th><th class="num">H</th><th class="num">T</th><th class="num">C</th><th class="num">A</th><th class="num">R</th><th>分群</th><th>作答時間</th></tr></thead><tbody>';
+  s.scored.slice().sort(function(a,b){return (b.score.R||0)-(a.score.R||0);}).forEach(function(x){ var d=x.score.dims, Lv=L[x.score.level];
+    st+='<tr><td><b>'+esc(x.rec.sid)+'</b></td><td class="sm">'+esc(x.rec.cls||"")+'</td>'+["D","H","T","C","A"].map(function(k){return '<td class="num">'+(d[k]===null||d[k]===undefined?"—":d[k])+'</td>';}).join("")+
+      '<td class="num"><b>'+(x.score.R===null?"—":x.score.R)+'</b></td><td><span class="tag lv" style="background:'+Lv.color+'">'+Lv.name+'</span></td><td class="sm">'+esc(String(x.rec.ts||"").replace("T"," "))+'</td></tr>'; });
+  $("stuTable").innerHTML=st+"</tbody>";
+}
+function qbox(q,s){
+  var d=s.dist[q.id]; if(!d) return "";
+  var labels=q.type==="scale"?q.labels.map(function(l,i){return (q.min+i)+" "+l;}):q.opts;
+  var h='<div class="qb"><div class="t"><small>'+q.id+'</small>'+esc(q.text)+'</div>';
+  labels.forEach(function(l,i){ var p=pct(d.counts[i],d.n), isAns=q.answer===i;
+    h+='<div class="row'+(isAns?" ans":"")+'"><span title="'+esc(l)+'">'+esc(l.length>26?l.slice(0,25)+"…":l)+(isAns?" ✓":"")+'</span><div class="tr"><i style="width:'+p+'%"></i></div><span>'+p+'%</span></div>'; });
+  return h+'<div class="hint" style="margin-top:4px">n='+d.n+(q.type==="multi"?"・複選，比例為勾選率":"")+'</div></div>';
+}
+
+/* ---------- 匯出 ---------- */
+function dl(name,content,type){ var b=new Blob([content],{type:type}), u=URL.createObjectURL(b), a=document.createElement("a"); a.href=u; a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(u);a.remove();},0); }
+$("btnJson").addEventListener("click",function(){ dl("presurvey_"+stamp()+".json",JSON.stringify(scope(),null,1),"application/json"); });
+$("btnCsv").addEventListener("click",function(){ dl("presurvey_"+stamp()+".csv",PS.toCSV(scope()),"text/csv;charset=utf-8"); });
+$("btnPrint").addEventListener("click",function(){ window.print(); });
+$("btnStats").addEventListener("click",function(){
+  var recs=PS.toStatsRecords(scope());
+  try{ localStorage.setItem(AE.DATASET_KEY,JSON.stringify({savedAt:new Date().toISOString(),schemeKey:"presurvey",raw:JSON.stringify(recs)})); }catch(e){}
+  location.href="stats.html#from-presurvey";
+});
+function stamp(){ return new Date().toISOString().slice(0,10); }
+
+/* ---------- 輸入 ---------- */
+$("btnAdd").addEventListener("click",function(){ ingest($("codeIn").value); });
+$("btnFile").addEventListener("click",function(){ $("fileIn").click(); });
+$("fileIn").addEventListener("change",function(e){ Array.prototype.forEach.call(e.target.files,readFile); e.target.value=""; });
+function readFile(f){ var rd=new FileReader(); rd.onload=function(){ ingest(rd.result); }; rd.readAsText(f,"utf-8"); }
+var drop=$("drop");
+["dragenter","dragover"].forEach(function(ev){ drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add("over");}); });
+["dragleave","drop"].forEach(function(ev){ drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove("over");}); });
+drop.addEventListener("drop",function(e){ Array.prototype.forEach.call(e.dataTransfer.files,readFile); });
+$("btnDemo").addEventListener("click",function(){ var a=merge(PS.demoData()); save(); render(); msg("✓ 已載入示範資料（新增 "+a+" 筆）。示範資料與真實資料混在一起時請先「清空」。","ok"); });
+$("btnReset").addEventListener("click",function(){ if(!confirm("清空儀表板所有資料？（學生端的本機紀錄不受影響）")) return; records=[]; save(); render(); msg("已清空。","ok"); });
+$("clsSel").addEventListener("change",render);
+
+var base=location.href.replace(/[^/]*$/,"")+"presurvey.html";
+$("linkBox").textContent=base;
+function copy(t,label){ var ok=function(){ msg("已複製"+label+"連結。","ok"); }; if(navigator.clipboard) navigator.clipboard.writeText(t).then(ok,function(){ prompt("請手動複製：",t); }); else prompt("請手動複製：",t); }
+$("btnLinkPre").addEventListener("click",function(){ copy(base,"課前評量"); });
+$("btnLinkPost").addEventListener("click",function(){ copy(base+"?stage=post","期末複測"); });
+
+/* ---------- 雲端 ---------- */
+var cloudOthers={};   // sid → {kind:{n,pct}}
+var consensusSids={};
+function cmsg(t,c){ var m=$("cloudMsg"); m.textContent=t; m.className="msg show "+c; }
+function cloudState(){
+  var st=$("cloudState");
+  if(!AECloud.ready()){ st.textContent="未設定（本機模式）"; st.style.color="var(--warn)"; return; }
+  st.textContent="已設定"; st.style.color="var(--ok)";
+}
+$("tcode").value="";
+$("cloudUrl").value=(function(){ try{return localStorage.getItem("ae.cloud.url")||"";}catch(e){return "";} })();
+$("btnSaveUrl").addEventListener("click",function(){ AECloud.setUrl($("cloudUrl").value); cloudState(); cmsg("已儲存雲端網址到此瀏覽器。","ok"); });
+$("btnPing").addEventListener("click",function(){ AECloud.ping().then(function(j){ cmsg("連線正常。工作表："+(j.kinds||[]).map(function(k){return k.kind+"("+k.n+")";}).join("、"),"ok"); }).catch(function(e){ cmsg("連線失敗："+e.message,"err"); }); });
+function fromCloud(r){
+  var d=r.detail||{}; if(!d.ans) return null;
+  return { v:d.v||PS.VERSION, sid:String(r.sid), cls:r.cls||"", stage:d.stage||"pre", ts:String(r.ts||"").slice(0,19), ans:d.ans, cloudId:r.id };
+}
+function pull(silent){
+  var code=$("tcode").value.trim()||AECloud.teacherCode(); if($("tcode").value.trim()) AECloud.teacherCode(code);
+  if(!AECloud.ready()){ cmsg("尚未設定雲端網址：請在「進階」貼上 Apps Script /exec 網址，或改各頁 meta。","warn"); return; }
+  if(!code){ cmsg("請輸入教師碼。","warn"); return; }
+  if(!silent) cmsg("讀取中…","warn");
+  AECloud.pull("",code,{incremental:true,reset:!silent}).then(function(list){
+    var mine=list.filter(function(r){return r.kind==="presurvey";}).map(fromCloud).filter(Boolean);
+    var added=merge(mine); save();
+    cloudOthers={};
+    consensusSids={}; list.filter(function(r){return r.kind==="consensus";}).forEach(function(r){ consensusSids[String(r.sid)+"|"+(r.cls||"")]=1; });
+    list.filter(function(r){return r.kind!=="presurvey"&&r.kind!=="consensus";}).forEach(function(r){
+      var sid=String(r.sid||""); if(!sid) return;
+      var o=cloudOthers[sid]=cloudOthers[sid]||{};
+      var k=o[r.kind]=o[r.kind]||{n:0,sum:0,pct:null};
+      k.n++; var sc=Number(r.score), mx=Number(r.max);
+      if(!isNaN(sc)&&mx>0){ k.sum+=sc/mx*100; k.pct=Math.round(k.sum/k.n); }
+    });
+    render();
+    cmsg("✓ "+new Date().toLocaleTimeString()+(list.incremental?"（增量 +"+list.added+"）":"")+" 雲端共 "+list.length+" 筆，課前評量 "+mine.length+" 筆（新增 "+added+"），共識確認 "+Object.keys(consensusSids).length+" 筆，其他評量 "+list.filter(function(r){return r.kind!=="presurvey"&&r.kind!=="consensus";}).length+" 筆。","ok");
+  }).catch(function(e){ cmsg("讀取失敗："+e.message+(e.message.indexOf("code")>=0?"（教師碼錯誤）":""),"err"); });
+}
+$("btnPull").addEventListener("click",function(){ pull(false); });
+var timer=null;
+$("autoRefresh").addEventListener("change",function(){ if(timer){clearInterval(timer);timer=null;} if(this.checked){ pull(true); timer=setInterval(function(){pull(true);},15000); } });
+function renderCross(s){
+  var kinds={}; Object.keys(cloudOthers).forEach(function(sid){ Object.keys(cloudOthers[sid]).forEach(function(k){kinds[k]=1;}); });
+  var ks=Object.keys(kinds).sort();
+  if(!ks.length){ $("crossCard").style.display="none"; return; }
+  $("crossCard").style.display="block";
+  var KN={assess4c:"4C 評量",quiz:"即時測驗",exam:"期末考",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"問卷",progress:"進度"};
+  var h='<thead><tr><th>學號</th><th>班級</th><th class="num">課前 R</th><th>分群</th>'+ks.map(function(k){return '<th class="num">'+(KN[k]||k)+'<br><small>平均得分率（筆數）</small></th>';}).join("")+'</tr></thead><tbody>';
+  var rows=0, pairs=[];
+  s.scored.forEach(function(x){ var o=cloudOthers[x.rec.sid]; if(!o) return; rows++;
+    h+='<tr><td><b>'+esc(x.rec.sid)+'</b></td><td class="sm">'+esc(x.rec.cls||"")+'</td><td class="num">'+(x.score.R===null?"—":x.score.R)+'</td><td><span class="tag lv" style="background:'+PS.LEVELS[x.score.level].color+'">'+PS.LEVELS[x.score.level].name+'</span></td>'+
+      ks.map(function(k){ var v=o[k]; if(v&&v.pct!==null&&x.score.R!==null) pairs.push([x.score.R,v.pct,k]); return '<td class="num">'+(v?((v.pct===null?"—":v.pct+"%")+" <small>("+v.n+")</small>"):"—")+'</td>'; }).join("")+'</tr>'; });
+  $("crossTable").innerHTML=h+"</tbody>";
+  var txt=rows?"課前評量與雲端其他評量可配對 "+rows+" 人。":"目前雲端其他評量的學號與課前評量尚無重疊。";
+  ks.forEach(function(k){ var ps=pairs.filter(function(p){return p[2]===k;}); if(ps.length>=5){ var r=AE.pearson?AE.pearson(ps.map(function(p){return p[0];}),ps.map(function(p){return p[1];})):corr(ps); txt+="　課前 R 與"+(KN[k]||k)+"得分率相關 r = "+r.toFixed(2)+"（n="+ps.length+"）"+(Math.abs(r)>=.5?"，起點預測力強，建議分層。":Math.abs(r)>=.3?"，中度相關。":"，相關弱：後續表現主要由教學歷程決定。"); } });
+  $("crossHint").textContent=txt;
+}
+function corr(ps){ var n=ps.length,mx=0,my=0; ps.forEach(function(p){mx+=p[0];my+=p[1];}); mx/=n; my/=n; var sxy=0,sxx=0,syy=0; ps.forEach(function(p){sxy+=(p[0]-mx)*(p[1]-my);sxx+=(p[0]-mx)*(p[0]-mx);syy+=(p[1]-my)*(p[1]-my);}); return sxx&&syy?sxy/Math.sqrt(sxx*syy):0; }
+
+load(); cloudState(); render();
+if(AECloud.ready()&&AECloud.teacherCode()) pull(true);
+})();
+</script>
+</body>
+</html>

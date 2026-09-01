@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>操作手冊｜AI 賦能教學 Hub</title>
+<meta name="description" content="AI 賦能教學 Hub 平台操作教學手冊網頁版：學生操作與教師研究者應用，含實際畫面截圖與常見問題。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/manual.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作手冊｜AI 賦能教學 Hub">
+<meta property="og:description" content="學生操作 × 教師研究者應用，含截圖與 FAQ。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+.mlayout{display:grid;grid-template-columns:230px 1fr;gap:24px;align-items:start;margin-top:18px}
+@media(max-width:860px){.mlayout{grid-template-columns:1fr}}
+.mtoc{position:sticky;top:66px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;font-size:12.5px}
+.mtoc b{display:block;color:var(--primary);margin-bottom:8px;font-size:13px}
+.mtoc a{display:block;padding:4px 0;color:var(--muted);font-weight:600}
+.mtoc a:hover{color:var(--primary)}
+.mtoc a.sub{padding-left:14px;font-weight:500;font-size:12px}
+@media(max-width:860px){.mtoc{position:static}}
+.mbody{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 30px;line-height:1.8;font-size:13.5px}
+.mbody h1{font-size:22px;color:var(--primary);margin-bottom:6px}
+.mbody h2{font-size:17px;color:var(--primary);margin:30px 0 10px;padding-top:14px;border-top:1px solid var(--line);scroll-margin-top:70px}
+.mbody h2:first-of-type{border-top:0;margin-top:14px}
+.mbody h3{font-size:14.5px;color:var(--accent);margin:18px 0 8px;scroll-margin-top:70px}
+.mbody p{margin-bottom:10px}
+.mbody ol,.mbody ul{margin:0 0 12px 22px}
+.mbody li{margin-bottom:6px}
+.mbody img{max-width:100%;border-radius:10px;border:1px solid var(--line);box-shadow:var(--shadow);margin:10px 0 4px}
+.mbody .cap{font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:16px}
+.mbody table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0 16px}
+.mbody th{background:var(--soft);color:var(--primary);text-align:left;padding:7px 10px;border-bottom:2px solid var(--line)}
+.mbody td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tip{border-left:4px solid var(--accent);background:#EFF6FF;border-radius:8px;padding:10px 14px;font-size:12.5px;margin:12px 0}
+.tip.warn{border-left-color:var(--warn);background:var(--warn-bg)}
+.topbtn{position:fixed;right:18px;bottom:18px;z-index:50;background:var(--primary);color:#fff;border:0;
+  border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;box-shadow:var(--shadow-lg);
+  opacity:0;pointer-events:none;transition:.25s}
+.topbtn.show{opacity:1;pointer-events:auto}
+@media print{.mtoc,.topbtn,.topnav,video,#video,#video+p,#video~h3{display:none}.mlayout{grid-template-columns:1fr}.mbody{box-shadow:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a><a href='/console'>教師工作台</a>
+      
+      <a aria-current='page' href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="mlayout">
+    <nav class="mtoc noprint" aria-label="手冊目錄">
+      <b>📖 目錄</b>
+      <a href="#video">🎬 教學影片</a>
+      <a href="#s1">1　平台總覽</a>
+      <a href="#s2">2　學生篇</a>
+      <a class="sub" href="#s21">2.1 IOC 課程模擬</a>
+      <a class="sub" href="#s22">2.2 做專題</a>
+      <a class="sub" href="#s23">2.3 4C 評量</a>
+      <a class="sub" href="#s24">2.4 課前評量</a>
+      <a href="#s3">3　統計分析</a>
+      <a class="sub" href="#s31">3.1 課前評量儀表板</a>
+      <a class="sub" href="#s32">3.2 教師總覽（全平台）</a>
+      <a href="#s4">4　論文生成（HOTL）</a>
+      <a href="#s5">5　常見問題</a>
+      <a style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px" href="javascript:window.print()">🖨 列印 / 存 PDF</a>
+    </nav>
+
+    <article class="mbody">
+      <h1>平台操作教學手冊</h1>
+      <p style="color:var(--muted);font-size:12.5px">學生操作 × 教師研究者應用（網頁版）　·　v1.2　·　國立屏東科技大學 資訊管理系</p>
+
+      <h2 id="video">🎬 教學影片</h2>
+      <p>三分鐘看完四大功能實際操作。中文旁白版與英文旁白（中文字幕）版內容相同，擇一觀看即可。</p>
+      <h3>中文旁白版（3 分 04 秒）</h3>
+      <video controls preload="metadata" poster="assets/img/video-poster.jpg" style="width:100%;border-radius:10px;box-shadow:var(--shadow)">
+        <source src="assets/video/tutorial-zh.mp4" type="video/mp4">
+        您的瀏覽器不支援影片播放，請<a href="assets/video/tutorial-zh.mp4" style="color:var(--accent)">下載觀看</a>。
+      </video>
+      <p class="cap">入口導覽 → 專題製作 → IOC 課程 → 統計分析 → 論文生成（HOTL 全流程）</p>
+      <h3>英文旁白＋中文字幕版（2 分 08 秒）</h3>
+      <video controls preload="metadata" poster="assets/img/video-poster.jpg" style="width:100%;border-radius:10px;box-shadow:var(--shadow)">
+        <source src="assets/video/tutorial-en.mp4" type="video/mp4">
+        您的瀏覽器不支援影片播放，請<a href="assets/video/tutorial-en.mp4" style="color:var(--accent)">下載觀看</a>。
+      </video>
+      <p class="cap">English narration with Traditional Chinese subtitles — for international audiences</p>
+
+      <h2 id="s1">1　平台總覽</h2>
+      <p>AI 賦能教學 Hub 是四合一的教學研究平台：專題創作與課程模擬產生學習數據，統計分析把數據算清楚，論文生成器把結果寫成可投稿的草稿。整個迴圈在瀏覽器內完成——零後端、免安裝、可離線；所有資料只存在你自己的裝置，除非主動匯出不會離開電腦。</p>
+      <table>
+        <tr><th>頁面</th><th>用途</th><th>主要對象</th></tr>
+        <tr><td><a href="./" style="color:var(--accent)">入口</a></td><td>總覽與導流：連接所有教學平台</td><td>所有人</td></tr>
+        <tr><td><a href='/ioc' style='color:var(--accent)'>IOC 課程</a></td><td>計算機概論模擬平台（12 模組）</td><td>學生</td></tr>
+        <tr><td><a href='/presurvey' style='color:var(--accent)'>課前評量</a></td><td>27 題六向度起點調查＋教師儀表板</td><td>學生／教師</td></tr>
+        <tr><td><a href='/stats' style='color:var(--accent)'>統計分析</a></td><td>配對 t、效果量、信度、圖表</td><td>教師／研究者</td></tr>
+        <tr><td><a href='/paper' style='color:var(--accent)'>論文生成</a></td><td>七節論文草稿＋HOTL 審查</td><td>教師／研究者</td></tr>
+      </table>
+      <img src="assets/img/01-portal-hero.jpg" alt="入口首頁" loading="lazy">
+      <p class="cap">入口首頁：教學研究迴圈（專題創作 → 課程模擬 → 評量回饋 → 統計分析 → 論文生成）</p>
+      <div class="tip">💡 <b>建議書籤</b>：學生只需記住入口網址一個，其餘平台都能一鍵到達。</div>
+
+      <h2 id="s2">2　學生篇：日常學習操作</h2>
+      <h3 id="s21">2.1　進入 IOC 課程模擬平台</h3>
+      <ol>
+        <li>入口首頁點「IOC 計算機概論課程」區的「進入次頁」（或導覽列「IOC 課程」）。</li>
+        <li>上方 12 顆模組快速鍵：總覽、硬體、軟體、網路、封包流、3C 拆解、實作中心、虛擬組裝、即時評量、期中、期末考、AI 協作，點選即切換。</li>
+        <li>需要大畫面時點右上「全螢幕 ↗」。</li>
+      </ol>
+      <img src="assets/img/03-ioc.jpg" alt="IOC 次頁" loading="lazy">
+      <p class="cap">IOC 次頁：上方模組快速鍵，下方直接操作模擬平台</p>
+      <div class="tip warn">⚠ <b>請固定使用同一台裝置與同一個瀏覽器</b>：學習紀錄存在瀏覽器本機，換裝置不會自動同步。</div>
+
+      <h3 id="s22">2.2　做專題：AI 賦能學習平台</h3>
+      <ol>
+        <li>入口點「AI 賦能學習平台」開啟。</li>
+        <li>依左側五步驟：① 心智圖 → ② IPO 結構表 → ③ Python → ④ PPT → ⑤ 影音腳本。</li>
+        <li>需要 AI 協助時，先點側欄「⚙ 設定 AI 金鑰」（有免費方案清單）。</li>
+        <li>完成課程後填寫側欄「學習資源 → 學習後測問卷」（40 題）。</li>
+      </ol>
+      <p><b>IPO 工具組</b>：還沒寫程式 → 用「構想 → 架構」拆解器；已有程式 → 用「程式 → 模組」分析器。</p>
+
+      <h3 id="s23">2.3　填寫 4C 學習成效評量</h3>
+      <ol>
+        <li>入口點「4C 學習成效評量」。</li>
+        <li>填「學號後 4 碼」（前後測配對用）、選擇階段（前測／後測）。</li>
+        <li>完成 12 題核心素養＋4 題教學效能後送出。</li>
+      </ol>
+
+      <h3 id="s24">2.4　填寫課前評量（開學第一週）</h3>
+      <ol>
+        <li>入口點「課前評量 → 學生作答」（或老師給的連結）。</li>
+        <li>選班級、填學號後 4 碼，依序作答 27 題（約 8 分鐘；有正解的題目不會就憑直覺選，不計成績）。</li>
+        <li>送出後作答自動上傳雲端（老師端即時看到）；畫面上的 <code>PS1.</code> 回覆碼是備份，老師要求時再貼。</li>
+        <li>下方「你的起點」只給自己看；「給你的建議」用生活化的話說明接下來怎麼學；「全班現況與這學期的上課方式」是依全班即時資料產生的師生共識，看完勾「我看過了」。</li>
+      </ol>
+      <div class="tip">💡 期末老師會發「期末複測」連結（同一網址加 <code>?stage=post</code>），只做 11 題運算思維與電腦常識，用來和學期初比較。</div>
+
+      <h2 id="s3">3　教師研究者篇：統計分析工作台</h2>
+      <h3 id="s31">3.1　課前評量教師儀表板</h3>
+      <p>開啟<a href='/presurvey-teacher' style='color:var(--accent)'>教師儀表板</a>，把學生回覆碼整段貼入（可一次貼整個 LINE 對話，系統自動撈出所有 <code>PS1.</code> 碼），或匯入 JSON／CSV。同裝置作答的紀錄會自動納入。</p>
+      <table>
+        <tr><th>區塊</th><th>內容</th></tr>
+        <tr><td>總覽</td><td>人數、準備度 R 平均與 SD、起步／穩健／進階三群比例、建議教學模式（基礎鞏固／分層差異化／加速專題／標準節奏）與總體解釋</td></tr>
+        <tr><td>具體建議</td><td>依 12 條判準自動觸發（例：無程式經驗 ≥ 50% → Python 前加 1 週積木式；照單全收 AI ≥ 30% → 加「抓 AI 錯誤」活動）</td></tr>
+        <tr><td>18 週逐週調整</td><td>左側選單選取單一班級，即顯示該班的逐週進度調整建議</td></tr>
+        <tr><td>答對率</td><td>11 題有正解題紅橘綠燈；&lt; 50% 的概念建議前 4 週優先處理</td></tr>
+        <tr><td>分布與清單</td><td>學習偏好、AI 使用、所有題目分布、學生期望、逐人向度分數與分群</td></tr>
+      </table>
+      <p>匯出：JSON（原始作答）、CSV（含向度分數與分群）、列印。按「📈 帶到統計工作台」會把 T＋C 共 11 題（答對=1）連同期末複測資料交給統計工作台做前後測配對 t 檢定。</p>
+      <h3>雲端資料庫（與其他評量同一份試算表）</h3>
+      <p>學生送出後會自動以統一記錄模型（<code>kind=presurvey</code>）寫入 Google 試算表；儀表板輸入教師碼按「⟳ 從雲端載入」即可拉回全班，勾「每 60 秒自動更新」可在課堂上即時看。雲端若同時有 4C 評量、即時測驗、期末考（<code>assess4c</code>／<code>quiz</code>／<code>exam</code>），會多出「跨評量對照」表：同一學號的課前準備度與後續得分率並列，並計算相關係數解讀起點的預測力。</p>
+      <p>學生端送出後也會直接看到「給你的建議」與「全班現況與這學期的上課方式」（去識別化的全班即時統計＋生活化的師生共識清單），勾選「我看過了」會回傳 <code>kind=consensus</code>，儀表板顯示已確認人數。</p>
+      <div class="tip">🔧 <b>啟用雲端</b>：開一份 Google 試算表 → 擴充功能 → Apps Script → 貼上 repo 的 <code>gas/Code.gs</code> → 填 <code>SHEET_ID</code>與 <code>TEACHER_CODE</code>（教師密碼，請自訂；教師工作台以此向雲端驗證） → 部署為網頁應用程式（任何人）→ 把 /exec 網址填進各頁 <code>&lt;meta name="cc-cloud-url"&gt;</code>。未填之前一切照舊存本機、排入佇列，填好後自動補送。</div>
+      <div class="tip warn">⚠ 「載入示範資料」會加入 40 筆虛構資料；正式使用前請先「清空」。</div>
+
+      <p>把 4C 評量（或任何前後測 Likert 資料）變成可發表等級的統計結果：自動配對、配對 t、Cohen’s dz（Hedges gz）、95% CI、Cronbach’s α 與比較圖。統計引擎已對照 SciPy 驗證（最大誤差 4.4×10⁻¹⁵）。</p>
+      <ol>
+        <li>從 4C 評量平台「前端資料區 → 匯出 JSON」取得檔案。</li>
+        <li>回到<a href='/stats' style='color:var(--accent)'>統計工作台</a>，把檔案<b>直接拖進頁面</b>或貼上內容，按「解析並分析」。</li>
+        <li>第一次可先按「🧪 示範資料」看輸出樣貌。</li>
+      </ol>
+      <img src="assets/img/05-stats-result.jpg" alt="統計結果" loading="lazy">
+      <p class="cap">分析結果：配對摘要、t 檢定表、信度與前後測比較圖</p>
+      <table>
+        <tr><th>欄位</th><th>判讀基準</th></tr>
+        <tr><td>p</td><td>p &lt; .05 顯著（* ** *** 對應 .05／.01／.001）</td></tr>
+        <tr><td>dz</td><td>0.2 小、0.5 中、0.8 大；小樣本引用 gz 更保守</td></tr>
+        <tr><td>Cronbach’s α</td><td>≥ .70 可接受，依施測階段分列</td></tr>
+      </table>
+      <p>配對失敗時，結果卡會列出「僅完成單次施測」的學號清單，可據此催收。分析完成後點「📝 帶著這份資料前往論文生成」，資料自動交接、免重複貼上。</p>
+
+      <h3 id="s32">3.2　教師工作台：總覽＋統計＋論文（單一頁面、密碼進入）</h3>
+      <p>開啟<a href='/console' style='color:var(--accent)'>教師工作台</a>，輸入教師密碼（由雲端驗證，不存於裝置）後有四個分頁：教師總覽、課前評量儀表板、統計分析、論文生成；右上顯示雲端連線狀態，「另開」可把目前分頁獨立開成新視窗。教師總覽（可 60 秒自動更新）把雲端裡所有平台的評量集中在一頁：</p>
+      <table>
+        <tr><th>區塊</th><th>內容</th></tr>
+        <tr><td>即時動態</td><td>今日筆數、本週活躍人數、14 天無活動人數、近 14 天每日作答圖、最新 40 筆動態</td></tr>
+        <tr><td>各平台 KPI</td><td>每種評量的平均得分率、筆數、人數、SD，附一段解讀</td></tr>
+        <tr><td>4C 前後測</td><td>雲端有 assess4c 前後測即自動算 paired t、dz、α，並交給統計工作台／論文生成</td></tr>
+        <tr><td>課前 → 期末複測</td><td>T＋C 11 題答對率的配對檢定</td></tr>
+        <tr><td>關聯與預測力</td><td>平台間 Pearson r 矩陣（同學號平均得分率）＋解讀</td></tr>
+        <tr><td>需關注學生</td><td>起步型且平時偏低／無紀錄、平時 &lt; 60%、14 天無活動</td></tr>
+        <tr><td>逐人矩陣</td><td>學號 × 平台，可排序、匯出 CSV</td></tr>
+        <tr><td>整合建議</td><td>依雲端目前有哪些 kind，列出各平台尚待接上的作法與送出格式</td></tr>
+      </table>
+      <div class="tip">💡 <b>其他平台一行接上</b>：舊站 <code>&lt;/body&gt;</code> 前加 <code>&lt;script src="https://ai-empower-hub.netlify.app/assets/bridge.js" data-app="ioc-sim"&gt;&lt;/script&gt;</code>。橋接會自動把 <code>CCLOUD.push</code>／<code>qadd</code>／<code>addRecord</code>／對舊 Apps Script 的送出轉成統一記錄鏡射到同一資料庫，原本行為不變；新程式可呼叫 <code>AEBridge.push({kind, score, max, detail})</code>。kind：assess4c／quiz／midterm／exam／repair／build／project／survey。</div>
+      <div class="tip">🪪 <b>共同身分</b>：入口頁「我是誰」小卡填一次學號後 4 碼＋班級（存在本機），課前評量自動帶入；從 Hub 連到舊站的連結會自動附 <code>?sid=&amp;cls=</code>，舊站的橋接腳本接收後同樣自動帶入，沒有身分時會彈出小卡請學生填。</div>
+
+      <h2 id="s4">4　教師研究者篇：HOTL 論文內文生成器</h2>
+      <p>把評量數據直接寫成<b>七節論文草稿</b>（題目關鍵詞、摘要、引言、方法、結果含表格、討論、結論），繁中／英文／IEEE 會議風格切換。<b>每一段都必須經你「採納／修改後採納／退回重生」才進入最終稿</b>——AI 起草、人把關，決策全程留痕。</p>
+      <img src="assets/img/09-paper-drafts.jpg" alt="論文草稿審查" loading="lazy">
+      <p class="cap">草稿佇列：結果節自動附統計表格，逐段審查</p>
+      <table>
+        <tr><th>動作</th><th>效果</th><th>快速鍵</th></tr>
+        <tr><td>✅ 採納</td><td>原文進入最終稿</td><td>A</td></tr>
+        <tr><td>✏️ 修改後採納</td><td>開編輯框改完存檔（記錄修改幅度）</td><td>E</td></tr>
+        <tr><td>↩️ 退回重生</td><td>填理由，AI 換寫法重生 V2、V3…</td><td>R</td></tr>
+      </table>
+      <p>快速鍵作用於<b>最上方的待審段落</b>；在輸入框內打字時不會觸發。進度自動存檔，重新整理不會遺失。</p>
+      <img src="assets/img/11-paper-dash.jpg" alt="HOTL 儀表板" loading="lazy">
+      <p class="cap">儀表板：生成數、採納率與平均修改幅度——監督紀錄本身就是 HOTL 研究資料</p>
+      <p>匯出：📋 複製全文、Markdown、Word (.doc)、<b>LaTeX（IEEEtran 骨架）</b>；監督日誌可另存 CSV／JSON。按「➕ 人機協作聲明」自動生成可放進論文的聲明段落。</p>
+
+      <h2 id="s5">5　常見問題</h2>
+      <table>
+        <tr><th style="width:32%">問題</th><th>解答</th></tr>
+        <tr><td>資料會上傳到伺服器嗎？</td><td>不會。零後端，一切存在你的瀏覽器；只有主動匯出才產生檔案。</td></tr>
+        <tr><td>換電腦後資料不見了？</td><td>資料綁定瀏覽器本機。換裝置前先匯出（CSV／Markdown／JSON），到新裝置重新貼入。</td></tr>
+        <tr><td>清除瀏覽紀錄會怎樣？</td><td>連同「網站資料」清除時，本機草稿與紀錄會消失，請養成隨手匯出的習慣。</td></tr>
+        <tr><td>統計數字可信嗎？</td><td>引擎已對照 SciPy 1.17 驗證，最大誤差 4.4×10⁻¹⁵（repo 內 tests/verify-stats.md）。</td></tr>
+        <tr><td>生成段落可直接投稿？</td><td>不建議——數字可信，文字須逐句確認潤飾，這正是 HOTL 流程的意義。文責在人。</td></tr>
+        <tr><td>前後測配對 0 人？</td><td>檢查兩階段學號是否一致、stage 是否為「前測／後測」，且至少 2 人完成前後測；結果卡的未配對名單可幫你追人。</td></tr>
+      </table>
+      <p style="color:var(--muted);font-size:12px;margin-top:20px">Word 版手冊與教學影片請洽課程公告；平台原始碼見 GitHub（pjkuo）。</p>
+    </article>
+  </div>
+  <footer class="footer">國立屏東科技大學 資訊管理系 · AI 賦能教學 Hub</footer>
+</main>
+<button class="topbtn" id="topbtn" aria-label="回到頂部" title="回到頂部">↑</button>
+<script>
+(function(){
+  var b=document.getElementById('topbtn');
+  addEventListener('scroll',function(){ b.classList.toggle('show',scrollY>500); },{passive:true});
+  b.addEventListener('click',function(){ scrollTo({top:0,behavior:'smooth'}); });
+})();
+</script>
+</body>
+</html>

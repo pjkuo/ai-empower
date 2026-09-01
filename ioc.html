@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IOC 課程模擬｜AI 賦能教學 Hub</title>
+<meta name="description" content="計算機概論模擬平台：硬體・軟體・網路三軸互動模擬、3C 拆解、虛擬組裝、即時評量與期末考，12 個模組一鍵直達。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/ioc.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="IOC 課程模擬｜AI 賦能教學 Hub">
+<meta property="og:description" content="硬體・軟體・網路三軸互動模擬，12 個模組一鍵直達。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+body{display:flex;flex-direction:column;min-height:100vh}
+.chipbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:52px;z-index:30}
+.chipbar .wrap{display:flex;align-items:center;gap:6px;padding:8px 18px;flex-wrap:wrap}
+.chipbar .lab{font-size:11.5px;font-weight:800;color:var(--muted);margin-right:4px;white-space:nowrap}
+.chip{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--line);
+  background:#fff;color:var(--ink);cursor:pointer;transition:.14s;font-family:inherit}
+.chip:hover{border-color:var(--accent);color:var(--primary)}
+.chip.on{background:var(--primary);color:#fff;border-color:transparent}
+.chipbar .spacer{flex:1}
+.chipbar .ext{font-size:11.5px;font-weight:700;color:var(--muted)}
+.chipbar .ext:hover{color:var(--primary)}
+/* 手機：模組列改單行橫向捲動，外部連結移到列尾一起捲 */
+@media(max-width:720px){
+  .chipbar .wrap{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;padding:8px 12px;scroll-snap-type:x proximity}
+  .chipbar .wrap::-webkit-scrollbar{display:none}
+  #chips{display:inline-flex;flex-wrap:nowrap;gap:6px}
+  .chip{flex:0 0 auto;scroll-snap-align:start}
+  .chipbar .lab{display:none}
+  .chipbar .spacer{flex:0 0 8px}
+  .chipbar .ext{flex:0 0 auto;white-space:nowrap}
+}
+.stage{flex:1;display:flex;min-height:0}
+.stage iframe{flex:1;width:100%;border:0;min-height:calc(100vh - 110px)}
+.fallback{margin:40px auto;max-width:520px;text-align:center;display:none}
+.loader{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;
+  justify-content:center;background:var(--bg);z-index:5;transition:opacity .4s}
+.loader.hide{opacity:0;pointer-events:none}
+.loader .spin{width:42px;height:42px;border:4px solid var(--line);border-top-color:var(--primary);
+  border-radius:50%;animation:sp 1s linear infinite}
+.loader p{font-size:13px;color:var(--muted);font-weight:700}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.loader .spin{animation:none}}
+.stage{position:relative}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span>
+    </a>
+    <div class="navlinks">
+      <a href="./">入口</a>
+      <a aria-current='page' href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a><a href='/console'>教師工作台</a>
+      
+      
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<div class="chipbar" aria-label="模組選單">
+  <div class="wrap">
+    <span class="lab">模組</span>
+    <span id="chips"></span>
+    <span class="spacer"></span>
+    <a class="ext" href="https://pjkuo.github.io/IOC-platform/" target="_blank" rel="noopener">課程總覽 ↗</a>
+    <a class="ext" href="https://pjkuo.github.io/IOC-platform/teacher.html" target="_blank" rel="noopener">教師版 ↗</a>
+    <a class="ext" href="https://pjkuo.github.io/IOC-platform/student.html" target="_blank" rel="noopener" title="在新分頁開啟完整版">全螢幕 ↗</a>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="loader" id="loader" aria-hidden="true"><div class="spin"></div><p>模擬平台載入中…</p></div>
+  <iframe id="sim" title="計算機概論模擬平台（學生版）"
+          src="https://pjkuo.github.io/IOC-platform/student.html"
+          allow="fullscreen"></iframe>
+</div>
+<div class="fallback card" id="fb">
+  <h2>模擬平台載入中…</h2>
+  <p class="sub">若長時間沒有出現內容，可能是網路受限或嵌入被阻擋，請改用
+    <a href="https://pjkuo.github.io/IOC-platform/student.html" style="color:var(--accent);font-weight:700">直接開啟完整版</a>。</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var MODULES=[
+    ["overview","總覽"],["hardware","硬體"],["software","軟體"],["network","網路"],
+    ["packetflow","封包流"],["repair","3C 拆解"],["lab-hub","實作中心"],["pcbuild","虛擬組裝"],
+    ["assess","即時評量"],["midterm","期中"],["exam","期末考"],["aicollab","AI 協作"]
+  ];
+  var BASE="https://pjkuo.github.io/IOC-platform/student.html";
+  var box=document.getElementById("chips"), iframe=document.getElementById("sim");
+  var current=(location.hash||"").replace(/^#/,"")||null;
+
+  MODULES.forEach(function(m){
+    var b=document.createElement("button");
+    b.className="chip"+(current===m[0]?" on":"");
+    b.type="button"; b.textContent=m[1]; b.dataset.key=m[0];
+    b.addEventListener("click",function(){ go(m[0]); });
+    box.appendChild(b);
+  });
+
+  function mark(key){
+    Array.prototype.forEach.call(box.children,function(c){
+      var on=c.dataset.key===key;
+      c.classList.toggle("on",on);
+      if(on&&c.scrollIntoView) try{ c.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}); }catch(e){}
+    });
+  }
+  function go(key){
+    mark(key);
+    try{ history.replaceState(null,"","#"+key); }catch(e){}
+    // 同源（都在 pjkuo.github.io）時直接改 iframe 的 hash，不重載整頁；
+    // 跨域或本機測試時退回重設 src。
+    try{ iframe.contentWindow.location.hash=key; }
+    catch(e){ iframe.src=BASE+"#"+key; }
+  }
+  window.addEventListener("hashchange",function(){
+    var k=(location.hash||"").replace(/^#/,"");
+    if(k) go(k);
+  });
+  if(current) iframe.src=BASE+"#"+current;
+
+  // 載入逾時提示
+  var loaded=false;
+  iframe.addEventListener("load",function(){
+    loaded=true;
+    var l=document.getElementById("loader");
+    if(l){ l.classList.add("hide"); setTimeout(function(){ l.remove(); },450); }
+  });
+  setTimeout(function(){
+    if(!loaded){
+      document.getElementById("fb").style.display="block";
+      var l=document.getElementById("loader");
+      if(l){ l.classList.add("hide"); setTimeout(function(){ l.remove(); },450); }
+    }
+  },8000);
+})();
+</script>
+</body>
+</html>

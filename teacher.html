@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>教師總覽：即時與統計報表｜AI 賦能教學 Hub</title>
+<meta name="description" content="所有平台評量（課前評量、4C、即時測驗、期中期末、3C 拆解、虛擬組裝、專題、問卷）集中一頁：即時動態、各平台 KPI、跨平台逐人矩陣、前後測統計、預測力與需關注名單。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/teacher.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script>
+/* 教師頁面門禁：未經教師工作台（console.html）驗證者一律導回；密碼只存 sessionStorage，關閉分頁即失效 */
+(function(){ if(window.top!==window.self || /[?&]embed=1/.test(location.search)) return; try{ if(sessionStorage.getItem("ae.teacher.gate")==="1") return; }catch(e){} location.replace("console.html#"+(/presurvey-teacher/.test(location.pathname)?"presurvey":"teacher")); })();
+</script>
+<style>
+.layout{display:grid;grid-template-columns:300px 1fr;gap:var(--gap);align-items:start;margin-top:16px}
+@media(max-width:960px){.layout{grid-template-columns:1fr}}
+.side{position:sticky;top:64px}@media(max-width:960px){.side{position:static}}
+.card+.card{margin-top:var(--gap)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px;border-top:3px solid var(--c,var(--accent))}
+.kpi b{display:block;font-size:22px;color:var(--primary);font-variant-numeric:tabular-nums}
+.kpi span{font-size:11px;color:var(--muted);display:block}
+.kpi small{font-size:11px;color:var(--ink)}
+.live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.live .dot{width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.live .dot.on{background:var(--ok);box-shadow:0 0 0 4px var(--ok-bg)}
+.feed{list-style:none;display:grid;gap:5px;max-height:260px;overflow:auto;font-size:12.5px}
+.feed li{display:grid;grid-template-columns:58px 1fr auto;gap:8px;padding:6px 10px;background:var(--soft);border-radius:8px;align-items:center}
+.feed li .t{color:var(--muted);font-variant-numeric:tabular-nums;font-size:11px}
+.feed li .k{font-weight:700;color:var(--primary)}
+.sp{height:120px;width:100%}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.interp{font-size:13px;line-height:1.8;background:var(--soft);border-left:4px solid var(--primary);border-radius:8px;padding:10px 14px;margin-top:8px}
+table.data td.sm{font-size:11px;color:var(--muted);white-space:nowrap}
+.pct{display:inline-block;min-width:42px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.pct.r{color:var(--err)}.pct.o{color:var(--warn)}.pct.g{color:var(--ok)}
+.cell{position:relative}
+.cell i{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);opacity:.5}
+.risk li{font-size:12.5px;line-height:1.6;padding:7px 11px;border-radius:9px;background:var(--err-bg);border-left:4px solid var(--err);margin-bottom:6px;list-style:none}
+.risk li.w{background:var(--warn-bg);border-left-color:var(--warn)}
+.adv{list-style:none;display:grid;gap:7px;margin-top:8px}
+.adv li{font-size:12.5px;line-height:1.6;padding:8px 12px;border-radius:9px;background:var(--soft);border-left:4px solid var(--accent)}
+.adv li.ok{border-left-color:var(--ok);background:var(--ok-bg)}
+.adv li.todo{border-left-color:var(--warn);background:var(--warn-bg)}
+.adv code{font-family:var(--mono);font-size:11px;background:#fff;padding:1px 5px;border-radius:4px}
+.corr td{text-align:center;font-variant-numeric:tabular-nums}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+@media print{.side,.toolbar{display:none!important}.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a><a aria-current='page' href='/console'>教師工作台</a>
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="layout">
+    <div class="side">
+      <div class="card noprint">
+        <h2>🧑‍🏫 教師總覽 <span class="en">All-platform Console</span></h2>
+        <p class="sub">所有平台的評量都在同一份雲端試算表；這一頁把它們集中成即時動態＋統計報表。</p>
+        <label class="fld" for="tcode" style="margin-top:0">教師碼</label>
+        <input type="password" id="tcode" placeholder="教師碼（已從工作台登入者可留空）" autocomplete="off">
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btnPull">⟳ 從雲端載入</button>
+          <button class="btn btn-ghost" id="btnDemo">🧪 示範資料</button>
+        </div>
+        <label style="display:flex;gap:6px;align-items:center;font-size:12px;margin-top:10px;cursor:pointer"><input type="checkbox" id="autoRefresh"> 每 15 秒自動更新</label>
+        <div class="live" style="margin-top:6px"><span class="dot" id="dot"></span><span id="liveTxt">未連線</span></div>
+        <div class="msg" id="cloudMsg"></div>
+        <label class="fld" for="clsSel">班級</label>
+        <select id="clsSel"><option value="">全部班級</option></select>
+        <label class="fld" for="rangeSel">時間範圍</label>
+        <select id="rangeSel"><option value="0">全部</option><option value="7">最近 7 天</option><option value="30">最近 30 天</option><option value="120">本學期（120 天）</option></select>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="btnCsv">⬇️ 逐人矩陣 CSV</button>
+          <button class="btn btn-ghost" id="btnRaw">⬇️ 原始 JSON</button>
+          <button class="btn btn-ghost" id="btnPrint">🖨 列印</button>
+        </div>
+        <details style="margin-top:10px;font-size:11.5px;color:var(--muted)"><summary style="cursor:pointer">進階：雲端網址</summary>
+          <input type="text" id="cloudUrl" placeholder="https://script.google.com/macros/s/…/exec" style="margin-top:6px;font-size:11px">
+          <div class="toolbar"><button class="btn btn-ghost" id="btnSaveUrl" style="font-size:11.5px;padding:5px 10px">儲存到此瀏覽器</button></div>
+        </details>
+        <p class="hint">捷徑：<a href='/presurvey-teacher' style='color:var(--accent);font-weight:700'>課前評量儀表板</a>・<a href='/stats' style='color:var(--accent);font-weight:700'>統計工作台</a>・<a href='/paper' style='color:var(--accent);font-weight:700'>論文生成</a></p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card empty" id="emptyCard">
+        <h2 style="justify-content:center">還沒有資料</h2>
+        <p class="sub">輸入教師碼從雲端載入，或先按「示範資料」看看這一頁長什麼樣子。</p>
+      </div>
+      <div id="dash" style="display:none">
+        <div class="card">
+          <h2>⚡ 即時動態 <span class="en" id="scopeTxt"></span></h2>
+          <div class="kpis" id="liveKpi"></div>
+          <svg class="sp" id="spark" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="近 14 天每日作答數"></svg>
+          <ul class="feed" id="feed"></ul>
+        </div>
+
+        <div class="card">
+          <h2>📊 各平台評量 KPI</h2>
+          <div class="kpis" id="kindKpi"></div>
+          <div class="interp" id="kindInterp"></div>
+        </div>
+
+        <div class="card" id="fourcCard" style="display:none">
+          <h2>📈 4C 學習成效：前後測統計 <span class="en">paired t・dz・α</span></h2>
+          <div style="overflow-x:auto"><table class="data" id="fourcTable"></table></div>
+          <p class="hint" id="fourcHint"></p>
+        </div>
+
+        <div class="card" id="ctCard" style="display:none">
+          <h2>📈 運算思維（課前 → 期末複測）<span class="en">T＋C 11 題</span></h2>
+          <div style="overflow-x:auto"><table class="data" id="ctTable"></table></div>
+          <p class="hint" id="ctHint"></p>
+        </div>
+
+        <div class="card">
+          <h2>🔗 平台間關聯與預測力 <span class="en">Pearson r（同學號平均得分率）</span></h2>
+          <div style="overflow-x:auto"><table class="data corr" id="corrTable"></table></div>
+          <div class="interp" id="corrInterp"></div>
+        </div>
+
+        <div class="card">
+          <h2>🚩 需要關注的學生 <span class="en" id="riskN"></span></h2>
+          <ul class="risk" id="riskList"></ul>
+          <p class="hint">規則：課前起步型且（尚無任何平時紀錄 或 平時平均 &lt; 60%）→ 紅；平時平均 &lt; 60% 或 最近 14 天無活動 → 橘。</p>
+        </div>
+
+        <div class="card">
+          <h2>👥 跨平台逐人矩陣 <span class="en" id="matrixN"></span></h2>
+          <p class="sub">每格＝該平台平均得分率（筆數）。點欄位標題可排序。</p>
+          <div style="overflow-x:auto"><table class="data" id="matrix"></table></div>
+        </div>
+
+        <div class="card">
+          <h2>🧭 整合建議 <span class="en">依目前雲端裡有哪些資料自動判斷</span></h2>
+          <ul class="adv" id="advice"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">國立屏東科技大學 資訊管理系 · AI 賦能教學 Hub · 教師總覽 v1</footer>
+</main>
+
+<script src="assets/presurvey-questions.js"></script>
+<script src="assets/stats-engine.js"></script>
+<script src="assets/cloud.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var all=[], timer=null, sortKey="presurvey", sortDir=-1;
+var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中考",exam:"期末考",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度"};
+var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",exam:"#1E3A8A",repair:"#D97706",build:"#D97706",project:"#7C3AED",survey:"#DB2777",consensus:"#6B7280",progress:"#6B7280"};
+var kname=function(k){return KN[k]||k;};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
+function pctOf(r){var s=Number(r.score),m=Number(r.max);return (!isNaN(s)&&m>0)?s/m*100:null;}
+function mean(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
+function sd(a){if(a.length<2)return 0;var m=mean(a);return Math.sqrt(a.reduce(function(s,v){return s+(v-m)*(v-m);},0)/(a.length-1));}
+function corr(x,y){var n=x.length;if(n<3)return null;var mx=mean(x),my=mean(y),sxy=0,sxx=0,syy=0;for(var i=0;i<n;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)*(x[i]-mx);syy+=(y[i]-my)*(y[i]-my);}return sxx&&syy?sxy/Math.sqrt(sxx*syy):null;}
+function cls3(p){return p===null?"":p<60?"r":p<75?"o":"g";}
+
+/* ---------- 載入 ---------- */
+function pull(silent){
+  var code=$("tcode").value.trim()||AECloud.teacherCode(); if($("tcode").value.trim()) AECloud.teacherCode(code);
+  if(!AECloud.ready()){msg("尚未設定雲端網址（進階 → 貼上 /exec 網址，或改各頁 meta）。","warn");return;}
+  if(!code){msg("請輸入教師碼。","warn");return;}
+  if(!silent)msg("讀取中…","warn");
+  AECloud.pull("",code,{incremental:true,reset:!silent}).then(function(list){
+    all=list.map(function(r){ if(typeof r.detail==="string"){try{r.detail=JSON.parse(r.detail);}catch(e){r.detail={};}} r.detail=r.detail||{}; r.sid=String(r.sid||""); r.ts=String(r.ts||""); return r; });
+    $("dot").classList.add("on"); $("liveTxt").textContent="已連線・"+new Date().toLocaleTimeString()+" 更新";
+    render(); msg("✓ 雲端共 "+all.length+" 筆。","ok");
+  }).catch(function(e){$("dot").classList.remove("on");$("liveTxt").textContent="連線失敗";msg("讀取失敗："+e.message+(e.message.indexOf("code")>=0?"（教師碼錯誤）":""),"err");});
+}
+$("btnPull").addEventListener("click",function(){pull(false);});
+$("autoRefresh").addEventListener("change",function(){if(timer){clearInterval(timer);timer=null;}if(this.checked){pull(true);timer=setInterval(function(){pull(true);},15000);}});
+$("tcode").value="";
+$("cloudUrl").value=(function(){try{return localStorage.getItem("ae.cloud.url")||"";}catch(e){return "";}})();
+$("btnSaveUrl").addEventListener("click",function(){AECloud.setUrl($("cloudUrl").value);msg("已儲存。","ok");});
+$("clsSel").addEventListener("change",render); $("rangeSel").addEventListener("change",render);
+$("btnPrint").addEventListener("click",function(){window.print();});
+
+/* ---------- 範圍 ---------- */
+function scope(){
+  var c=$("clsSel").value, d=Number($("rangeSel").value), since=d?new Date(Date.now()-d*864e5).toISOString():"";
+  return all.filter(function(r){return (!c||r.cls===c)&&(!since||r.ts>=since);});
+}
+function refreshCls(){var cur=$("clsSel").value,set={};all.forEach(function(r){if(r.cls)set[r.cls]=1;});$("clsSel").innerHTML='<option value="">全部班級</option>'+Object.keys(set).sort().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join("");$("clsSel").value=cur;}
+
+/* ---------- 主渲染 ---------- */
+var lastMatrix=[];
+function render(){
+  refreshCls();
+  if(!all.length){$("emptyCard").style.display="block";$("dash").style.display="none";return;}
+  $("emptyCard").style.display="none";$("dash").style.display="block";
+  var recs=scope(), kinds={}, students={};
+  recs.forEach(function(r){
+    var k=r.kind; (kinds[k]=kinds[k]||[]).push(r);
+    if(!r.sid)return; var s=students[r.sid]=students[r.sid]||{sid:r.sid,cls:r.cls,kinds:{},last:""};
+    if(k==="presurvey"&&(r.detail.stage||"pre")!=="pre") return;   // 期末複測另計
+    var kk=s.kinds[k]=s.kinds[k]||{n:0,sum:0,cnt:0,pct:null,last:""};
+    kk.n++; var p=pctOf(r); if(p!==null){kk.sum+=p;kk.cnt++;kk.pct=Math.round(kk.sum/kk.cnt);}
+    if(r.ts>kk.last)kk.last=r.ts; if(r.ts>s.last)s.last=r.ts;
+    if(k==="presurvey"&&r.detail.level)s.level=r.detail.level;
+  });
+  var klist=Object.keys(kinds).sort(function(a,b){return (Object.keys(KN).indexOf(a)+99)%99-(Object.keys(KN).indexOf(b)+99)%99;});
+  $("scopeTxt").textContent=($("clsSel").value||"全部班級")+"・"+recs.length+" 筆・"+Object.keys(students).length+" 位學生";
+
+  /* 即時動態 */
+  var now=Date.now(), today=recs.filter(function(r){return now-Date.parse(r.ts)<864e5;}), week=recs.filter(function(r){return now-Date.parse(r.ts)<7*864e5;});
+  var activeWeek={}; week.forEach(function(r){if(r.sid)activeWeek[r.sid]=1;});
+  var quietN=Object.keys(students).filter(function(s){return now-Date.parse(students[s].last||0)>14*864e5;}).length;
+  $("liveKpi").innerHTML='<div class="kpi"><b>'+today.length+'</b><span>今日作答筆數</span></div><div class="kpi"><b>'+Object.keys(activeWeek).length+'</b><span>本週活躍學生</span></div>'+
+    '<div class="kpi"><b>'+recs.length+'</b><span>期間總筆數</span></div><div class="kpi" style="--c:var(--warn)"><b>'+quietN+'</b><span>14 天無活動</span></div>';
+  drawSpark(recs);
+  $("feed").innerHTML=recs.slice().sort(function(a,b){return b.ts<a.ts?-1:1;}).slice(0,40).map(function(r){var p=pctOf(r);
+    return '<li><span class="t">'+esc(r.ts.slice(5,16).replace("T"," "))+'</span><span><span class="k">'+esc(kname(r.kind))+'</span> '+esc(r.sid)+' <span class="sm">'+esc(r.cls||"")+'</span></span><span class="pct '+cls3(p)+'">'+(p===null?"—":Math.round(p)+"%")+'</span></li>';}).join("");
+
+  /* 各平台 KPI */
+  $("kindKpi").innerHTML=klist.map(function(k){var rs=k==="presurvey"?kinds[k].filter(function(r){return (r.detail.stage||"pre")==="pre";}):kinds[k],ps=rs.map(pctOf).filter(function(p){return p!==null;}),sids={};rs.forEach(function(r){if(r.sid)sids[r.sid]=1;});
+    var m=ps.length?Math.round(mean(ps)):null;
+    return '<div class="kpi" style="--c:'+(KC[k]||"#94A3B8")+'"><span>'+esc(kname(k))+'</span><b>'+(m===null?rs.length:m+"%")+'</b><small>'+(m===null?"筆":rs.length+" 筆・")+Object.keys(sids).length+' 人'+(ps.length>1?"・SD "+Math.round(sd(ps)):"")+'</small></div>';}).join("");
+  $("kindInterp").innerHTML=kindInterp(kinds,students);
+
+  /* 4C 前後測 */
+  var f=kinds.assess4c||[], f2=f.filter(function(r){return r.detail&&r.detail.stage&&Array.isArray(r.detail.scores);});
+  if(f2.length>=4){
+    var a=AE.analyse(AE.parseRecords(JSON.stringify(f2.map(function(r){return {sid:r.sid,stage:r.detail.stage,ts:r.ts,scores:r.detail.scores,se:r.detail.se};}))).records,"fourc");
+    $("fourcCard").style.display="block"; $("fourcTable").innerHTML=tTable(a); $("fourcHint").innerHTML=alphaLine(a)+" <a href='stats.html' style='color:var(--accent);font-weight:700'>到統計工作台看圖表 →</a>";
+    try{localStorage.setItem(AE.DATASET_KEY,JSON.stringify({savedAt:new Date().toISOString(),schemeKey:"fourc",raw:JSON.stringify(f2.map(function(r){return {sid:r.sid,stage:r.detail.stage,ts:r.ts,scores:r.detail.scores,se:r.detail.se};}))}));}catch(e){}
+  } else $("fourcCard").style.display="none";
+
+  /* 課前→期末複測 */
+  var ps2=(kinds.presurvey||[]).filter(function(r){return r.detail&&r.detail.ans;}).map(function(r){return {sid:r.sid,cls:r.cls,stage:r.detail.stage||"pre",ts:r.ts,ans:r.detail.ans};});
+  if(ps2.some(function(r){return r.stage==="post";})){
+    var a2=AE.analyse(AE.parseRecords(JSON.stringify(PS.toStatsRecords(ps2))).records,"presurvey");
+    $("ctCard").style.display="block"; $("ctTable").innerHTML=tTable(a2,true); $("ctHint").textContent="答對率 0–1；配對 "+a2.pairs+" 人。";
+  } else $("ctCard").style.display="none";
+
+  /* 關聯矩陣 */
+  var ks=klist.filter(function(k){return k!=="consensus"&&k!=="progress"&&kinds[k].some(function(r){return pctOf(r)!==null;});});
+  var ct='<thead><tr><th></th>'+ks.map(function(k){return '<th>'+esc(kname(k))+'</th>';}).join("")+'</tr></thead><tbody>', notes=[];
+  ks.forEach(function(a){ct+='<tr><th>'+esc(kname(a))+'</th>'+ks.map(function(b){ if(a===b)return '<td class="sm">—</td>'; var x=[],y=[]; Object.keys(students).forEach(function(s){var A=students[s].kinds[a],B=students[s].kinds[b];if(A&&B&&A.pct!==null&&B.pct!==null){x.push(A.pct);y.push(B.pct);}});
+    var r=corr(x,y); if(r!==null&&a<b&&x.length>=5&&Math.abs(r)>=.3) notes.push(kname(a)+" ↔ "+kname(b)+" r="+r.toFixed(2)+"（n="+x.length+"）"+(Math.abs(r)>=.5?"，關係強":"，中度"));
+    return '<td'+(r!==null&&Math.abs(r)>=.5?' style="font-weight:800;color:var(--primary)"':'')+'>'+(r===null?'<span class="sm">n&lt;3</span>':r.toFixed(2)+'<br><span class="sm">n='+x.length+'</span>')+'</td>';}).join("")+'</tr>';});
+  $("corrTable").innerHTML=ct+"</tbody>";
+  var pre=students, preN=Object.keys(pre).filter(function(s){return pre[s].kinds.presurvey;}).length;
+  $("corrInterp").innerHTML=(ks.length<2?"目前只有一種評量有分數，等第二種平台的資料進來後，這裡會自動算出平台之間的關聯。":
+    (notes.length?"值得注意的關聯："+notes.join("；")+"。"+(notes.some(function(n){return n.indexOf("課前評量")>=0;})?"課前起點能預測後續表現，分層差異化有依據。":"課前起點與後續表現關係不強，表示教學歷程本身影響更大。"):
+    "各平台之間相關都不強（|r| < .3）或樣本不足 5 人：每個平台量到的是不同能力面向，評量設計互補而非重複。"));
+
+  /* 風險名單 */
+  var risk=[];
+  Object.keys(students).forEach(function(s){var st=students[s], form=[],formSum=0,formN=0;
+    ["quiz","midterm","exam","repair","build","project","assess4c"].forEach(function(k){var v=st.kinds[k];if(v&&v.pct!==null){form.push(k);formSum+=v.pct;formN++;}});
+    var avg=formN?Math.round(formSum/formN):null, quiet=now-Date.parse(st.last||0)>14*864e5;
+    if(st.level==="starter"&&(avg===null||avg<60)) risk.push({sid:s,cls:st.cls,lv:"r",why:"課前起步型"+(avg===null?"，尚無任何平時紀錄":"，平時平均 "+avg+"%")+"→ 建議第一週主動關心、配進異質小組。"});
+    else if(avg!==null&&avg<60) risk.push({sid:s,cls:st.cls,lv:"w",why:"平時平均 "+avg+"%（"+form.map(kname).join("、")+"）→ 檢查是哪個模組卡住。"});
+    else if(quiet&&Object.keys(st.kinds).length>1) risk.push({sid:s,cls:st.cls,lv:"w",why:"最近 14 天無活動（最後："+st.last.slice(0,10)+"）→ 私訊確認狀況。"});
+  });
+  $("riskN").textContent=risk.length+" 人"; $("riskList").innerHTML=risk.length?risk.map(function(x){return '<li class="'+x.lv+'"><b>'+esc(x.sid)+'</b> <span class="sm">'+esc(x.cls||"")+'</span>　'+esc(x.why)+'</li>';}).join(""):'<li class="w" style="background:var(--ok-bg);border-left-color:var(--ok)">目前沒有需要特別關注的學生。</li>';
+
+  /* 逐人矩陣 */
+  lastMatrix=Object.keys(students).map(function(s){return students[s];});
+  renderMatrix(ks);
+  /* 整合建議 */
+  $("advice").innerHTML=integration(kinds,students);
+}
+
+function tTable(a,rate){
+  var h='<thead><tr><th>分析單位</th><th class="num">n</th><th class="num">前測 M (SD)</th><th class="num">後測 M (SD)</th><th class="num">t(df)</th><th class="num">p</th><th class="num">dz [95% CI]</th><th>效果量</th></tr></thead><tbody>';
+  a.results.forEach(function(r){var t=r.test; if(!t){h+='<tr><td>'+r.unit.name+'</td><td colspan="7" class="sm">配對數不足</td></tr>';return;}
+    var st=t.p<.001?"***":t.p<.01?"**":t.p<.05?"*":"";
+    h+='<tr><td><b>'+r.unit.name+'</b></td><td class="num">'+t.n+'</td><td class="num">'+AE.fnum(t.preMean)+' ('+AE.fnum(t.preSD)+')</td><td class="num">'+AE.fnum(t.postMean)+' ('+AE.fnum(t.postSD)+')</td><td class="num">'+AE.fnum(t.t)+'('+t.df+')</td><td class="num"'+(t.p<.05?' style="color:var(--ok);font-weight:800"':'')+'>'+AE.fp(t.p).replace('p ','')+st+'</td><td class="num">'+AE.fnum(t.dz)+' ['+AE.fnum(t.dzCiLow)+', '+AE.fnum(t.dzCiHigh)+']</td><td>'+AE.magnitude(t.dz,'zh')+'</td></tr>';});
+  return h+"</tbody>";
+}
+function alphaLine(a){var t=[];if(a.alphaPre)t.push("前測 "+AE.falpha(a.alphaPre.alpha));if(a.alphaPost)t.push("後測 "+AE.falpha(a.alphaPost.alpha));return "配對 "+a.pairs+" 人；Cronbach’s α："+(t.join("；")||"樣本不足")+"。* p&lt;.05 ** p&lt;.01 *** p&lt;.001。";}
+
+function renderMatrix(ks){
+  var cols=["presurvey"].concat(ks.filter(function(k){return k!=="presurvey";}));
+  var rows=lastMatrix.slice().sort(function(a,b){var A=a.kinds[sortKey]?a.kinds[sortKey].pct:null,B=b.kinds[sortKey]?b.kinds[sortKey].pct:null; if(A===null&&B===null)return 0; if(A===null)return 1; if(B===null)return -1; return (A-B)*sortDir;});
+  var h='<thead><tr><th>學號</th><th>班級</th><th>起點</th>'+cols.map(function(k){return '<th class="num" style="cursor:pointer" data-k="'+k+'">'+esc(kname(k))+(sortKey===k?(sortDir<0?" ▼":" ▲"):"")+'</th>';}).join("")+'<th>最後活動</th><th>共識</th></tr></thead><tbody>';
+  rows.forEach(function(s){h+='<tr><td><b>'+esc(s.sid)+'</b></td><td class="sm">'+esc(s.cls||"")+'</td><td>'+(s.level?'<span class="tag" style="color:#fff;background:'+PS.LEVELS[s.level].color+'">'+PS.LEVELS[s.level].name+'</span>':'<span class="sm">—</span>')+'</td>'+
+    cols.map(function(k){var v=s.kinds[k]; return '<td class="num cell">'+(v?('<span class="pct '+cls3(v.pct)+'">'+(v.pct===null?"—":v.pct+"%")+'</span> <span class="sm">('+v.n+')</span><i style="width:'+(v.pct||0)+'%"></i>'):'<span class="sm">—</span>')+'</td>';}).join("")+
+    '<td class="sm">'+esc((s.last||"").slice(0,10))+'</td><td>'+(s.kinds.consensus?"🤝":"")+'</td></tr>';});
+  $("matrix").innerHTML=h+"</tbody>"; $("matrixN").textContent=rows.length+" 人";
+  Array.prototype.forEach.call($("matrix").querySelectorAll("th[data-k]"),function(th){th.addEventListener("click",function(){var k=th.dataset.k; if(sortKey===k)sortDir=-sortDir; else {sortKey=k;sortDir=-1;} renderMatrix(ks);});});
+  $("matrix").dataset.cols=JSON.stringify(cols);
+}
+
+function kindInterp(kinds,students){
+  var out=[], n=Object.keys(students).length;
+  var ps=(kinds.presurvey||[]).filter(function(r){return (r.detail.stage||"pre")==="pre";}); if(ps.length){var lv={starter:0,steady:0,advanced:0};ps.forEach(function(r){if(r.detail.level)lv[r.detail.level]++;});out.push("課前評量 "+ps.length+" 份：起步 "+lv.starter+"、穩健 "+lv.steady+"、進階 "+lv.advanced+"。");}
+  ["quiz","midterm","exam","assess4c","repair","build","project"].forEach(function(k){var rs=kinds[k];if(!rs)return;var p=rs.map(pctOf).filter(function(v){return v!==null;});if(!p.length)return;var m=Math.round(mean(p)),lo=p.filter(function(v){return v<60;}).length;
+    out.push(kname(k)+"平均 "+m+"%"+(m<60?"（偏低，建議回頭補強該模組）":m>=85?"（掌握良好）":"")+(lo?"，"+lo+" 筆低於 60%":"")+"。");});
+  var c=kinds.consensus||[]; if(ps.length)out.push("師生共識已確認 "+c.length+" / "+ps.length+"。");
+  if(!out.length)out.push("尚無可解讀的分數資料。");
+  return out.join(" ");
+}
+
+function integration(kinds,students){
+  var has=function(k){return !!kinds[k];};
+  var items=[];
+  items.push({ok:has("presurvey"),text:"<b>課前評量</b>"+(has("presurvey")?"已寫入雲端（kind=presurvey）。":"尚無資料：請學生從入口「課前評量」作答，送出即自動入庫。")});
+  items.push({ok:has("assess4c"),text:"<b>4C 學習成效評量</b>（AICT-assess-platform）"+(has("assess4c")?"已接上。":"尚未接上：該站把 <code>COLLECT_URL</code> 改成本 Hub 的 /exec 網址，送出格式改為統一記錄 <code>{kind:\"assess4c\", sid, cls, score, max, detail:{stage:\"前測|後測\", scores:[16], se}}</code>，這一頁就會自動出現前後測 paired t。")});
+  items.push({ok:has("quiz")||has("exam")||has("midterm"),text:"<b>IOC 模擬平台</b>（即時測驗／期中／期末）"+((has("quiz")||has("exam"))?"已接上。":"尚未接上：<code>student.html</code> 的 <code>qadd()</code>／<code>addRecord()</code> 改呼叫 <code>AECloud.push({kind:\"quiz\"|\"midterm\"|\"exam\", sid, cls, score, max, detail:{scope, level, cat, items}})</code>；記得帶學號（整合案 P1-2）。")});
+  items.push({ok:has("repair")||has("build"),text:"<b>3C 拆解／虛擬組裝</b>"+((has("repair")||has("build"))?"已接上。":"尚未接上：完成一次拆解或組裝時以 <code>kind:\"repair\"|\"build\"</code> 記錄 <code>score/max</code>（步驟正確數）與耗時 <code>detail.durationSec</code>。")});
+  items.push({ok:has("project"),text:"<b>AI 賦能學習平台（專題五步）</b>"+(has("project")?"已接上。":"尚未接上：每完成一步送 <code>kind:\"project\", score:步數, max:5, detail:{step, title}</code>，這一頁就能看到專題進度。")});
+  items.push({ok:has("survey"),text:"<b>40 題學習後測問卷</b>"+(has("survey")?"已接上。":"尚未接上：送 <code>kind:\"survey\", detail:{scores:[40]}</code>，可與課前 A 向度（AI 使用）做前後比較。")});
+  items.push({ok:true,text:"<b>共同身分</b>已做：入口頁「我是誰」小卡（<code>assets/identity.js</code>，存本機 <code>ae.identity.v1</code>），課前評量自動帶入；Hub 連到 pjkuo.github.io 的連結自動附 <code>?sid=&cls=</code>，舊站由 bridge.js 接收。"});
+  items.push({ok:true,text:"<b>一行接上舊站</b>：各舊站 <code>&lt;/body&gt;</code> 前加 <code>&lt;script src=\"https://ai-empower-hub.netlify.app/assets/bridge.js\" data-app=\"ioc-sim\"&gt;&lt;/script&gt;</code>（data-app 填 assess-4c／ioc-sim／studio）。它會自動攔截 <code>CCLOUD.push</code>、<code>qadd</code>、<code>addRecord</code> 與對舊 Apps Script 的送出，轉成統一記錄鏡射到本資料庫；沒有身分時彈出小卡請學生填一次。新程式可直接呼叫 <code>AEBridge.push({kind, score, max, detail})</code>。"});
+  items.push({ok:true,text:"<b>研究迴圈</b>：這一頁的 4C 前後測已自動交給 <a href='stats.html' style='color:var(--accent);font-weight:700'>統計工作台</a>／<a href='paper.html' style='color:var(--accent);font-weight:700'>論文生成</a>；課前 → 期末複測、平台間相關係數、師生共識確認率都可作為 HOTL 研究的佐證資料。"});
+  items.push({ok:true,text:"<b>共用層上線</b>：整合案的 <code>pjkuo.github.io/shared/</code>（cc-store.js、Code.gs）目前尚未部署（404）。本 Hub 的 <code>assets/cloud.js</code>＋<code>gas/Code.gs</code> 用的是同一記錄模型，可直接當作共用層推上去，舊站只要多載入一支 script。"});
+  return items.map(function(i){return '<li class="'+(i.ok?"ok":"todo")+'">'+(i.ok?"✅ ":"🔧 ")+i.text+'</li>';}).join("");
+}
+
+function drawSpark(recs){
+  var days=[],cnt=[];for(var i=13;i>=0;i--){var d=new Date(Date.now()-i*864e5).toISOString().slice(0,10);days.push(d);cnt.push(0);}
+  recs.forEach(function(r){var i=days.indexOf(r.ts.slice(0,10));if(i>=0)cnt[i]++;});
+  var mx=Math.max(1,Math.max.apply(null,cnt)),W=600,H=120,bw=W/14;
+  var s='';cnt.forEach(function(c,i){var h=c/mx*90;s+='<rect x="'+(i*bw+4)+'" y="'+(100-h)+'" width="'+(bw-8)+'" height="'+h+'" rx="3" fill="#3B82F6" opacity="'+(i===13?1:.55)+'"/>'+(c?'<text x="'+(i*bw+bw/2)+'" y="'+(96-h)+'" text-anchor="middle" font-size="10" fill="#374151">'+c+'</text>':'')+'<text x="'+(i*bw+bw/2)+'" y="114" text-anchor="middle" font-size="9" fill="#6B7280">'+days[i].slice(5)+'</text>';});
+  $("spark").innerHTML=s;
+}
+
+/* ---------- 匯出 ---------- */
+function dl(name,content,type){var b=new Blob([content],{type:type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},0);}
+$("btnRaw").addEventListener("click",function(){dl("cloud_"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(scope(),null,1),"application/json");});
+$("btnCsv").addEventListener("click",function(){var cols=JSON.parse($("matrix").dataset.cols||"[]");var lines=[["sid","class","level"].concat(cols.map(function(k){return kname(k)+"_pct";}),cols.map(function(k){return kname(k)+"_n";}),["last"]).join(",")];
+  lastMatrix.forEach(function(s){lines.push([s.sid,s.cls||"",s.level?PS.LEVELS[s.level].name:""].concat(cols.map(function(k){return s.kinds[k]&&s.kinds[k].pct!==null?s.kinds[k].pct:"";}),cols.map(function(k){return s.kinds[k]?s.kinds[k].n:0;}),[s.last]).join(","));});
+  dl("matrix_"+new Date().toISOString().slice(0,10)+".csv","﻿"+lines.join("\r\n"),"text/csv;charset=utf-8");});
+
+/* ---------- 示範資料（模擬雲端） ---------- */
+$("btnDemo").addEventListener("click",function(){
+  var seed=11;function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+  var ps=PS.demoData(), out=[], day=function(off){return new Date(Date.now()-off*864e5).toISOString();};
+  ps.forEach(function(r){var s=PS.scoreResponse(r.ans);out.push(AECloud.record({id:"ps"+r.sid+r.stage,ts:r.stage==="post"?day(2):day(100),app:"ai-empower",kind:"presurvey",sid:r.sid,cls:r.cls,score:s.R,max:100,detail:{stage:r.stage,ans:r.ans,dims:s.dims,level:s.level}}));});
+  var stu=ps.filter(function(r){return r.stage==="pre";});
+  stu.forEach(function(r,i){var base=PS.scoreResponse(r.ans).R/100;
+    if(rnd()<.8)out.push(AECloud.record({id:"cs"+r.sid,ts:day(99),kind:"consensus",sid:r.sid,cls:r.cls,score:1,max:1}));
+    for(var w=0;w<8;w++){ if(rnd()<.85) out.push(AECloud.record({id:"q"+r.sid+w,ts:day(90-w*10+Math.floor(rnd()*3)),app:"ioc-sim",kind:"quiz",sid:r.sid,cls:r.cls,score:Math.round(Math.min(10,Math.max(2,(base*4+3+w*.3+rnd()*3)))),max:10,detail:{scope:["hardware","software","network"][w%3]}})); }
+    if(rnd()<.9)out.push(AECloud.record({id:"rp"+r.sid,ts:day(70),app:"ioc-sim",kind:"repair",sid:r.sid,cls:r.cls,score:Math.round(5+base*4+rnd()*3),max:12}));
+    if(rnd()<.85)out.push(AECloud.record({id:"bd"+r.sid,ts:day(60),app:"ioc-sim",kind:"build",sid:r.sid,cls:r.cls,score:Math.round(6+base*5+rnd()*3),max:14}));
+    if(rnd()<.9)out.push(AECloud.record({id:"mt"+r.sid,ts:day(45),app:"ioc-sim",kind:"midterm",sid:r.sid,cls:r.cls,score:Math.round(40+base*35+rnd()*20),max:100}));
+    var step=Math.min(5,Math.floor(1+base*3+rnd()*2)); out.push(AECloud.record({id:"pj"+r.sid,ts:day(20),app:"studio",kind:"project",sid:r.sid,cls:r.cls,score:step,max:5,detail:{step:step}}));
+    if(i%5!==4){var pre=[],post=[];for(var k=0;k<16;k++){var b=2+base*1.5+rnd();pre.push(Math.min(5,Math.max(1,Math.round(b))));post.push(Math.min(5,Math.max(1,Math.round(b+.6+rnd()*.8))));}
+      out.push(AECloud.record({id:"4a"+r.sid,ts:day(95),app:"assess-4c",kind:"assess4c",sid:r.sid,cls:r.cls,score:pre.slice(0,12).reduce(function(a,b){return a+b;},0),max:60,detail:{stage:"前測",scores:pre,se:i%3}}));
+      if(rnd()<.85)out.push(AECloud.record({id:"4b"+r.sid,ts:day(3),app:"assess-4c",kind:"assess4c",sid:r.sid,cls:r.cls,score:post.slice(0,12).reduce(function(a,b){return a+b;},0),max:60,detail:{stage:"後測",scores:post,se:i%3}}));}
+    if(rnd()<.8)out.push(AECloud.record({id:"ex"+r.sid,ts:day(1),app:"ioc-sim",kind:"exam",sid:r.sid,cls:r.cls,score:Math.round(45+base*35+rnd()*18),max:100}));
+  });
+  all=out; $("dot").classList.remove("on"); $("liveTxt").textContent="示範資料（非雲端）"; render(); msg("已載入示範資料 "+out.length+" 筆（模擬 8 種平台）。","ok");
+});
+
+if(AECloud.ready()&&AECloud.teacherCode()) pull(true);
+})();
+</script>
+</body>
+</html>

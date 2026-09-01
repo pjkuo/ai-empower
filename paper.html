@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HOTL 論文內文生成器｜AI 賦能教學 Hub</title>
+<meta name="description" content="評量數據即時寫成七節論文草稿（題目關鍵詞、摘要、引言、方法、結果、討論、結論），中英雙語與 IEEE 風格切換；逐段 HOTL 審查留痕，支援 Markdown、Word、LaTeX 匯出。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/paper.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HOTL 論文內文生成器｜AI 賦能教學 Hub">
+<meta property="og:description" content="AI 起草七節全文、人在迴路上逐段把關；監督紀錄即研究資料。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+.steps{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}
+.steps .st{font-size:12px;font-weight:700;padding:6px 13px;border-radius:20px;background:#fff;
+  border:1px solid var(--line);color:var(--muted)}
+.steps .st.done{background:var(--ok-bg);color:#065F46;border-color:transparent}
+.steps .st.now{background:var(--primary);color:#fff;border-color:transparent}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:var(--gap);align-items:start}
+@media(max-width:940px){.layout{grid-template-columns:1fr}}
+.sw{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.sw button{font-family:inherit;font-size:12.5px;font-weight:700;padding:7px 13px;border:0;background:#fff;color:var(--muted);cursor:pointer}
+.sw button.on{background:var(--primary);color:#fff}
+/* 資料狀態列 */
+.datachips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dchip{background:var(--soft);border-radius:9px;padding:7px 11px;text-align:center;flex:1;min-width:70px}
+.dchip b{display:block;font-size:16px;color:var(--primary);font-variant-numeric:tabular-nums}
+.dchip span{font-size:10px;color:var(--muted)}
+details.raw summary{font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;margin:8px 0 4px}
+/* 七節狀態總覽 */
+.secmap{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 10px}
+.secmap .sc{font-size:11px;font-weight:700;padding:4px 10px;border-radius:16px;background:var(--soft);color:var(--muted);cursor:pointer;border:1px solid transparent}
+.secmap .sc.pending{background:var(--warn-bg);color:var(--warn)}
+.secmap .sc.adopted{background:var(--ok-bg);color:#065F46}
+.secmap .sc:hover{border-color:var(--accent)}
+/* 草稿卡 */
+.draft{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;padding:13px 15px;margin-top:12px;background:#FFFDF7}
+.draft.adopted{border-left-color:var(--ok);background:#F7FEFB}
+.draft.rejected{border-left-color:var(--err);background:#FEF8F8;opacity:.72}
+.draft .dhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.draft .dhead b{font-size:13px;color:var(--primary)}
+.draft .state{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+.state.pending{background:var(--warn-bg);color:var(--warn)}
+.state.adopted{background:var(--ok-bg);color:#065F46}
+.state.revised{background:var(--accent-soft);color:var(--primary)}
+.state.rejected{background:var(--err-bg);color:var(--err)}
+.draft .txt{font-size:13px;line-height:1.75;white-space:pre-wrap}
+.draft .acts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.draft .acts .btn{padding:6px 12px;font-size:12px}
+.draft textarea{margin-top:8px}
+.draft table{background:#fff}
+/* HOTL 儀表板 */
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:8px}
+.dash .d{background:var(--soft);border-radius:10px;padding:9px 10px;text-align:center}
+.dash .d b{display:block;font-size:19px;color:var(--primary);font-variant-numeric:tabular-nums}
+.dash .d span{font-size:10.5px;color:var(--muted)}
+/* 最終稿 */
+.final{font-size:13.5px;line-height:1.85}
+.final h3{font-size:15px;color:var(--primary);margin:18px 0 6px}
+.final h3:first-child{margin-top:0}
+.final p{margin-bottom:10px;white-space:pre-wrap}
+.final table{margin:8px 0 12px}
+.logtable td,.logtable th{font-size:11.5px}
+.pill{font-size:11px;font-weight:700;color:var(--muted)}
+.genrow{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.genrow .btn{justify-content:flex-start}
+@media(max-width:420px){.genrow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a><a aria-current='page' href='/console'>教師工作台</a>
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="steps" aria-hidden="true">
+    <span class="st" id="st1">① 資料與設定</span>
+    <span class="st" id="st2">② 生成草稿</span>
+    <span class="st" id="st3">③ HOTL 逐段審查</span>
+    <span class="st" id="st4">④ 全文匯出</span>
+  </div>
+
+  <div class="layout">
+    <!-- ===== 左欄 ===== -->
+    <div class="noprint">
+      <div class="card">
+        <h2>1️⃣ 資料</h2>
+        <p class="sub">與統計分析工作台共用同一份資料——任一頁載入過，另一頁自動沿用，不必重貼。</p>
+        <div class="datachips" id="dataChips" style="display:none"></div>
+        <div class="msg" id="dataMsg"></div>
+        <details class="raw" id="rawBox">
+          <summary>貼上／更換資料（JSON / CSV）</summary>
+          <textarea id="dataIn" class="mono" rows="5" placeholder='[{"sid":"2345","stage":"前測","scores":[…]}, …]'></textarea>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">
+            <button class="btn btn-primary" id="btnLoad">載入並計算</button>
+            <button class="btn btn-ghost" id="btnDemo">🧪 示範資料</button>
+            <a class='btn btn-ghost' href='/stats'>📈 到統計工作台細看 →</a>
+          </div>
+        </details>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>2️⃣ 研究設定</h2>
+        <label class="fld" for="scaleName">量表／構念名稱</label>
+        <input type="text" id="scaleName" value="4C 核心素養">
+        <label class="fld" for="scaleNameEn">英文名稱</label>
+        <input type="text" id="scaleNameEn" value="4C core competencies">
+        <label class="fld" for="courseName">課程／情境描述</label>
+        <input type="text" id="courseName" value="運算思維課程（先思考、後驗證教學模式）">
+        <label class="fld" for="courseNameEn">英文情境描述</label>
+        <input type="text" id="courseNameEn" value="a computational thinking course adopting a think-then-verify workflow">
+        <label class="fld" for="semester">學期／週數</label>
+        <input type="text" id="semester" value="一學期（18 週）">
+        <label class="fld">輸出語言</label>
+        <div class="sw" role="group" aria-label="輸出語言">
+          <button type="button" id="langZh" class="on">繁體中文</button>
+          <button type="button" id="langEn">English</button>
+        </div>
+        <label class="fld">英文風格</label>
+        <div class="sw" role="group" aria-label="英文風格">
+          <button type="button" id="styGen" class="on">學術通用</button>
+          <button type="button" id="styIeee">IEEE 會議</button>
+        </div>
+        <p class="pill" style="margin-top:6px">IEEE 風格影響英文段落之措辭（This paper presents…）與結構慣例。</p>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>3️⃣ 生成段落</h2>
+        <p class="sub">七節任點；已審段落不會被覆蓋，重生只影響待審稿。</p>
+        <div class="genrow">
+          <button class="btn btn-ghost gen" data-sec="titlekw" disabled>🏷 題目＋關鍵詞</button>
+          <button class="btn btn-ghost gen" data-sec="abstract" disabled>🧾 摘要</button>
+          <button class="btn btn-ghost gen" data-sec="intro" disabled>📖 引言</button>
+          <button class="btn btn-ghost gen" data-sec="methods" disabled>🧪 方法</button>
+          <button class="btn btn-ghost gen" data-sec="results" disabled>📊 結果＋表格</button>
+          <button class="btn btn-ghost gen" data-sec="discussion" disabled>💬 討論</button>
+          <button class="btn btn-ghost gen" data-sec="conclusion" disabled>🎯 結論</button>
+          <button class="btn btn-primary" id="btnGenAll" disabled>⚡ 生成全部七節</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 右欄 ===== -->
+    <div>
+      <div class="card">
+        <h2>HOTL 逐段審查</h2>
+        <p class="sub">人在迴路上：AI 起草、你把關。「退回重生」自動換寫法。進度與決策全程自動存檔於本機，重新整理不會遺失。<br><span style="font-size:11px">⌨ 快速鍵（作用於最上方待審段落）：<b>A</b> 採納　<b>E</b> 修改　<b>R</b> 退回　<b>Esc</b> 取消編輯</span></p>
+        <div class="secmap" id="secmap"></div>
+        <div id="drafts"><p class="pill" id="draftsEmpty">尚無草稿——載入資料後點選左側要生成的段落。</p></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>HOTL 儀表板 <span class="en">Supervision metrics</span></h2>
+        <div class="dash" id="dash"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>最終稿 <span class="en">Adopted manuscript</span></h2>
+        <div class="final" id="final"></div>
+        <div class="noprint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <button class="btn btn-primary" id="btnCopy">📋 複製全文</button>
+          <button class="btn btn-ghost" id="btnMd">⬇️ Markdown</button>
+          <button class="btn btn-ghost" id="btnDoc">⬇️ Word (.doc)</button>
+          <button class="btn btn-ghost" id="btnTex">⬇️ LaTeX (.tex)</button>
+          <button class="btn btn-ghost" id="btnStmt">➕ 人機協作聲明</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>監督日誌 <span class="en">Supervision log</span></h2>
+        <div style="overflow-x:auto"><table class="data logtable" id="logTable"></table></div>
+        <div class="noprint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn btn-ghost" id="btnLogCsv">⬇️ 日誌 CSV</button>
+          <button class="btn btn-ghost" id="btnLogJson">⬇️ 日誌 JSON</button>
+          <button class="btn btn-err" id="btnReset">🗑 清空草稿與日誌</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">草稿由確定性模板依實測數據生成（離線可用、免金鑰）；統計引擎已對照 SciPy 驗證。<br>
+    生成內容僅為起點——文責在人，投稿前請逐句確認。</footer>
+</main>
+
+<script src="assets/stats-engine.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var A=null, LANG='zh', STYLE='gen';
+var DRAFTS=[], LOG=[], SEQ=0;
+var SAVE_KEY='ae.paper.v1';
+var SECORDER=['titlekw','abstract','intro','methods','results','discussion','conclusion','statement'];
+var SECNAME={
+  titlekw:{zh:'題目與關鍵詞',en:'Title & Keywords',ico:'🏷'},
+  abstract:{zh:'摘要',en:'Abstract',ico:'🧾'},
+  intro:{zh:'引言',en:'Introduction',ico:'📖'},
+  methods:{zh:'方法',en:'Methods',ico:'🧪'},
+  results:{zh:'結果',en:'Results',ico:'📊'},
+  discussion:{zh:'討論',en:'Discussion',ico:'💬'},
+  conclusion:{zh:'結論',en:'Conclusion',ico:'🎯'},
+  statement:{zh:'人機協作聲明',en:'Human–AI Statement',ico:'🤝'}
+};
+
+/* ---------------- 工具 ---------------- */
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function nowISO(){return new Date().toISOString();}
+function dmsg(t,cls){var m=$('dataMsg');m.textContent=t;m.className='msg show '+cls;}
+function ctx(){
+  return {
+    scale:$('scaleName').value.trim()||'量表', scaleEn:$('scaleNameEn').value.trim()||'the scale',
+    course:$('courseName').value.trim()||'本課程', courseEn:$('courseNameEn').value.trim()||'the course',
+    semester:$('semester').value.trim()||'一學期'
+  };
+}
+function overall(){ return A.results[0].test; }
+function subResults(){ return A.results.slice(1).filter(function(r){return r.test;}); }
+function bestWorst(){
+  var subs=subResults(); if(!subs.length) return null;
+  var s=subs.slice().sort(function(a,b){return b.test.dz-a.test.dz;});
+  return {best:s[0],worst:s[s.length-1]};
+}
+function editRatio(a,b){
+  a=a||'';b=b||'';
+  if(!a.length&&!b.length) return 0;
+  var same=0,map={};
+  a.split('').forEach(function(ch){map[ch]=(map[ch]||0)+1;});
+  b.split('').forEach(function(ch){if(map[ch]){same++;map[ch]--;}});
+  return Math.round((1-same/Math.max(a.length,b.length))*100);
+}
+function fmtT(t){ return AE.fnum(t.t)+'('+t.df+')'; }
+
+/* ---------------- 持久化 ---------------- */
+function save(){
+  try{
+    localStorage.setItem(SAVE_KEY,JSON.stringify({
+      v:1,ts:nowISO(),SEQ:SEQ,LANG:LANG,STYLE:STYLE,
+      drafts:DRAFTS.map(function(d){var c={};for(var k in d)if(k!=='editing')c[k]=d[k];return c;}),
+      log:LOG,
+      settings:{scale:$('scaleName').value,scaleEn:$('scaleNameEn').value,course:$('courseName').value,
+                courseEn:$('courseNameEn').value,semester:$('semester').value}
+    }));
+  }catch(e){}
+}
+function restore(){
+  try{
+    var s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(!s) return;
+    DRAFTS=s.drafts||[]; LOG=s.log||[]; SEQ=s.SEQ||DRAFTS.length;
+    LANG=s.LANG||'zh'; STYLE=s.STYLE||'gen';
+    if(s.settings){
+      $('scaleName').value=s.settings.scale||$('scaleName').value;
+      $('scaleNameEn').value=s.settings.scaleEn||$('scaleNameEn').value;
+      $('courseName').value=s.settings.course||$('courseName').value;
+      $('courseNameEn').value=s.settings.courseEn||$('courseNameEn').value;
+      $('semester').value=s.settings.semester||$('semester').value;
+    }
+    $('langZh').classList.toggle('on',LANG==='zh'); $('langEn').classList.toggle('on',LANG==='en');
+    $('styGen').classList.toggle('on',STYLE==='gen'); $('styIeee').classList.toggle('on',STYLE==='ieee');
+  }catch(e){}
+}
+
+/* ---------------- 表格 ---------------- */
+function resultsTableHTML(lang){
+  var zh=lang==='zh';
+  var h='<table class="data"><thead><tr><th>'+(zh?'構面':'Measure')+'</th><th class="num">n</th>'+
+    '<th class="num">'+(zh?'前測 M (SD)':'Pre M (SD)')+'</th><th class="num">'+(zh?'後測 M (SD)':'Post M (SD)')+'</th>'+
+    '<th class="num">t(df)</th><th class="num">p</th><th class="num">dz [95% CI]</th></tr></thead><tbody>';
+  A.results.forEach(function(r){
+    var t=r.test; if(!t) return;
+    h+='<tr><td>'+esc(zh?r.unit.name:r.unit.en)+'</td><td class="num">'+t.n+'</td>'+
+      '<td class="num">'+AE.fnum(t.preMean)+' ('+AE.fnum(t.preSD)+')</td>'+
+      '<td class="num">'+AE.fnum(t.postMean)+' ('+AE.fnum(t.postSD)+')</td>'+
+      '<td class="num">'+fmtT(t)+'</td><td class="num">'+AE.fp(t.p).replace('p ','')+'</td>'+
+      '<td class="num">'+AE.fnum(t.dz)+' ['+AE.fnum(t.dzCiLow)+', '+AE.fnum(t.dzCiHigh)+']</td></tr>';
+  });
+  return h+'</tbody></table>';
+}
+function alphaSentence(lang){
+  var p=[];
+  if(A.alphaPre) p.push((lang==='zh'?'前測 ':'pretest ')+AE.falpha(A.alphaPre.alpha));
+  if(A.alphaPost) p.push((lang==='zh'?'後測 ':'posttest ')+AE.falpha(A.alphaPost.alpha));
+  if(!p.length) return lang==='zh'?'信度因樣本不足未予估計':'reliability was not estimable';
+  return p.join(lang==='zh'?'、':', ');
+}
+
+/* ---------------- 模板 ----------------
+   TPL[sec] = { zh:[fn,…], en:[fn,…], ieee:[fn,…] }（ieee 僅英文；缺者退回 en） */
+var TPL={};
+
+TPL.titlekw={
+  zh:[function(c){
+    return '【題目建議】\n以 AI 賦能「先思考、後驗證」教學提升學生'+c.scale+'：單組前後測研究\n\n'+
+      '【備選】\nAI 賦能學習生態下'+c.scale+'之改變：即時評量與效果量分析\n\n'+
+      '【關鍵詞】\nAI 賦能教學、'+c.scale+'、先思考後驗證、前後測設計、人在迴路上（HOTL）';
+  },function(c){
+    return '【題目建議】\n'+c.course+'對'+c.scale+'之影響：結合即時評量平台之實證研究\n\n'+
+      '【備選】\n從教學到證據：AI 賦能課程之'+c.scale+'成效評估\n\n'+
+      '【關鍵詞】\n'+c.scale+'、運算思維、教學成效、效果量、AI 輔助學習';
+  }],
+  en:[function(c){
+    return '[Suggested title]\nEnhancing Students\u2019 '+c.scaleEn+' through AI-Empowered Think-then-Verify Instruction: A One-Group Pretest\u2013Posttest Study\n\n'+
+      '[Alternative]\nFrom Teaching to Evidence: Assessing '+c.scaleEn+' in an AI-Empowered Learning Ecosystem\n\n'+
+      '[Keywords]\nAI-empowered instruction; '+c.scaleEn+'; think-then-verify; pretest\u2013posttest design; human-on-the-loop (HOTL)';
+  }],
+  ieee:[function(c){
+    return '[Suggested title]\nAI-Empowered Think-then-Verify Instruction for '+c.scaleEn+': Design and Evaluation of a Zero-Backend Learning Platform\n\n'+
+      '[Alternative]\nDesign, Deployment, and Evaluation of an AI-Empowered Assessment Ecosystem for '+c.scaleEn+'\n\n'+
+      '[Index Terms]\nAI in education, '+c.scaleEn+', learning analytics, human-on-the-loop, educational assessment';
+  }]
+};
+
+TPL.intro={
+  zh:[function(c){
+    var o=overall();
+    return '在生成式 AI 快速普及的背景下，高等教育面臨的關鍵課題已從「能否使用 AI」轉為「如何使 AI 成為學習的鷹架而非替代」。'+
+      c.scale+'——批判思考、溝通協調、團隊合作與創新創造——被廣泛視為 AI 時代不可外包的核心能力，然而其教學成效往往缺乏即時、可重複的量測工具。\n\n'+
+      '本研究以'+c.course+'為場域，實作「先思考、後驗證」工作流程：學生先以既有認知建構答案，再透過 AI 回饋與平台模擬驗證，'+
+      '並以自建之純前端評量平台於課程前後蒐集資料（有效配對 '+o.n+' 人）。'+
+      '研究問題有二：（1）課程介入後，學生之'+c.scale+'是否顯著提升？（2）各構面之改變幅度為何、對教學設計有何啟示？';
+  },function(c){
+    var o=overall();
+    return c.scale+'之培養是當前課程改革的核心目標，但既有研究多倚賴期末一次性問卷，難以支撐教學過程中的即時調整。'+
+      '本研究提出並驗證一套零後端、可離線運作的評量生態：作答即入庫、統計即時生成，使「教學—評量—回饋」形成閉環。\n\n'+
+      '在'+c.course+'（'+c.semester+'）中，'+o.n+' 名學生完成前後測配對。本文報告其'+c.scale+'之變化、'+
+      '各構面之效果量差異，並討論結果對 AI 賦能教學設計之意涵。';
+  }],
+  en:[function(c){
+    var o=overall();
+    return 'As generative AI becomes ubiquitous, the central question for higher education has shifted from whether to use AI to how to make it a scaffold rather than a substitute for learning. '+
+      'The '+c.scaleEn+'\u2014critical thinking, communication, collaboration, and creativity\u2014are widely regarded as competencies that cannot be outsourced to AI, yet their instruction is rarely supported by real-time, repeatable measurement.\n\n'+
+      'This study implemented a think-then-verify workflow in '+c.courseEn+': students first construct answers from prior knowledge and then verify them against AI feedback and platform simulations. '+
+      'A zero-backend assessment platform collected pre- and post-course data (n = '+o.n+' matched pairs). Two research questions guided the study: (1) Do students\u2019 '+c.scaleEn+' improve significantly after the intervention? (2) How do the subscales differ, and what are the implications for instructional design?';
+  }],
+  ieee:[function(c){
+    var o=overall();
+    return 'This paper presents the design and evaluation of an AI-empowered, zero-backend learning ecosystem for cultivating '+c.scaleEn+'. '+
+      'Unlike end-of-term surveys, the proposed platform captures assessment data in real time and pairs pre/post responses automatically, closing the loop between teaching, assessment, and feedback.\n\n'+
+      'We deployed the system in '+c.courseEn+' and collected '+o.n+' matched pre\u2013post pairs. '+
+      'The contributions are threefold: (1) a single-file, offline-capable assessment architecture; (2) empirical evidence of competency gains with effect-size analysis; and (3) a human-on-the-loop (HOTL) workflow in which every AI-drafted artefact is reviewed, revised, or rejected by the instructor, with the supervision log itself serving as research data.';
+  }]
+};
+
+TPL.methods={
+  zh:[function(c){
+    var o=overall();
+    return '研究對象與程序　本研究於'+c.course+'實施'+c.semester+'之單組前後測準實驗設計。'+
+      '前測有效樣本 '+A.nPre+' 人、後測 '+A.nPost+' 人，依匿名代碼配對後，納入分析之成對樣本為 '+o.n+' 人'+
+      '（另有 '+(A.preOnly+A.postOnly)+' 人因僅完成單次施測未納入）。\n\n'+
+      '研究工具　採用「'+c.scale+'」自陳量表（'+A.itemCount+' 題，Likert 五點計分）'+
+      (A.scheme.subs.length?('，涵蓋'+A.scheme.subs.map(function(s){return s.name;}).join('、')+'構面'):'')+
+      '；內部一致性信度為 '+alphaSentence('zh')+'。\n\n'+
+      '資料分析　以配對樣本 t 檢定（雙尾）考驗前後測差異，效果量以 Cohen\u2019s dz 表示並附 95% 信賴區間，'+
+      '另附 Hedges 校正（gz）供小樣本參考；信度以 Cronbach\u2019s α 依施測階段分別估計（listwise）。'+
+      '統計均於自建之前端統計引擎完成，數值已對照 SciPy 交叉驗證。';
+  },function(c){
+    var o=overall();
+    return '本研究採單組前後測設計，情境為'+c.course+'（'+c.semester+'）。'+
+      '學生於課程首週與末週填答「'+c.scale+'」量表（'+A.itemCount+' 題、五點 Likert），以匿名代碼完成配對；'+
+      '有效成對樣本 n = '+o.n+'（前測 '+A.nPre+'、後測 '+A.nPost+'）。量表信度：'+alphaSentence('zh')+'。'+
+      '分析以配對樣本 t 檢定為主，效果量報告 Cohen\u2019s dz（95% CI）與 Hedges gz；顯著水準 α = .05（雙尾）。';
+  }],
+  en:[function(c){
+    var o=overall();
+    return 'Participants and procedure. A one-group pretest\u2013posttest quasi-experimental design was implemented in '+
+      c.courseEn+' over one semester. Valid responses were obtained from '+A.nPre+' students at pretest and '+A.nPost+
+      ' at posttest; after matching by anonymous codes, '+o.n+' pairs were retained ('+(A.preOnly+A.postOnly)+
+      ' students completed only one wave).\n\n'+
+      'Instrument. The '+c.scaleEn+' self-report scale ('+A.itemCount+' items, 5-point Likert)'+
+      (A.scheme.subs.length?(' covered '+A.scheme.subs.map(function(s){return s.en;}).join(', ')+'.'):'.')+
+      ' Internal consistency was '+alphaSentence('en')+'.\n\n'+
+      'Analysis. Paired-samples t tests (two-tailed) were conducted; effect sizes are reported as Cohen\u2019s dz with 95% CIs and Hedges\u2019 gz. '+
+      'Reliability was estimated with Cronbach\u2019s α per wave (listwise). All computations used a client-side statistics engine cross-validated against SciPy.';
+  }],
+  ieee:[function(c){
+    var o=overall();
+    return 'A. Design and Participants\nA one-group pretest\u2013posttest design was adopted in '+c.courseEn+
+      '. Of '+A.nPre+' pretest and '+A.nPost+' posttest responses, '+o.n+' matched pairs were retained via anonymous-code matching.\n\n'+
+      'B. Instrument\nThe '+c.scaleEn+' scale ('+A.itemCount+' items, 5-point Likert) was administered through the proposed platform; reliability was '+alphaSentence('en')+'.\n\n'+
+      'C. Analysis\nPaired-samples t tests (two-tailed, α = .05) with Cohen\u2019s dz (95% CI) and Hedges\u2019 gz were computed by the platform\u2019s client-side engine, cross-validated against SciPy.';
+  }]
+};
+
+TPL.results={
+  zh:[function(c){
+    var o=overall(), bw=bestWorst();
+    var txt='表 1 呈現各構面前後測之描述統計與檢定結果。整體而言，'+c.scale+'由前測 M = '+AE.fnum(o.preMean)+
+      '（SD = '+AE.fnum(o.preSD)+'）提升至後測 M = '+AE.fnum(o.postMean)+'（SD = '+AE.fnum(o.postSD)+'），'+
+      '配對樣本 t 檢定達顯著，t('+o.df+') = '+AE.fnum(o.t)+'，'+AE.fp(o.p)+'，Cohen\u2019s dz = '+AE.fnum(o.dz)+
+      '（95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']），屬'+AE.magnitude(o.dz,'zh')+'效果量。';
+    if(bw) txt+='\n\n就構面而言，以「'+bw.best.unit.name+'」提升幅度最大（dz = '+AE.fnum(bw.best.test.dz)+'，'+AE.fp(bw.best.test.p)+
+      '），「'+bw.worst.unit.name+'」相對較小（dz = '+AE.fnum(bw.worst.test.dz)+'，'+AE.fp(bw.worst.test.p)+'）。';
+    return txt;
+  },function(c){
+    var o=overall(), bw=bestWorst();
+    var txt='配對樣本 t 檢定顯示，學生在'+c.scale+'之整體表現於課程後顯著提升'+
+      '（前測 M = '+AE.fnum(o.preMean)+'、後測 M = '+AE.fnum(o.postMean)+'；t('+o.df+') = '+AE.fnum(o.t)+'，'+
+      AE.fp(o.p)+'），效果量 dz = '+AE.fnum(o.dz)+'（95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']），達'+
+      AE.magnitude(o.dz,'zh')+'水準。';
+    if(bw) txt+='各構面均呈同方向變化（詳表 1），其中'+bw.best.unit.name+'之效果量最高（dz = '+AE.fnum(bw.best.test.dz)+'）。';
+    return txt;
+  }],
+  en:[function(c){
+    var o=overall(), bw=bestWorst();
+    var txt='Table 1 presents descriptive statistics and test results. Overall '+c.scaleEn+' scores increased from M = '+
+      AE.fnum(o.preMean)+' (SD = '+AE.fnum(o.preSD)+') to M = '+AE.fnum(o.postMean)+' (SD = '+AE.fnum(o.postSD)+
+      '); the paired-samples t test was significant, t('+o.df+') = '+AE.fnum(o.t)+', '+AE.fp(o.p)+
+      ', Cohen\u2019s dz = '+AE.fnum(o.dz)+', 95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+'], a '+
+      AE.magnitude(o.dz,'en')+' effect.';
+    if(bw) txt+='\n\nAt the subscale level, '+bw.best.unit.en+' showed the largest gain (dz = '+AE.fnum(bw.best.test.dz)+
+      ', '+AE.fp(bw.best.test.p)+'), whereas '+bw.worst.unit.en+' showed the smallest (dz = '+
+      AE.fnum(bw.worst.test.dz)+', '+AE.fp(bw.worst.test.p)+').';
+    return txt;
+  }],
+  ieee:[function(c){
+    var o=overall(), bw=bestWorst();
+    var txt='Table I summarizes the results. The overall '+c.scaleEn+' score rose from M = '+AE.fnum(o.preMean)+
+      ' (SD = '+AE.fnum(o.preSD)+') to M = '+AE.fnum(o.postMean)+' (SD = '+AE.fnum(o.postSD)+'), t('+o.df+') = '+
+      AE.fnum(o.t)+', '+AE.fp(o.p)+', with a '+AE.magnitude(o.dz,'en')+' effect size (dz = '+AE.fnum(o.dz)+
+      ', 95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']).';
+    if(bw) txt+=' Among the subscales, '+bw.best.unit.en+' improved most (dz = '+AE.fnum(bw.best.test.dz)+
+      ') and '+bw.worst.unit.en+' least (dz = '+AE.fnum(bw.worst.test.dz)+').';
+    return txt;
+  }]
+};
+
+TPL.discussion={
+  zh:[function(c){
+    var o=overall(), bw=bestWorst();
+    var t='本研究結果顯示，'+c.course+'介入後，學生之'+c.scale+'整體呈'+AE.magnitude(o.dz,'zh')+
+      '幅度且統計顯著之提升（dz = '+AE.fnum(o.dz)+'）。此結果支持「先思考、後驗證」工作流程之教學價值：'+
+      '學生先以既有認知建構答案，再藉 AI 或平台回饋驗證，使錯誤成為可觀察、可修正之學習資源。';
+    if(bw) t+='\n\n構面差異亦具啟示：'+bw.best.unit.name+'之提升最為明顯，可能與課程中高頻的實作—回饋循環有關；'+
+      '相對地，'+bw.worst.unit.name+'的成長較緩，後續教學可強化對應之鷹架設計。';
+    t+='\n\n研究限制　本研究為單組前後測設計，無對照組，成熟與練習效應無法完全排除；量表為自陳工具，'+
+      '測得為自我知覺而非客觀表現；樣本來自單一課程情境，外推宜謹慎。'+
+      '未來可納入對照組、行為指標與跨學期追蹤，並於 HOTL 架構下檢驗督導強度與學習成效之關聯。';
+    return t;
+  },function(c){
+    var o=overall();
+    return '整體而言，數據支持本課程對'+c.scale+'之正向影響（dz = '+AE.fnum(o.dz)+'，'+AE.fp(o.p)+'），'+
+      '效果量達'+AE.magnitude(o.dz,'zh')+'水準，顯示改變幅度具實務意義而非僅統計顯著。\n\n'+
+      '惟解釋時應注意：單組設計限制因果推論；自陳量表可能受社會期許影響；配對後樣本縮減（n = '+o.n+'）'+
+      '使檢定力受限。建議後續以準實驗對照設計與多元資料來源（平台行為紀錄、作品評分）交叉驗證。';
+  }],
+  en:[function(c){
+    var o=overall(), bw=bestWorst();
+    var t='The findings indicate a statistically significant, '+AE.magnitude(o.dz,'en')+'-sized improvement in '+
+      c.scaleEn+' following '+c.courseEn+' (dz = '+AE.fnum(o.dz)+'). This supports the think-then-verify workflow: '+
+      'students construct answers from prior knowledge and verify them against AI or platform feedback, turning errors into observable, correctable resources.';
+    if(bw) t+='\n\nSubscale differences are informative: '+bw.best.unit.en+' improved most, plausibly reflecting frequent '+
+      'practice\u2013feedback cycles, whereas '+bw.worst.unit.en+' grew more slowly and may require additional scaffolding.';
+    t+='\n\nLimitations. The one-group design cannot rule out maturation or practice effects; self-reports capture perceived '+
+      'rather than objective competence; and the single-course sample limits generalisability. Future work should add control '+
+      'groups, behavioural indicators, and longitudinal follow-ups within a human-on-the-loop (HOTL) framework.';
+    return t;
+  }],
+  ieee:[function(c){
+    var o=overall();
+    return 'The evaluation demonstrates that the proposed ecosystem yields a '+AE.magnitude(o.dz,'en')+
+      ' and significant gain in '+c.scaleEn+' (dz = '+AE.fnum(o.dz)+', '+AE.fp(o.p)+
+      '). Beyond the effect itself, the architecture shows that meaningful learning analytics need not require server '+
+      'infrastructure: a single-file client computes reliability, paired tests, and effect sizes in situ.\n\n'+
+      'Threats to validity include the absence of a control group, reliance on self-report, and the reduced matched sample '+
+      '(n = '+o.n+'). These are partially mitigated by effect-size reporting with confidence intervals and by SciPy-validated computation.';
+  }]
+};
+
+TPL.conclusion={
+  zh:[function(c){
+    var o=overall();
+    return '本研究在'+c.course+'中驗證了 AI 賦能「先思考、後驗證」教學之成效：'+c.scale+'整體顯著提升'+
+      '（dz = '+AE.fnum(o.dz)+'，95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']）。'+
+      '本文貢獻有三：（1）提出零後端、可離線之即時評量生態，使教學數據之蒐集與分析在課堂內即時完成；'+
+      '（2）以效果量與信度並陳之方式提供可重複之實證證據；（3）示範 HOTL 人機協作流程——'+
+      'AI 起草、教師逐段把關，且監督紀錄本身構成人機協作研究之資料。'+
+      '未來將擴充對照設計與跨學期追蹤，深化構面層次之教學調整。';
+  },function(c){
+    var o=overall();
+    return '綜上，'+c.course+'對學生'+c.scale+'具'+AE.magnitude(o.dz,'zh')+'且顯著之正向效果（dz = '+AE.fnum(o.dz)+'）。'+
+      '「教學產生數據、數據回饋教學」的閉環在零後端架構下即可運作，'+
+      '為資源有限的教學現場提供了可直接複用的實作路徑。';
+  }],
+  en:[function(c){
+    var o=overall();
+    return 'This study validated AI-empowered think-then-verify instruction in '+c.courseEn+': '+c.scaleEn+
+      ' improved significantly overall (dz = '+AE.fnum(o.dz)+', 95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']). '+
+      'The contributions are: (1) a zero-backend, offline-capable ecosystem for real-time classroom assessment; '+
+      '(2) reproducible evidence combining effect sizes with reliability; and (3) a demonstrated HOTL workflow in which '+
+      'AI drafts and the instructor adjudicates paragraph-by-paragraph, with the supervision log itself constituting research data. '+
+      'Future work will add controlled comparisons and longitudinal tracking.';
+  }],
+  ieee:[function(c){
+    var o=overall();
+    return 'This paper presented and evaluated an AI-empowered learning ecosystem for '+c.scaleEn+
+      '. Deployment in a semester-long course produced a significant, '+AE.magnitude(o.dz,'en')+'-sized gain '+
+      '(dz = '+AE.fnum(o.dz)+'). The zero-backend architecture, SciPy-validated in-browser analytics, and HOTL '+
+      'drafting workflow together offer a replicable path from everyday teaching to publishable evidence. '+
+      'Future work includes controlled designs and cross-semester replication.';
+  }]
+};
+
+TPL.abstract={
+  zh:[function(c){
+    var o=overall();
+    return '本研究以單組前後測設計，檢驗'+c.course+'對學生'+c.scale+'之影響。'+
+      '有效配對樣本 '+o.n+' 人，前後測以「'+c.scale+'」量表（'+A.itemCount+' 題，'+alphaSentence('zh')+'）施測。'+
+      '配對樣本 t 檢定顯示整體顯著提升：t('+o.df+') = '+AE.fnum(o.t)+'，'+AE.fp(o.p)+'，Cohen\u2019s dz = '+
+      AE.fnum(o.dz)+'（95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']）。'+
+      '結果支持 AI 賦能之「先思考、後驗證」教學設計；文末就單組設計與自陳量表之限制提出後續研究建議。';
+  }],
+  en:[function(c){
+    var o=overall();
+    return 'This study examined the effect of '+c.courseEn+' on students\u2019 '+c.scaleEn+
+      ' using a one-group pretest\u2013posttest design (n = '+o.n+' matched pairs). The '+A.itemCount+'-item scale showed '+
+      'adequate reliability ('+alphaSentence('en')+'). Paired-samples t tests revealed a significant overall gain, '+
+      't('+o.df+') = '+AE.fnum(o.t)+', '+AE.fp(o.p)+', Cohen\u2019s dz = '+AE.fnum(o.dz)+' (95% CI ['+
+      AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']). Findings support AI-empowered think-then-verify instruction; '+
+      'limitations and future directions are discussed.';
+  }],
+  ieee:[function(c){
+    var o=overall();
+    return 'This paper evaluates an AI-empowered, zero-backend learning ecosystem for cultivating '+c.scaleEn+
+      '. In a one-group pretest\u2013posttest deployment (n = '+o.n+' matched pairs; scale reliability '+alphaSentence('en')+
+      '), paired-samples t tests showed a significant overall improvement, t('+o.df+') = '+AE.fnum(o.t)+', '+AE.fp(o.p)+
+      ', Cohen\u2019s dz = '+AE.fnum(o.dz)+' (95% CI ['+AE.fnum(o.dzCiLow)+', '+AE.fnum(o.dzCiHigh)+']). '+
+      'All analytics run client-side and are cross-validated against SciPy; drafting follows a human-on-the-loop workflow whose supervision log doubles as research data.';
+  }]
+};
+
+function variantsOf(sec){
+  if(LANG==='en'&&STYLE==='ieee'&&TPL[sec].ieee) return TPL[sec].ieee;
+  return TPL[sec][LANG]||TPL[sec].zh;
+}
+
+/* ---------------- 草稿生命週期 ---------------- */
+function generate(sec,variant){
+  if(!A){ dmsg('請先載入資料','err'); return; }
+  var vs=variantsOf(sec);
+  var v=(variant===undefined)?0:variant%vs.length;
+  var text=vs[v](ctx());
+  var html=(sec==='results')?resultsTableHTML(LANG):null;
+  DRAFTS.forEach(function(d){ if(d.sec===sec&&d.lang===LANG&&d.state==='pending') d.state='superseded'; });
+  DRAFTS.push({id:'d'+(++SEQ),sec:sec,lang:LANG,style:STYLE,variant:v,text:text,html:html,state:'pending',finalText:null,revised:false,ts:nowISO()});
+  addLog(sec,v,'generated',0,'');
+  renderAll();
+}
+function addLog(sec,variant,action,ratio,reason){
+  LOG.push({ts:nowISO(),sec:sec,lang:LANG,style:STYLE,variant:'V'+(variant+1),action:action,editRatio:ratio,reason:reason||''});
+}
+function act(id,what){
+  var d=DRAFTS.filter(function(x){return x.id===id;})[0];
+  if(!d) return;
+  if(what==='adopt'){
+    // 同節同語言先前採納的自動讓位
+    DRAFTS.forEach(function(x){ if(x!==d&&x.sec===d.sec&&x.lang===d.lang&&x.state==='adopted') x.state='superseded'; });
+    d.state='adopted'; d.finalText=d.text;
+    LANG=d.lang; addLog(d.sec,d.variant,'adopted',0,'');
+  }else if(what==='reviseOpen'){ d.editing=true;
+  }else if(what==='reviseSave'){
+    var ta=document.getElementById('ta-'+id);
+    var t=ta?ta.value.trim():d.text;
+    DRAFTS.forEach(function(x){ if(x!==d&&x.sec===d.sec&&x.lang===d.lang&&x.state==='adopted') x.state='superseded'; });
+    var ratio=editRatio(d.text,t);
+    d.state='adopted'; d.finalText=t; d.editing=false; d.revised=true;
+    LANG=d.lang; addLog(d.sec,d.variant,'revised_adopted',ratio,'');
+  }else if(what==='reviseCancel'){ d.editing=false;
+  }else if(what==='reject'){
+    var reason=prompt('退回理由（會寫入監督日誌，可留白）','')||'';
+    d.state='rejected';
+    LANG=d.lang; addLog(d.sec,d.variant,'rejected',0,reason);
+    generate(d.sec,d.variant+1);
+    return;
+  }
+  renderAll();
+}
+
+/* ---------------- 畫面 ---------------- */
+function renderAll(){ renderSecmap(); renderDrafts(); renderFinal(); renderLog(); renderDash(); syncSteps(); save(); }
+
+function secState(sec){
+  var st=null;
+  DRAFTS.forEach(function(d){
+    if(d.sec!==sec||d.state==='superseded') return;
+    if(d.state==='adopted') st='adopted';
+    else if(d.state==='pending'&&st!=='adopted') st='pending';
+  });
+  return st;
+}
+function renderSecmap(){
+  var host=$('secmap'); host.innerHTML='';
+  SECORDER.forEach(function(sec){
+    if(sec==='statement'&&!secState(sec)) return;
+    var st=secState(sec);
+    var b=document.createElement('button');
+    b.type='button';
+    b.className='sc'+(st?' '+st:'');
+    b.textContent=SECNAME[sec].ico+' '+SECNAME[sec].zh+(st==='adopted'?' ✓':st==='pending'?' •':'');
+    b.title=st==='adopted'?'已採納':st==='pending'?'待審':'尚未生成';
+    b.addEventListener('click',function(){
+      if(!st){ if(sec!=='statement') generate(sec); return; }
+      var card=document.querySelector('.draft[data-sec="'+sec+'"]');
+      if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+    host.appendChild(b);
+  });
+}
+function renderDrafts(){
+  var host=$('drafts');
+  var live=DRAFTS.filter(function(d){return d.state!=='superseded';});
+  if(!live.length){ host.innerHTML='<p class="pill">尚無草稿——載入資料後點選左側要生成的段落。</p>'; return; }
+  host.innerHTML='';
+  live.slice().reverse().forEach(function(d){
+    var el=document.createElement('div');
+    el.className='draft'+(d.state==='adopted'?' adopted':d.state==='rejected'?' rejected':'');
+    el.setAttribute('data-sec',d.sec);
+    var stateTag=d.state==='pending'?'<span class="state pending">待審</span>'
+      :d.state==='adopted'?(d.revised?'<span class="state revised">修改後採納</span>':'<span class="state adopted">已採納</span>')
+      :'<span class="state rejected">已退回</span>';
+    var body=d.editing
+      ?'<textarea id="ta-'+d.id+'" rows="8">'+esc(d.text)+'</textarea>'
+      :'<div class="txt">'+esc(d.state==='adopted'?d.finalText:d.text)+'</div>'+(d.html||'');
+    var acts='';
+    if(d.state==='pending'&&!d.editing){
+      acts='<button class="btn btn-ok" data-a="adopt">✅ 採納</button>'+
+           '<button class="btn btn-ghost" data-a="reviseOpen">✏️ 修改後採納</button>'+
+           '<button class="btn btn-err" data-a="reject">↩️ 退回重生</button>';
+    }else if(d.editing){
+      acts='<button class="btn btn-ok" data-a="reviseSave">💾 儲存並採納</button>'+
+           '<button class="btn btn-ghost" data-a="reviseCancel">取消</button>';
+    }else if(d.state==='adopted'){
+      acts='<button class="btn btn-ghost" data-a="reviseOpen">✏️ 再修改</button>';
+      if(d.editing===undefined||!d.editing){} // no-op
+    }
+    el.innerHTML='<div class="dhead"><b>'+SECNAME[d.sec].ico+' '+SECNAME[d.sec].zh+' '+SECNAME[d.sec].en+'</b>'+
+      '<span class="pill">'+(d.lang==='zh'?'中文':(d.style==='ieee'?'EN·IEEE':'EN'))+' · V'+(d.variant+1)+'</span>'+stateTag+'</div>'+
+      body+'<div class="acts">'+acts+'</div>';
+    el.querySelectorAll('[data-a]').forEach(function(b){
+      b.addEventListener('click',function(){
+        if(d.state==='adopted'&&b.dataset.a==='reviseOpen'){ d.text=d.finalText; d.state='pending'; d.editing=true; renderAll(); return; }
+        act(d.id,b.dataset.a);
+      });
+    });
+    host.appendChild(el);
+  });
+}
+function adoptedMap(){
+  var m={};
+  DRAFTS.forEach(function(d){ if(d.state==='adopted') m[d.sec+'|'+d.lang]=d; });
+  return m;
+}
+function renderFinal(){
+  var host=$('final');
+  var m=adoptedMap(), parts=[];
+  SECORDER.forEach(function(sec){
+    ['zh','en'].forEach(function(lang){
+      var d=m[sec+'|'+lang]; if(!d) return;
+      parts.push('<h3>'+SECNAME[sec][lang]+(lang==='zh'?'（'+SECNAME[sec].en+'）':'')+'</h3>'+
+        '<p>'+esc(d.finalText)+'</p>'+(sec==='results'&&d.html?d.html:''));
+    });
+  });
+  var missing=[];
+  ['titlekw','abstract','intro','methods','results','discussion','conclusion'].forEach(function(sec){
+    if(!m[sec+'|zh']&&!m[sec+'|en']) missing.push(SECNAME[sec].zh);
+  });
+  var hint = parts.length&&missing.length
+    ? '<p class="pill" style="margin-top:12px">尚未採納：'+missing.join('、')+'（點上方狀態條可直接生成）</p>' : '';
+  host.innerHTML=parts.length?(parts.join('')+hint):'<p class="pill">已採納段落將依 題目 → 摘要 → 引言 → 方法 → 結果 → 討論 → 結論 排列。</p>';
+}
+function renderDash(){
+  var gen=0,ad=0,rev=0,rej=0,ratios=[];
+  LOG.forEach(function(l){
+    if(l.action==='generated')gen++;
+    else if(l.action==='adopted')ad++;
+    else if(l.action==='revised_adopted'){rev++;ratios.push(l.editRatio);}
+    else if(l.action==='rejected')rej++;
+  });
+  var decided=ad+rev+rej;
+  var rate=decided?Math.round((ad+rev)/decided*100):null;
+  var avg=ratios.length?Math.round(ratios.reduce(function(a,b){return a+b;},0)/ratios.length):null;
+  $('dash').innerHTML=
+    '<div class="d"><b>'+gen+'</b><span>AI 生成段數</span></div>'+
+    '<div class="d"><b>'+ad+'</b><span>直接採納</span></div>'+
+    '<div class="d"><b>'+rev+'</b><span>修改後採納'+(avg!==null?'（均 '+avg+'%）':'')+'</span></div>'+
+    '<div class="d"><b>'+rej+'</b><span>退回重生</span></div>'+
+    '<div class="d"><b>'+(rate===null?'—':rate+'%')+'</b><span>採納率</span></div>';
+}
+function renderLog(){
+  var t=$('logTable');
+  if(!LOG.length){ t.innerHTML=''; return; }
+  var ACT={generated:'生成',adopted:'採納',revised_adopted:'修改後採納',rejected:'退回重生'};
+  var h='<thead><tr><th>時間</th><th>段落</th><th>語/風格</th><th>寫法</th><th>動作</th><th class="num">修改幅度</th><th>理由</th></tr></thead><tbody>';
+  LOG.slice().reverse().forEach(function(l){
+    h+='<tr><td>'+l.ts.replace('T',' ').slice(5,19)+'</td><td>'+SECNAME[l.sec].zh+'</td>'+
+       '<td>'+(l.lang==='zh'?'中':(l.style==='ieee'?'EN·IEEE':'EN'))+'</td><td>'+l.variant+'</td>'+
+       '<td>'+(ACT[l.action]||l.action)+'</td>'+
+       '<td class="num">'+(l.action==='revised_adopted'?l.editRatio+'%':'—')+'</td><td>'+esc(l.reason)+'</td></tr>';
+  });
+  t.innerHTML=h+'</tbody>';
+}
+function syncSteps(){
+  var s1=!!A, s2=DRAFTS.length>0,
+      s3=LOG.some(function(l){return l.action!=='generated';}),
+      s4=DRAFTS.some(function(d){return d.state==='adopted';});
+  [[1,s1],[2,s2],[3,s3],[4,s4]].forEach(function(x){ $('st'+x[0]).className='st '+(x[1]?'done':''); });
+  $('st'+(!s1?1:!s2?2:!s4?3:4)).className='st now';
+}
+
+/* ---------------- 人機協作聲明 ---------------- */
+function stmt(){
+  var gen=0,ad=0,rev=0,rej=0,ratios=[];
+  LOG.forEach(function(l){
+    if(l.action==='generated')gen++; else if(l.action==='adopted')ad++;
+    else if(l.action==='revised_adopted'){rev++;ratios.push(l.editRatio);}
+    else if(l.action==='rejected')rej++;
+  });
+  var avg=ratios.length?Math.round(ratios.reduce(function(a,b){return a+b;},0)/ratios.length):0;
+  var zh='人機協作聲明　本文初稿由確定性模板引擎依實測數據生成，作者以人在迴路上（Human-on-the-Loop）'+
+    '方式逐段審查：共生成 '+gen+' 段，其中 '+ad+' 段直接採納、'+rev+' 段修改後採納（平均修改幅度 '+avg+'%）、'+
+    rej+' 段退回重生。全部統計數值由經 SciPy 交叉驗證之前端引擎計算；最終文字內容與學術責任由作者承擔。';
+  var en='Human\u2013AI collaboration statement. Initial drafts were produced by a deterministic template engine from the '+
+    'empirical data and reviewed paragraph-by-paragraph in a human-on-the-loop workflow: '+gen+' drafts were generated, '+
+    ad+' adopted as-is, '+rev+' adopted after revision (mean edit ratio '+avg+'%), and '+rej+' rejected and regenerated. '+
+    'All statistics were computed by a client-side engine cross-validated against SciPy. The authors bear full '+
+    'responsibility for the final text.';
+  DRAFTS.forEach(function(d){ if(d.sec==='statement'&&d.lang===LANG&&d.state==='pending') d.state='superseded'; });
+  DRAFTS.push({id:'d'+(++SEQ),sec:'statement',lang:LANG,style:STYLE,variant:0,
+    text:(LANG==='zh'?zh:en),html:null,state:'pending',finalText:null,revised:false,ts:nowISO()});
+  addLog('statement',0,'generated',0,'');
+  renderAll();
+}
+
+/* ---------------- 匯出 ---------------- */
+function mdTable(lang){
+  var zh=lang==='zh', out=[];
+  out.push('| '+(zh?'構面':'Measure')+' | n | '+(zh?'前測':'Pre')+' M (SD) | '+(zh?'後測':'Post')+' M (SD) | t(df) | p | dz [95% CI] |');
+  out.push('|---|---|---|---|---|---|---|');
+  A.results.forEach(function(r){
+    var t=r.test; if(!t) return;
+    out.push('| '+(zh?r.unit.name:r.unit.en)+' | '+t.n+' | '+AE.fnum(t.preMean)+' ('+AE.fnum(t.preSD)+') | '+
+      AE.fnum(t.postMean)+' ('+AE.fnum(t.postSD)+') | '+fmtT(t)+' | '+AE.fp(t.p).replace('p ','')+' | '+
+      AE.fnum(t.dz)+' ['+AE.fnum(t.dzCiLow)+', '+AE.fnum(t.dzCiHigh)+'] |');
+  });
+  return out.join('\n');
+}
+function finalText(fmt){
+  var m=adoptedMap(), out=[];
+  SECORDER.forEach(function(sec){
+    ['zh','en'].forEach(function(lang){
+      var d=m[sec+'|'+lang]; if(!d) return;
+      var title=SECNAME[sec][lang];
+      if(fmt==='md'){
+        out.push('## '+title+'\n\n'+d.finalText);
+        if(sec==='results'&&A) out.push('\n'+mdTable(lang));
+      }else out.push(title+'\n\n'+d.finalText);
+    });
+  });
+  return out.join('\n\n');
+}
+function texEscape(s){
+  return String(s).replace(/\\/g,'\\textbackslash{}').replace(/([%&#$_{}])/g,'\\$1')
+    .replace(/\u2019/g,"'").replace(/～/g,'\\textasciitilde{}');
+}
+function toTex(){
+  var m=adoptedMap();
+  var TEXSEC={abstract:null,intro:'Introduction',methods:'Methodology',results:'Results',
+              discussion:'Discussion',conclusion:'Conclusion',statement:'Human--AI Collaboration Statement'};
+  // 從「題目與關鍵詞」節抽出建議題目；抽不到就放佔位字
+  var title='Your Title Here';
+  var tk=m['titlekw|en']||m['titlekw|zh'];
+  if(tk){
+    var mt=tk.finalText.match(/\[(?:Suggested title|題目建議)\]\n([^\n]+)/)||tk.finalText.match(/【題目建議】\n([^\n]+)/);
+    if(mt) title=mt[1].trim();
+  }
+  var lines=['% 由 AI 賦能教學 Hub 論文生成器輸出（IEEEtran 骨架）',
+    '\\documentclass[conference]{IEEEtran}','\\usepackage[utf8]{inputenc}','\\usepackage{booktabs}','',
+    '\\title{'+texEscape(title)+'}',
+    '\\author{\\IEEEauthorblockN{Author}\\IEEEauthorblockA{Affiliation}}','',
+    '\\begin{document}','\\maketitle',''];
+  // 摘要
+  var ab=m['abstract|en']||m['abstract|zh'];
+  if(ab) lines.push('\\begin{abstract}',texEscape(ab.finalText),'\\end{abstract}','');
+  var kw=m['titlekw|en']||m['titlekw|zh'];
+  if(kw){
+    var kws=(kw.finalText.match(/\[(?:Keywords|Index Terms)\]\n([^\n]+)/)||[])[1];
+    if(kws) lines.push('\\begin{IEEEkeywords}',texEscape(kws),'\\end{IEEEkeywords}','');
+  }
+  ['intro','methods','results','discussion','conclusion','statement'].forEach(function(sec){
+    var d=m[sec+'|en']||m[sec+'|zh'];
+    if(!d) return;
+    lines.push('\\section{'+TEXSEC[sec]+'}',texEscape(d.finalText),'');
+    if(sec==='results'&&A){
+      lines.push('\\begin{table}[!t]','\\caption{Descriptive Statistics and Paired-Samples Tests}','\\centering',
+        '\\begin{tabular}{lcccccc}','\\toprule',
+        'Measure & n & Pre M (SD) & Post M (SD) & t(df) & p & dz \\\\','\\midrule');
+      A.results.forEach(function(r){
+        var t=r.test; if(!t) return;
+        lines.push(texEscape(r.unit.en)+' & '+t.n+' & '+AE.fnum(t.preMean)+' ('+AE.fnum(t.preSD)+') & '+
+          AE.fnum(t.postMean)+' ('+AE.fnum(t.postSD)+') & '+fmtT(t)+' & '+
+          texEscape(AE.fp(t.p).replace('p ',''))+' & '+AE.fnum(t.dz)+' \\\\');
+      });
+      lines.push('\\bottomrule','\\end{tabular}','\\end{table}','');
+    }
+  });
+  lines.push('\\end{document}');
+  return lines.join('\n');
+}
+function dl(name,content,mime){
+  var blob=new Blob([content],{type:mime+';charset=utf-8'});
+  var u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(u);a.remove();},0);
+}
+$('btnCopy').addEventListener('click',function(){
+  var t=finalText('txt'); if(!t){alert('尚無已採納段落');return;}
+  navigator.clipboard.writeText(t).then(function(){ $('btnCopy').textContent='✓ 已複製'; setTimeout(function(){$('btnCopy').textContent='📋 複製全文';},1500); });
+});
+$('btnMd').addEventListener('click',function(){ var t=finalText('md'); if(!t){alert('尚無已採納段落');return;} dl('manuscript.md',t,'text/markdown'); });
+$('btnDoc').addEventListener('click',function(){
+  if(!DRAFTS.some(function(d){return d.state==='adopted';})){alert('尚無已採納段落');return;}
+  var html='<html xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8">'+
+    '<style>body{font-family:"Times New Roman","標楷體",serif;font-size:12pt;line-height:1.8}'+
+    'h3{font-size:14pt}table{border-collapse:collapse}td,th{border:1px solid #333;padding:4px 8px;font-size:10.5pt}</style>'+
+    '</head><body>'+$('final').innerHTML+'</body></html>';
+  dl('manuscript.doc',html,'application/msword');
+});
+$('btnTex').addEventListener('click',function(){
+  if(!DRAFTS.some(function(d){return d.state==='adopted';})){alert('尚無已採納段落');return;}
+  dl('manuscript.tex',toTex(),'application/x-tex');
+});
+$('btnStmt').addEventListener('click',stmt);
+$('btnLogCsv').addEventListener('click',function(){
+  if(!LOG.length){alert('日誌是空的');return;}
+  var head=['ts','section','lang','style','variant','action','edit_ratio_pct','reason'];
+  var lines=[head.join(',')].concat(LOG.map(function(l){
+    return [l.ts,l.sec,l.lang,l.style,l.variant,l.action,l.editRatio,'"'+String(l.reason).replace(/"/g,'""')+'"'].join(',');
+  }));
+  dl('hotl-supervision-log.csv','﻿'+lines.join('\r\n'),'text/csv');
+});
+$('btnLogJson').addEventListener('click',function(){
+  dl('hotl-supervision-log.json',JSON.stringify({exportedAt:nowISO(),log:LOG},null,2),'application/json');
+});
+$('btnReset').addEventListener('click',function(){
+  if(!confirm('清空所有草稿與監督日誌？（資料來源與設定保留）'))return;
+  DRAFTS=[];LOG=[];SEQ=0;
+  try{localStorage.removeItem(SAVE_KEY);}catch(e){}
+  renderAll();
+});
+
+/* ---------------- 資料載入（共用資料流） ---------------- */
+function load(silent){
+  var parsed=AE.parseRecords($('dataIn').value);
+  if(!parsed.records.length){ if(!silent) dmsg(parsed.errors[0]||'解析不到任何紀錄','err'); return false; }
+  var key=AE.guessScheme(parsed.records);
+  A=AE.analyse(parsed.records,key);
+  if(!overall()){ if(!silent) dmsg('配對樣本不足（需至少 2 人完成前後測）','err'); A=null; return false; }
+  var o=overall();
+  $('dataChips').style.display='flex';
+  $('dataChips').innerHTML=
+    '<div class="dchip"><b>'+A.pairs+'</b><span>配對樣本</span></div>'+
+    '<div class="dchip"><b>'+AE.fnum(o.dz)+'</b><span>整體 dz</span></div>'+
+    '<div class="dchip"><b>'+(A.alphaPre?AE.fnum(A.alphaPre.alpha):'—')+'</b><span>α 前測</span></div>'+
+    '<div class="dchip"><b>'+(A.alphaPost?AE.fnum(A.alphaPost.alpha):'—')+'</b><span>α 後測</span></div>';
+  dmsg('✓ '+A.scheme.name+'（與統計工作台共用，免重複貼上）','ok');
+  document.querySelectorAll('.gen').forEach(function(b){b.disabled=false;});
+  $('btnGenAll').disabled=false;
+  // 存回共用資料流
+  try{ localStorage.setItem(AE.DATASET_KEY,JSON.stringify({savedAt:nowISO(),schemeKey:key,raw:$('dataIn').value})); }catch(e){}
+  syncSteps();
+  return true;
+}
+$('btnLoad').addEventListener('click',function(){ load(false); });
+$('btnDemo').addEventListener('click',function(){ $('dataIn').value=AE.demoData(); load(false); });
+document.querySelectorAll('.gen').forEach(function(b){
+  b.addEventListener('click',function(){ generate(b.dataset.sec); });
+});
+$('btnGenAll').addEventListener('click',function(){
+  ['titlekw','abstract','intro','methods','results','discussion','conclusion'].forEach(function(s){
+    // 已採納的節不重生（精簡操作：避免覆蓋已審內容）
+    var done=DRAFTS.some(function(d){return d.sec===s&&d.lang===LANG&&d.state==='adopted';});
+    if(!done) generate(s);
+  });
+});
+$('langZh').addEventListener('click',function(){ LANG='zh'; $('langZh').classList.add('on'); $('langEn').classList.remove('on'); save(); });
+$('langEn').addEventListener('click',function(){ LANG='en'; $('langEn').classList.add('on'); $('langZh').classList.remove('on'); save(); });
+$('styGen').addEventListener('click',function(){ STYLE='gen'; $('styGen').classList.add('on'); $('styIeee').classList.remove('on'); save(); });
+$('styIeee').addEventListener('click',function(){ STYLE='ieee'; $('styIeee').classList.add('on'); $('styGen').classList.remove('on'); save(); });
+['scaleName','scaleNameEn','courseName','courseNameEn','semester'].forEach(function(id){
+  $(id).addEventListener('change',save);
+});
+
+/* ---- 鍵盤快速鍵：A 採納 / E 修改 / R 退回 / Esc 取消（不干擾輸入框） ---- */
+document.addEventListener('keydown',function(e){
+  var tag=(document.activeElement&&document.activeElement.tagName)||'';
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||e.ctrlKey||e.metaKey||e.altKey) {
+    if(e.key==='Escape'&&tag==='TEXTAREA'){
+      var ed=DRAFTS.filter(function(d){return d.editing;})[0];
+      if(ed){ ed.editing=false; renderAll(); }
+    }
+    return;
+  }
+  var key=e.key.toLowerCase();
+  if(key!=='a'&&key!=='e'&&key!=='r') return;
+  var top=DRAFTS.filter(function(d){return d.state==='pending'&&!d.editing;}).pop();
+  if(!top) return;
+  e.preventDefault();
+  if(key==='a') act(top.id,'adopt');
+  else if(key==='e') act(top.id,'reviseOpen');
+  else if(key==='r') act(top.id,'reject');
+  var card=document.querySelector('.draft[data-sec="'+top.sec+'"]');
+  if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
+/* ---- 啟動：還原草稿 → 自動載入共用資料（一次貼、處處用） ---- */
+restore();
+try{
+  var saved=JSON.parse(localStorage.getItem(AE.DATASET_KEY)||'null');
+  if(saved&&saved.raw){ $('dataIn').value=saved.raw; load(true)&&dmsg('✓ 已自動沿用共用資料（'+(saved.savedAt||'').slice(0,10)+' 儲存）','ok'); }
+  else $('rawBox').setAttribute('open','');
+}catch(e){ $('rawBox').setAttribute('open',''); }
+renderAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>教師工作台｜AI 賦能教學 Hub</title>
+<meta name="description" content="教師專用單一頁面：教師總覽（全平台即時＋統計報表）、統計分析工作台、HOTL 論文生成，一組密碼進入。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/console.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+html,body{height:100%}
+body{display:flex;flex-direction:column;min-height:100vh}
+/* ---- 密碼 UI ---- */
+.gate{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.gbox{background:#fff;border-radius:18px;box-shadow:var(--shadow-lg);padding:30px 34px;width:100%;max-width:420px}
+.gbox .logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;margin-bottom:14px}
+.gbox h1{font-size:20px;color:var(--primary)}
+.gbox p{font-size:12.5px;color:var(--muted);margin:6px 0 16px;line-height:1.7}
+.gbox input[type=password]{font-size:18px;letter-spacing:6px;text-align:center;padding:12px}
+.gbox .row{display:flex;gap:8px;margin-top:12px}
+.gbox .row .btn{flex:1;justify-content:center;padding:11px}
+.gbox .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.gbox .tools div{background:var(--soft);border-radius:10px;padding:9px;font-size:11.5px;text-align:center;color:var(--ink)}
+.gbox .tools div b{display:block;font-size:18px;margin-bottom:2px}
+.gbox .msg{text-align:center}
+.gbox .remember{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:10px;cursor:pointer}
+/* ---- 工作台 ---- */
+.app{display:none;flex:1;flex-direction:column;min-height:0}
+.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:52px;z-index:30}
+.tabs .wrap{display:flex;align-items:center;gap:4px;padding:6px 18px;overflow-x:auto}
+.tab{font-family:inherit;font-size:13px;font-weight:700;padding:8px 16px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.tab:hover{background:var(--soft);color:var(--primary)}
+.tab.on{background:var(--primary);color:#fff}
+.tabs .spacer{flex:1}
+.tabs .st{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.tabs .st .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dim);margin-right:5px}
+.tabs .st .dot.on{background:var(--ok)}
+.tabs .x{font-size:11.5px;font-weight:700;color:var(--muted);background:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.tabs .x:hover{color:var(--err);border-color:var(--err)}
+.stage{flex:1;position:relative;min-height:0}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none;background:var(--bg)}
+.stage iframe.on{display:block}
+@media(max-width:640px){.tab{padding:7px 11px;font-size:12px}.tabs .st{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a>
+      <a aria-current='page' href='/console'>教師工作台</a>
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" style="display:contents">
+  <!-- 密碼 UI -->
+  <section class="gate" id="gate">
+    <form class="gbox" id="gform" autocomplete="off">
+      <div class="logo">🔐</div>
+      <h1>教師工作台</h1>
+      <p>教師總覽、統計分析、論文生成三合一。請輸入教師密碼進入（密碼由雲端驗證，不會保存在這台裝置；關閉分頁後需重新輸入）。</p>
+      <label class="fld" for="pw" style="margin-top:0">教師密碼</label>
+      <input type="password" id="pw" inputmode="numeric" placeholder="••••" maxlength="32" autofocus>
+      <div class="row"><button type="submit" class="btn btn-primary">進入工作台 →</button><a class="btn btn-ghost" href="./">回入口</a></div>
+      <div class="msg" id="gmsg"></div>
+      <div class="tools"><div><b>📡</b>教師總覽</div><div><b>📈</b>統計分析</div><div><b>📝</b>論文生成</div></div>
+    </form>
+  </section>
+
+  <!-- 工作台 -->
+  <section class="app" id="app">
+    <div class="tabs"><div class="wrap">
+      <button class="tab on" data-t="teacher">📡 教師總覽</button>
+      <button class="tab" data-t="presurvey">📋 課前評量儀表板</button>
+      <button class="tab" data-t="unit">📊 單元評量分析</button>
+      <button class="tab" data-t="stats">📈 統計分析</button>
+      <button class="tab" data-t="paper">📝 論文生成</button>
+      <span class="spacer"></span>
+      <span class="st"><span class="dot" id="cdot"></span><span id="ctxt">雲端檢查中…</span></span>
+      <button class="x" id="btnOpen" title="在新分頁開啟目前頁面">↗ 另開</button>
+      <button class="x" id="btnLock">🔒 登出</button>
+    </div></div>
+    <div class="stage">
+      <iframe id="f_teacher" title="教師總覽" class="on"></iframe>
+      <iframe id="f_presurvey" title="課前評量儀表板"></iframe>
+      <iframe id="f_unit" title="單元評量分析"></iframe>
+      <iframe id="f_stats" title="統計分析"></iframe>
+      <iframe id="f_paper" title="論文生成"></iframe>
+    </div>
+  </section>
+</main>
+
+<script src="assets/cloud.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var KEY="ae.teacher.gate";
+var SRC={teacher:"teacher.html",presurvey:"presurvey-teacher.html",unit:"unit-analysis.html",stats:"stats.html",paper:"paper.html"};
+var loaded={};
+
+function unlock(code){
+  try{ sessionStorage.setItem(KEY,"1"); }catch(e){}
+  AECloud.teacherCode(code);
+  $("gate").style.display="none"; $("app").style.display="flex";
+  var t=(location.hash||"").replace("#","")||"teacher"; show(SRC[t]?t:"teacher");
+  AECloud.ping().then(function(j){ $("cdot").classList.add("on"); $("ctxt").textContent="雲端已連線・"+(j.kinds||[]).filter(function(k){return k.n;}).map(function(k){return k.kind+" "+k.n;}).join("、")||"雲端已連線"; })
+    .catch(function(e){ $("ctxt").textContent="雲端未連線："+e.message; });
+}
+function show(t){
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(b){b.classList.toggle("on",b.dataset.t===t);});
+  Object.keys(SRC).forEach(function(k){ var f=$("f_"+k); f.classList.toggle("on",k===t); if(k===t&&!loaded[k]){ f.src=SRC[k]+"?embed=1"; loaded[k]=1; } });
+  try{ history.replaceState(null,"","#"+t); }catch(e){}
+}
+Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(b){ b.addEventListener("click",function(){ show(b.dataset.t); }); });
+/* 內嵌頁面自己導向（例如統計 → 論文）時同步分頁標籤 */
+Object.keys(SRC).forEach(function(k){ $("f_"+k).addEventListener("load",function(){ try{ var p=this.contentWindow.location.pathname.split("/").pop(); var hit=Object.keys(SRC).filter(function(x){return SRC[x]===p;})[0]; if(hit&&hit!==k){ loaded[hit]=1; var L=this.contentWindow.location, q=L.search; if(q.indexOf("embed=1")<0) q+=(q?"&":"?")+"embed=1"; $("f_"+hit).src=L.pathname+q+L.hash; this.src=SRC[k]+"?embed=1"; show(hit); } }catch(e){} }); });
+$("btnOpen").addEventListener("click",function(){ var t=document.querySelector(".tab.on").dataset.t; var f=$("f_"+t); var u=SRC[t]; try{ u=f.contentWindow.location.href.replace(/[?&]embed=1/,""); }catch(e){} window.open(u,"_blank"); });
+$("btnLock").addEventListener("click",function(){ try{ sessionStorage.removeItem(KEY); }catch(e){} AECloud.teacherCode(""); location.reload(); });
+
+$("gform").addEventListener("submit",function(e){
+  e.preventDefault();
+  var code=$("pw").value.trim(), m=$("gmsg"); if(!code) return;
+  m.className="msg show warn"; m.textContent="驗證中…";
+  AECloud.verify(code).then(function(){ m.className="msg"; unlock(code); })
+  .catch(function(err){ m.className="msg show err"; m.textContent=err.message.indexOf("code")>=0?"密碼錯誤，請再試一次。":"無法連線雲端驗證："+err.message; $("pw").value=""; $("pw").focus(); });
+});
+var ok=false; try{ ok=sessionStorage.getItem(KEY)==="1"&&!!AECloud.teacherCode(); }catch(e){}
+if(ok) unlock(AECloud.teacherCode()); else $("pw").focus();
+window.addEventListener("hashchange",function(){ var t=(location.hash||"").replace("#",""); if(SRC[t]&&$("app").style.display==="flex") show(t); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI 賦能教學 Hub｜ai-empower</title>
+<meta name="description" content="AI 賦能教學單一入口：課前評量、專題創作工作流、IOC 課程模擬、4C 評量與統計分析、HOTL 論文內文生成。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學 Hub">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:url" content="https://pjkuo.github.io/ai-empower/">
+<meta property="og:title" content="AI 賦能教學 Hub｜ai-empower">
+<meta property="og:description" content="專題創作 × 課程模擬 × 評量統計 × 論文生成，一個入口全部串起。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<style>
+/* hero */
+.hero{background:linear-gradient(120deg,var(--primary),var(--primary-2) 55%,#5B6FE0);color:#fff;
+  border-radius:18px;padding:26px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden;margin:18px 0}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 12% 18%,rgba(255,255,255,.12),transparent 42%),
+             radial-gradient(circle at 88% 82%,rgba(255,255,255,.1),transparent 46%)}
+.hero>*{position:relative;z-index:1}
+.hero .kicker{font-size:11px;letter-spacing:2px;font-weight:700;opacity:.85;margin-bottom:6px}
+.hero h1{font-size:24px;line-height:1.3}
+.hero h1 .en{font-size:13px;font-weight:600;opacity:.9;margin-left:8px}
+.hero p{font-size:13px;opacity:.93;margin-top:8px;max-width:780px}
+.hero .cta{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hero .cta a{background:#fff;color:var(--primary);font-weight:800;font-size:13.5px;
+  padding:10px 18px;border-radius:9px;transition:.16s}
+.hero .cta a.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.hero .cta a:hover{transform:translateY(-1px)}
+@media(max-width:640px){.hero h1 .en{display:none}}
+
+/* flow strip */
+.flow{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.flow .step{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  padding:5px 11px;border-radius:10px;font-size:12px;font-weight:700}
+.flow .arr{opacity:.6;font-weight:800}
+
+/* sections */
+section{margin-top:26px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-head .bar{width:4px;height:20px;border-radius:3px;background:var(--gc,var(--accent))}
+.sec-head h2{font-size:16.5px;color:var(--gc,var(--primary))}
+.sec-head p{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--gap)}
+.pc{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;display:flex;
+  flex-direction:column;border-top:3px solid var(--gc,var(--accent));transition:.18s}
+.pc:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.pc h3{font-size:14.5px;color:var(--primary);line-height:1.35;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pc .en{font-size:11px;font-weight:600;color:var(--muted);margin:2px 0 8px;display:block}
+.pc p{font-size:12.5px;flex:1;line-height:1.6}
+.pc .go{align-self:flex-start;margin-top:12px;display:inline-flex;gap:5px;align-items:center;
+  background:var(--gc,var(--accent));color:#fff;font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:8px}
+.pc .go:hover{filter:brightness(1.08)}
+.pc .badge{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:20px;background:var(--warn-bg);color:var(--warn)}
+.pc .badge.new{background:var(--eco-bg);color:var(--eco)}
+.mini{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.mini a{font-size:12px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);
+  padding:6px 12px;border-radius:20px;transition:.15s}
+.mini a:hover{color:var(--primary);border-color:var(--accent)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span>
+    </a>
+    <div class="navlinks">
+      <a href="./" aria-current="page">入口</a>
+      <a href='/ioc'>IOC 課程</a>
+      <a href='/presurvey'>課前評量</a><a href='/console'>教師工作台</a>
+      
+      
+      <a href='/manual'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <header class="hero">
+    <div class="kicker">NPUST 資訊管理系 · AI-EMPOWERED TEACHING</div>
+    <h1>AI 賦能教學 Hub<span class="en">One entry, the whole loop.</span></h1>
+    <p>從專題創作到課程模擬，從評量數據到論文段落——「先思考、後驗證」的完整迴圈，
+       教學產生數據，數據長成研究。</p>
+    <div class="flow" aria-label="教學研究迴圈">
+      <span class="step">📋 課前評量</span><span class="arr">→</span>
+      <span class="step">🎨 專題創作</span><span class="arr">→</span>
+      <span class="step">🖥 課程模擬</span><span class="arr">→</span>
+      <span class="step">📊 評量回饋</span><span class="arr">→</span>
+      <span class="step">📈 統計分析</span><span class="arr">→</span>
+      <span class="step">📝 論文生成</span><span class="arr">↺</span>
+    </div>
+    <div data-aeid style="margin-top:14px;max-width:620px"></div>
+    <div class="cta">
+      <a href="https://pjkuo.github.io/AI-empower-platform/">開始做專題 →</a>
+      <a class='ghost' href='/ioc'>進入 IOC 課程</a>
+      <a class='ghost' href='/console'>🔐 教師工作台</a>
+      <a class='ghost' href='/manual'>📖 操作手冊</a>
+      <a class='ghost' href='/manual#video'>🎬 3 分鐘導覽影片</a>
+    </div>
+  </header>
+
+  <!-- ===== 主軸：AI 賦能 ===== -->
+  <section style="--gc:var(--ipo)">
+    <div class="sec-head"><span class="bar"></span>
+      <div><h2>🎨 AI 賦能專題創作</h2><p>心智圖 → IPO → Python → 簡報 → 影音，五步做完一個專題</p></div>
+    </div>
+    <div class="cards">
+      <article class="pc">
+        <h3>AI 賦能學習平台 <span class="badge">主力</span></h3>
+        <span class="en">AI-Empowered Studio</span>
+        <p>五步一條龍工作區：10 家 AI 提供者可自選、教學中心、40 題學習後測問卷。專題資料存在自己的瀏覽器。</p>
+        <a class="go" href="https://pjkuo.github.io/AI-empower-platform/">開啟 →</a>
+      </article>
+      <article class="pc">
+        <h3>IPO 工具組</h3>
+        <span class="en">IPO Toolkit</span>
+        <p>同一件事、兩個起點：<b>還沒寫程式</b>→ 拆解器把一句構想長成 IPO 心智圖；<b>已有程式</b>→ 分析器把 .py／.ipynb 拆回 IPO 模組並出圖表。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <a class="go" href="https://pjkuo.github.io/IPO_Spliter/">構想 → 架構</a>
+          <a class="go" href="https://pjkuo.github.io/IPO_Spliter_tool/" style="background:var(--ink)">程式 → 模組</a>
+        </div>
+      </article>
+      <article class="pc">
+        <h3>心智圖 → Python 工作台</h3>
+        <span class="en">Gemini Workbench</span>
+        <p>串接 Gemini API，把心智圖轉成 IPO 結構、再產出可直接於 Colab 執行的 Python 程式碼。</p>
+        <a class="go" href="https://pjkuo.github.io/mind2IPO2python_AI/">開啟 →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== 次頁：IOC ===== -->
+  <section style="--gc:var(--accent)">
+    <div class="sec-head"><span class="bar"></span>
+      <div><h2>🖥 IOC 計算機概論課程</h2><p>硬體・軟體・網路三軸模擬，資管大一的做中學平台</p></div>
+    </div>
+    <div class="cards">
+      <article class="pc">
+        <h3>課程模擬平台 <span class="badge new">次頁</span></h3>
+        <span class="en">IOC Simulator</span>
+        <p>在本站直接操作：3C 拆解、虛擬組裝、封包流模擬、即時評量與期末考，12 個模組一鍵直達。</p>
+        <a class='go' href='/ioc'>進入次頁 →</a>
+      </article>
+      <article class="pc">
+        <h3>課程總覽與週次表</h3>
+        <span class="en">Course Hub</span>
+        <p>課程架構圖與 18 週對照表：從硬體、軟體、網路到 AI 人機協作的完整學習路徑。</p>
+        <a class="go" href="https://pjkuo.github.io/IOC-platform/">開啟 →</a>
+      </article>
+      <article class="pc">
+        <h3>教師版</h3>
+        <span class="en">Teacher Console</span>
+        <p>題庫控制、班級統計與雲端成績彙整，與學生版共用同一資料結構。</p>
+        <a class="go" href="https://pjkuo.github.io/IOC-platform/teacher.html">開啟 →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== 評量與統計 ===== -->
+  <section style="--gc:var(--eco)">
+    <div class="sec-head"><span class="bar"></span>
+      <div><h2>📊 問卷・評量・統計分析</h2><p>教學產生數據——收進來、算清楚、看得懂</p></div>
+    </div>
+    <div class="cards">
+      <article class="pc">
+        <h3>課前評量 <span class="badge new">新</span></h3>
+        <span class="en">Pre-course Readiness Survey</span>
+        <p>開學第一週用：27 題六向度（裝置、高中經歷、運算思維、電腦常識、AI 使用、學習偏好），約 8 分鐘、不計成績。學生送出得「回覆碼」貼 Moodle／LINE；教師端貼入即出準備度分群、12 條判準建議與 18 週逐週調整。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <a class='go' href='/presurvey' style='background:var(--eco)'>學生作答 →</a>
+          <a class='go' href='/presurvey-teacher' style='background:var(--ink)'>教師儀表板</a>
+        </div>
+      </article>
+      <article class="pc">
+        <h3>教師工作台：總覽＋統計＋論文 <span class="badge new">新</span></h3>
+        <span class="en">All-platform Teacher Console</span>
+        <p>以教師密碼進入，四個分頁：教師總覽、課前評量儀表板、統計分析、論文生成。總覽把所有平台的評量（課前、4C、即時測驗、期中期末、拆解組裝、專題、問卷）集中：即時動態、各平台 KPI、4C 前後測 paired t、平台間相關與預測力、需關注名單、跨平台逐人矩陣，並依雲端現況給整合建議。</p>
+        <a class='go' href='/console' style='background:var(--primary)'>開啟教師工作台 →</a>
+      </article>
+      <article class="pc">
+        <h3>4C 學習成效評量</h3>
+        <span class="en">4C Assessment</span>
+        <p>12 題核心素養＋4 題教學效能，作答即時入庫、學號後 4 碼自動配對前後測。<br>
+        <span style="font-size:11px;color:var(--muted)">（40 題學習後測問卷在 AI 賦能學習平台側欄「學習資源」內）</span></p>
+        <a class="go" href="https://pjkuo.github.io/AICT-assess-platform/" style="background:var(--eco)">開啟 →</a>
+      </article>
+      <article class="pc">
+        <h3>統計分析工作台 <span class="badge new">新</span></h3>
+        <span class="en">Statistics Workbench</span>
+        <p>匯入評量資料一次，配對 t、Cohen's dz、95% CI、Cronbach's α 與比較圖即刻算好——課前評量的 T＋C 題可於期末複測後直接帶入配對；資料自動與論文生成器共用，免重複貼上。</p>
+        <a class='go' href='/console#stats' style='background:var(--eco)'>開啟 →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== 論文生成 ===== -->
+  <section style="--gc:var(--py)">
+    <div class="sec-head"><span class="bar"></span>
+      <div><h2>📝 HOTL 論文內文生成</h2><p>數據長成研究——AI 起草，人在迴路上把關，每一段都留下監督紀錄</p></div>
+    </div>
+    <div class="cards" style="grid-template-columns:1fr">
+      <article class="pc" style="--gc:var(--py)">
+        <h3>即時論文段落生成器 <span class="badge new">新</span></h3>
+        <span class="en">HOTL Manuscript Drafter</span>
+        <p>把評量數據直接寫成<b>七節全文</b>：題目與關鍵詞、摘要、引言、方法、結果（含表格）、討論、結論——
+           繁中／英文／IEEE 會議風格三態切換。每段草稿經你「採納／修改後採納／退回重生」，
+           進度自動存檔、決策全程記錄；一鍵匯出 Markdown／Word／<b>LaTeX（IEEEtran）</b>與監督日誌，
+           並自動生成「人機協作聲明」。監督紀錄本身就是 HOTL 研究的實證資料。</p>
+        <a class='go' href='/console#paper' style='background:var(--py)'>開啟生成器 →</a>
+      </article>
+    </div>
+  </section>
+
+  <div class="mini" aria-label="更多資源">
+    <a href='/manual'>📖 平台操作手冊</a>
+    <a href="https://pjkuo.github.io/practice-videos.html">🎬 實作練習影片</a>
+    <a href="https://www.youtube.com/channel/UCxSRyHQ7kWgGBGqEUjK8dcQ" target="_blank" rel="noopener">▶️ YouTube 教學頻道</a>
+    <a href="https://pjkuo.github.io/mindmap-to-ipo/">🌱 非資訊科系入門教材</a>
+    <a href="https://pjkuo.github.io/">🗂 舊版平台入口</a>
+  </div>
+
+  <footer class="footer">
+    國立屏東科技大學 資訊管理系 · 郭博仁（Paul Kuo）<br>
+    本站所有頁面皆為靜態網頁、零後端；評量與統計資料保存在你自己的瀏覽器，除非主動匯出不會離開裝置。
+  </footer>
+</main>
+</body>
+</html>
