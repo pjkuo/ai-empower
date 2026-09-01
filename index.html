@@ -105,7 +105,7 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
   if(!want||want===here) return;
   var base=(want==='gh')?GH:NL;
   return tfetch(base+'/assets/theme.js?hc='+Date.now(),{method:'HEAD',mode:'no-cors',cache:'no-store'},2500)
-    .then(function(){ location.replace(base+'/'+location.search+location.hash); })
+    .then(function(){ var s=location.search; s=s?(s+'&r='+want):('?r='+want); location.replace(base+'/'+s+location.hash); })
     ['catch'](function(){ try{ localStorage.setItem(KEY,here); }catch(e){} });
 })['catch'](function(){});
 })();
