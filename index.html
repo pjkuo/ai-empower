@@ -102,7 +102,9 @@ function onReady(f){ if(document.readyState==='loading') document.addEventListen
 function decideAndAct(){
   if(cfg.mode==='force-gh'){ pin('gh'); go('gh'); return; }
   if(cfg.mode==='force-nl'){ pin('nl'); go('nl'); return; }
-  if(sidQ){ var pw=parity(sidQ); if(pw){ pin(pw); go(pw); return; } }
+  if(sidQ){ var pw=parity(sidQ); if(pw){ pin(pw);
+    if(pw===here){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){} return; }
+    go(pw); return; } }
   if(rp){ pin(rp); }
   onReady(showGate);
 }
