@@ -67,6 +67,49 @@ section{margin-top:26px}
   padding:6px 12px;border-radius:20px;transition:.15s}
 .mini a:hover{color:var(--primary);border-color:var(--accent)}
 </style>
+<script>
+/* AE Router v1 — 雙站分流備援:70/30 黏性分流+失效自動轉址
+   設定來源:GitHub 的 route-config.json(mode: auto|force-gh|force-nl; gh: 備援站權重%; gasUrl: 選配 GAS 自動負載偵測)
+   ?stay=1 可強制留在本站;?embed=1(內嵌)不分流。同一裝置抽籤結果會記住,避免本機學習紀錄分散兩站。 */
+(function(){
+"use strict";
+var NL='https://ai-empower-hub.netlify.app', GH='https://pjkuo.github.io/ai-empower';
+var here=location.hostname==='ai-empower-hub.netlify.app'?'nl':(location.hostname==='pjkuo.github.io'?'gh':'');
+if(!here) return;
+var rp='';
+try{ var p=new URLSearchParams(location.search); if(p.has('stay')||p.has('embed')) return; rp=p.get('r')||''; }catch(e){ return; }
+if(rp==='gh'||rp==='nl'){ try{ localStorage.setItem('ae.route.v2',rp); }catch(e){} }
+function tfetch(url,opt,ms){ var c=new AbortController(); var t=setTimeout(function(){c.abort();},ms||2500); opt=opt||{}; opt.signal=c.signal; return fetch(url,opt).then(function(r){clearTimeout(t);return r;},function(e){clearTimeout(t);throw e;}); }
+var KEY='ae.route.v2', cfg={mode:'auto',gh:30,gasUrl:''};
+tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'},2500)
+.then(function(r){ return r.ok? r.json():null; })['catch'](function(){ return null; })
+.then(function(j){
+  if(j) for(var k in j) if(k in cfg) cfg[k]=j[k];
+  if(cfg.gasUrl){
+    return tfetch(cfg.gasUrl+(cfg.gasUrl.indexOf('?')<0?'?':'&')+'action=route&host='+here,{cache:'no-store'},2500)
+      .then(function(r){ return r.ok? r.json():null; })
+      .then(function(g){ if(g&&g.mode){ cfg.mode=g.mode; if(g.gh!=null) cfg.gh=g.gh; } })['catch'](function(){});
+  }
+})
+.then(function(){
+  var want;
+  if(cfg.mode==='force-gh') want='gh';
+  else if(cfg.mode==='force-nl') want='nl';
+  else{
+    try{ want=localStorage.getItem(KEY); }catch(e){}
+    if(want!=='gh'&&want!=='nl'){
+      want=(Math.random()*100 < (+cfg.gh||30)) ? 'gh' : 'nl';
+      try{ localStorage.setItem(KEY,want); }catch(e){}
+    }
+  }
+  if(!want||want===here) return;
+  var base=(want==='gh')?GH:NL;
+  return tfetch(base+'/assets/theme.js?hc='+Date.now(),{method:'HEAD',mode:'no-cors',cache:'no-store'},2500)
+    .then(function(){ location.replace(base+'/'+location.search+location.hash); })
+    ['catch'](function(){ try{ localStorage.setItem(KEY,here); }catch(e){} });
+})['catch'](function(){});
+})();
+</script>
 </head>
 <body>
 <a class="skip" href="#main">跳到主要內容</a>
