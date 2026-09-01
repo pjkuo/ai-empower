@@ -69,7 +69,7 @@ section{margin-top:26px}
 </style>
 <script>
 /* AE Router v2 — 學號單雙號分流:進站先請學生輸入學號後 4 碼,單號→主站(Netlify)、雙號→備援站(GitHub Pages)。
-   優先序:route-config force > 學號單雙號 > ?r= 釘選。無學號且選擇略過者留在本站。
+   公用電腦防護:每次載入都要求輸入學號(僅帶 ?sid= 轉址抵達的一次免輸入);略過只對當次畫面有效。
    ?stay=1 強制留在本站;?embed=1(內嵌)不分流。轉址帶 ?r=&sid=&cls=,對方站自動帶入身分不必重填。 */
 (function(){
 "use strict";
@@ -102,10 +102,8 @@ function onReady(f){ if(document.readyState==='loading') document.addEventListen
 function decideAndAct(){
   if(cfg.mode==='force-gh'){ pin('gh'); go('gh'); return; }
   if(cfg.mode==='force-nl'){ pin('nl'); go('nl'); return; }
-  var id=idOf(), pw=id?parity(id.sid):'';
-  if(pw){ pin(pw); go(pw); return; }
-  if(rp){ pin(rp); return; }
-  try{ if(sessionStorage.getItem('ae.gate.skip')) return; }catch(e){}
+  if(sidQ){ var pw=parity(sidQ); if(pw){ pin(pw); go(pw); return; } }
+  if(rp){ pin(rp); }
   onReady(showGate);
 }
 function showGate(){
@@ -114,7 +112,7 @@ function showGate(){
   d.innerHTML='<div style="position:fixed;inset:0;background:rgba(15,23,42,.62);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">'
     +'<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:26px 28px;box-shadow:0 10px 40px rgba(0,0,0,.3)">'
     +'<div style="font-size:17px;font-weight:800;color:#1e293b">🚦 進入平台前,請先輸入學號後 4 碼</div>'
-    +'<div style="font-size:12.5px;color:#64748b;margin:8px 0 14px;line-height:1.7">系統會依<b>單雙號</b>把你分流到對應平台(單號 → 主站、雙號 → 備援站),兩邊功能與資料完全相同,評量成績都會送到同一個資料庫。</div>'
+    +'<div style="font-size:12.5px;color:#64748b;margin:8px 0 14px;line-height:1.7">系統會依<b>單雙號</b>把你分流到對應平台(單號 → 主站、雙號 → 備援站),兩邊功能與資料完全相同,評量成績都會送到同一個資料庫。<br>🔒 公用電腦安全防護:每次進站與重新整理都需重新輸入。</div>'
     +'<input id="aeGateSid" inputmode="numeric" maxlength="6" placeholder="例如:6010" style="width:100%;box-sizing:border-box;border:2px solid #c7d2fe;border-radius:10px;padding:10px 12px;font-size:16px;letter-spacing:2px">'
     +'<div id="aeGateErr" style="color:#dc2626;font-size:12px;min-height:16px;margin-top:4px"></div>'
     +'<button id="aeGateGo" type="button" style="width:100%;margin-top:8px;background:#4338ca;color:#fff;border:0;border-radius:10px;padding:11px;font-size:15px;font-weight:800;cursor:pointer">進入平台 →</button>'
@@ -134,7 +132,7 @@ function showGate(){
   }
   document.getElementById('aeGateGo').addEventListener('click',submit);
   inp.addEventListener('keydown',function(e){ if(e.key==='Enter') submit(); });
-  document.getElementById('aeGateSkip').addEventListener('click',function(e){ e.preventDefault(); try{ sessionStorage.setItem('ae.gate.skip','1'); }catch(err){} d.remove(); });
+  document.getElementById('aeGateSkip').addEventListener('click',function(e){ e.preventDefault(); d.remove(); });
 }
 tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'},2500)
 .then(function(r){ return r.ok? r.json():null; })['catch'](function(){ return null; })
