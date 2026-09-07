@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的學習週報｜ai-empower</title>
+<meta name="description" content="學生自查：輸入學號後 4 碼與班級，查看自己每週的學習活動、成績趨勢、與全班對照及下一步建議。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/weekly.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<style>
+/* ---- 我的學習週報 專頁樣式 ---- */
+.phead{background:linear-gradient(120deg,var(--primary),var(--primary-2) 55%,#5B6FE0);color:#fff;
+  border-radius:18px;padding:22px 24px;box-shadow:var(--shadow);margin:18px 0;position:relative;overflow:hidden}
+.phead::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 12% 18%,rgba(255,255,255,.12),transparent 42%),
+             radial-gradient(circle at 88% 82%,rgba(255,255,255,.1),transparent 46%)}
+.phead>*{position:relative;z-index:1}
+.phead h1{font-size:21px;line-height:1.3}
+.phead h1 .en{font-size:12px;font-weight:600;opacity:.9;margin-left:8px}
+.phead p{font-size:12.5px;opacity:.93;margin-top:6px;max-width:760px}
+.phead .idrow{margin-top:12px;max-width:620px}
+.phead .qrow{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.phead .qrow .btn{background:#fff;color:var(--primary)}
+.phead .qrow small{font-size:11.5px;opacity:.9}
+@media(max-width:640px){.phead h1 .en{display:none}}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--gap);margin-top:var(--gap)}
+.kpi{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;border-top:3px solid var(--kc,var(--accent))}
+.kpi .lb{font-size:11.5px;font-weight:700;color:var(--muted)}
+.kpi .v{font-size:26px;font-weight:800;color:var(--kc,var(--primary));line-height:1.25;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:12px;font-weight:700;color:var(--muted);margin-left:2px}
+.kpi .d{font-size:11px;color:var(--muted);margin-top:2px}
+
+section.blk{margin-top:var(--gap)}
+.chart-wrap{overflow-x:auto}
+.chart-wrap svg{display:block;min-width:520px;width:100%;height:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+.chip{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.chip.up{background:var(--ok-bg);color:#065F46}
+.chip.mid{background:var(--soft);color:var(--muted)}
+.chip.dn{background:var(--warn-bg);color:#92400E}
+.chip.na{background:var(--soft);color:var(--dim)}
+
+.tips{display:grid;gap:10px;margin-top:4px}
+.tip{display:flex;gap:11px;align-items:flex-start;background:var(--soft);border:1px solid var(--line);
+  border-left:4px solid var(--tc,var(--accent));border-radius:10px;padding:11px 13px}
+.tip .ic{font-size:19px;line-height:1.2}
+.tip .tx{flex:1;font-size:12.5px;line-height:1.65}
+.tip .tx b{color:var(--ink)}
+.tip a.act{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:#fff;background:var(--tc,var(--accent));
+  padding:5px 12px;border-radius:8px}
+.tip a.act:hover{filter:brightness(1.08)}
+
+.mutebar{font-size:11.5px;color:var(--muted);margin-top:8px}
+#vLoad{display:none;text-align:center;padding:34px 0;color:var(--muted);font-size:13px}
+#vLoad.on{display:block}
+.spin{display:inline-block;width:17px;height:17px;border:2.5px solid var(--line);border-top-color:var(--accent);
+  border-radius:50%;animation:sp 1s linear infinite;vertical-align:-4px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.numcell{font-variant-numeric:tabular-nums;white-space:nowrap}
+.stale{background:var(--warn-bg);color:#92400E;font-size:11.5px;border-radius:8px;padding:6px 11px;display:inline-block;margin-top:8px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span>
+    </a>
+    <div class="navlinks">
+      <a href="./">入口</a>
+      <a href='ioc.html'>IOC 課程</a>
+      <a href='presurvey.html'>課前評量</a>
+      <a href='weekly.html' aria-current="page">我的學習</a>
+      <a href='console.html'>教師工作台</a>
+      <a href='manual.html'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <header class="phead">
+    <h1>📈 我的學習週報<span class="en">My Weekly Learning</span></h1>
+    <p>每週看見自己：學習活動、成績趨勢、與全班中位數對照，以及「先思考、後驗證」的下一步建議。
+       只查得到<b>自己</b>的紀錄，別人看不到你的。</p>
+    <div class="idrow" data-aeid></div>
+    <div class="qrow">
+      <button id="btnQ" class="btn" type="button">🔍 查詢我的學習</button>
+      <button id="btnR" class="btn" type="button" title="重新讀取最新資料">⟳ 更新</button>
+      <small id="qMsg"></small>
+    </div>
+  </header>
+
+  <div id="vEmpty" class="card">
+    <h2>三步開始 <span class="en">How it works</span></h2>
+    <p class="sub">第一次使用？照著做：</p>
+    <table class="data">
+      <tr><th style="width:56px">步驟</th><th>做什麼</th></tr>
+      <tr><td>1</td><td>在上方「我是誰」小卡填<b>學號後 4 碼</b>與<b>班級</b>（跟你作答評量時用的同一組）。</td></tr>
+      <tr><td>2</td><td>按「🔍 查詢我的學習」。</td></tr>
+      <tr><td>3</td><td>看每週趨勢與建議，弱的單元點「去練習」直接補強。</td></tr>
+    </table>
+    <p class="mutebar">🔒 只回傳你自己的紀錄與全班「去識別化」統計；資料約每分鐘更新一次。想先看畫面？<a href="?demo=1" style="color:var(--accent);font-weight:700">開啟示範模式 →</a></p>
+  </div>
+
+  <div id="vLoad"><span class="spin"></span>正在讀取你的學習紀錄…</div>
+  <div id="vErr" class="msg err" role="alert"></div>
+
+  <div id="vMain" hidden>
+    <div id="staleNote"></div>
+    <div class="kpis" id="kpis"></div>
+
+    <section class="blk card">
+      <h2>📊 每週學習趨勢 <span class="en">Weekly trend</span></h2>
+      <p class="sub" id="wkSub"></p>
+      <div class="chart-wrap" id="wkChart"></div>
+      <div class="legend">
+        <span><b style="background:var(--accent)"></b>每週學習活動數（左軸）</span>
+        <span><b style="background:var(--warn)"></b>每週平均得分率 %（右軸）</span>
+        <span><b style="background:var(--eco)"></b>本週</span>
+      </div>
+    </section>
+
+    <section class="blk card">
+      <h2>🧩 各單元表現 <span class="en">By activity type</span></h2>
+      <p class="sub">你 vs 全班中位數（同班、去識別化）。⬇ 的單元先補強。</p>
+      <div style="overflow-x:auto"><table class="data" id="kindTbl"></table></div>
+    </section>
+
+    <section class="blk card">
+      <h2>🧭 給我的建議 <span class="en">Next steps</span></h2>
+      <p class="sub">依你的紀錄自動產生——先思考、後驗證，一次補一個弱點。</p>
+      <div class="tips" id="tips"></div>
+    </section>
+
+    <section class="blk card">
+      <h2>🕘 最近紀錄 <span class="en">Recent activity</span></h2>
+      <div style="overflow-x:auto"><table class="data" id="recentTbl"></table></div>
+      <p class="mutebar" id="metaLine"></p>
+    </section>
+  </div>
+
+  <footer class="footer">
+    國立屏東科技大學 資訊管理系 · 郭博仁（Paul Kuo）<br>
+    本頁只查詢「你自己」的評量紀錄與全班去識別化統計；查詢需要學號後 4 碼＋班級，未儲存任何密碼。
+  </footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+/* ================= 設定 ================= */
+var DEFAULT_SEM_START = "2026-09-14";          /* 週次基準（第 1 週的週一）；後端 cfg 表 semStart 可覆蓋 */
+var KIND_NAME = {
+  presurvey:"課前評量", consensus:"共識確認", quiz:"隨堂即時評量", exam:"課後評量",
+  midterm:"期中線上評量", repair:"3C 拆裝實訓", build:"PC 虛擬組裝", project:"專題步驟",
+  "project-run":"程式執行", "project-final":"專題完成", survey:"問卷", assess4c:"4C 素養評量",
+  warm:"暖身練習", subquiz:"講義小測", lab:"不插電五站", netflow:"封包流向",
+  vidq:"影音檢核題", xr:"XR 步驟", analysis:"學習分析", posttest:"學習後測"
+};
+var KIND_LINK = {
+  presurvey:"presurvey.html", consensus:"presurvey.html",
+  quiz:"ioc.html", exam:"ioc.html", midterm:"ioc.html", repair:"ioc.html", build:"ioc.html",
+  warm:"ioc.html", subquiz:"ioc.html", lab:"ioc.html", netflow:"ioc.html", vidq:"ioc.html", xr:"ioc.html",
+  project:"https://pjkuo.github.io/AI-empower-platform/", "project-run":"https://pjkuo.github.io/AI-empower-platform/",
+  "project-final":"https://pjkuo.github.io/AI-empower-platform/",
+  assess4c:"https://pjkuo.github.io/AICT-assess-platform/"
+};
+var CACHE_KEY = "ae.weekly.last.v1";
+
+/* ================= 小工具 ================= */
+function $(s){ return document.querySelector(s); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function gasUrl(){
+  var m=document.querySelector('meta[name="cc-cloud-url"]');
+  var u=m?(m.getAttribute("content")||"").trim():"";
+  try{ var o=localStorage.getItem("ae.cloud.url"); if(o) u=o; }catch(e){}
+  return /^https?:\/\//.test(u)?u:"";
+}
+function identity(){
+  try{ if(window.AEId){ var v=AEId.get(); if(v&&v.sid) return v; } }catch(e){}
+  try{ var raw=JSON.parse(localStorage.getItem("ae.identity.v1")||"null"); if(raw&&raw.sid) return raw; }catch(e2){}
+  return null;
+}
+function fmtDT(d){ function z(n){return (n<10?"0":"")+n;} return (d.getMonth()+1)+"/"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes()); }
+function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; return Math.max(0,Math.min(100,s/m*100)); }
+function median(a){ if(!a.length) return null; var b=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(b.length/2); return b.length%2?b[i]:(b[i-1]+b[i])/2; }
+function mean(a){ if(!a.length) return null; var s=0; for(var i=0;i<a.length;i++) s+=a[i]; return s/a.length; }
+function kn(k){ return KIND_NAME[k]||k; }
+
+/* ================= 週次 ================= */
+var semStart = new Date(DEFAULT_SEM_START+"T00:00:00");
+function mondayOf(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); var wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return x; }
+function weekIndex(d){ var w0=mondayOf(semStart); return Math.floor((mondayOf(d)-w0)/(7*864e5))+1; }  /* 第1週=semStart 當週；<1 為開學前 */
+function weekLabel(i){ return i<1 ? "開學前" : "第"+i+"週"; }
+function weekTick(i){ /* 圖表刻度：開學前的週以該週週一日期呈現 */
+  if(i>=1) return "W"+i;
+  var d=new Date(mondayOf(semStart).getTime()+(i-1)*7*864e5);
+  return (d.getMonth()+1)+"/"+d.getDate();
+}
+
+/* ================= 狀態 ================= */
+var DATA=null, IS_DEMO=false, IS_STALE=false;
+
+/* ================= 查詢 ================= */
+function setMsg(t){ $("#qMsg").textContent=t||""; }
+function showErr(t){ var e=$("#vErr"); e.textContent=t; e.classList.add("show"); }
+function clearErr(){ var e=$("#vErr"); e.textContent=""; e.classList.remove("show"); }
+function query(){
+  clearErr();
+  var id=identity();
+  if(!id){ setMsg("↑ 請先在小卡填學號後 4 碼與班級"); return; }
+  var u=gasUrl();
+  if(!u){ showErr("尚未設定雲端網址（cc-cloud-url）。"); return; }
+  $("#vEmpty").hidden=true; $("#vMain").hidden=true; $("#vLoad").classList.add("on"); setMsg("");
+  var ctl=("AbortController" in window)?new AbortController():null;
+  var tm=ctl?setTimeout(function(){ctl.abort();},15000):0;
+  fetch(u+(u.indexOf("?")>0?"&":"?")+"action=me&sid="+encodeURIComponent(id.sid)+"&cls="+encodeURIComponent(id.cls||""),
+        ctl?{signal:ctl.signal}:{})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(j){
+      clearTimeout(tm);
+      if(!j||!j.ok){
+        var er=String((j&&j.error)||"讀取失敗");
+        if(/unknown action|bad action/i.test(er)) throw new Error("__NOME__");
+        throw new Error(er);
+      }
+      IS_DEMO=false; IS_STALE=false; DATA=j;
+      try{ localStorage.setItem(CACHE_KEY,JSON.stringify({sid:id.sid,cls:id.cls||"",at:new Date().toISOString(),data:j})); }catch(e){}
+      render();
+    })
+    .catch(function(e){
+      clearTimeout(tm);
+      $("#vLoad").classList.remove("on");
+      var cached=null;
+      try{ var c=JSON.parse(localStorage.getItem(CACHE_KEY)||"null"); if(c&&c.sid===id.sid) cached=c; }catch(e2){}
+      if(String(e&&e.message)==="__NOME__"){
+        showErr("後端尚未啟用「me」查詢（請老師依 gas/me-patch.gs 更新 Apps Script 後重新部署）。你可以先開示範模式看畫面。");
+        $("#vEmpty").hidden=false; return;
+      }
+      if(cached){ IS_STALE=true; IS_DEMO=false; DATA=cached.data; render();
+        $("#staleNote").innerHTML='<span class="stale">⚠ 目前離線／連線失敗，顯示 '+esc(fmtDT(new Date(cached.at)))+' 的快取資料。</span>'; return; }
+      showErr("暫時連不上雲端（"+esc(String(e&&e.message||e))+"），請稍後再試。");
+      $("#vEmpty").hidden=false;
+    });
+}
+
+/* ================= 資料整理 ================= */
+function prep(j){
+  var recs=(j.records||[]).map(function(r){
+    var d=new Date(r.ts); if(isNaN(d)) d=new Date();
+    var det=r.d||r.detail||"";
+    if(typeof det==="string"&&det.charAt(0)==="{"){ try{ det=JSON.parse(det); }catch(e){ det={}; } }
+    if(typeof det!=="object"||!det) det={};
+    return { id:r.id, ts:d, app:r.app||"", kind:r.kind||"misc", ai:(r.ai?1:0),
+             score:r.score, max:r.max, pct:r.ai?null:pctOf(r), det:det, wk:weekIndex(d) };
+  });
+  recs.sort(function(a,b){ return a.ts-b.ts; });
+  return recs;
+}
+function detSummary(det,r){
+  if(r.ai) return "AI 協作";
+  var bits=[];
+  if(det.title) bits.push(det.title);
+  if(det.stepName) bits.push("步驟："+det.stepName);
+  if(det.unit||det.dev) bits.push(det.unit||det.dev);
+  if(det.stage) bits.push(det.stage==="pre"?"前測":det.stage==="post"?"後測":det.stage);
+  if(det.level) bits.push("程度："+det.level);
+  if(det.grade) bits.push("等級 "+det.grade);
+  var s=bits.join("｜");
+  return s.length>42 ? s.slice(0,42)+"…" : (s||"—");
+}
+
+/* ================= 呈現 ================= */
+function render(){
+  if(!DATA) return;
+  var j=DATA;
+  if(j.cfg&&j.cfg.semStart){ var sd=new Date(j.cfg.semStart+"T00:00:00"); if(!isNaN(sd)) semStart=sd; }
+  var recs=prep(j);
+  var now=new Date(), curWk=weekIndex(now);
+  var assess=recs.filter(function(r){ return !r.ai; });
+  var scored=assess.filter(function(r){ return r.pct!=null; });
+  var aiRecs=recs.filter(function(r){ return r.ai; });
+
+  /* --- KPI --- */
+  var wkActs=assess.filter(function(r){return r.wk===curWk;});
+  var wkScored=scored.filter(function(r){return r.wk===curWk;});
+  var wkAI=aiRecs.filter(function(r){return r.wk===curWk;});
+  var wkMean=mean(wkScored.map(function(r){return r.pct;}));
+  var allMean=mean(scored.map(function(r){return r.pct;}));
+  var streak=0,w=curWk;
+  if(!recs.some(function(r){return r.wk===w;})) w--;   /* 本週剛開始還沒紀錄，不打斷連續 */
+  while(w>=1){ var has=recs.some(function(r){return r.wk===w;}); if(!has) break; streak++; w--; }
+  var kpis=[
+    {lb:"本週學習活動",v:wkActs.length,u:"筆",d:weekLabel(curWk),c:"var(--accent)"},
+    {lb:"本週平均得分率",v:wkMean==null?"—":Math.round(wkMean),u:wkMean==null?"":"%",d:wkScored.length?("共 "+wkScored.length+" 筆計分"):"本週尚無計分紀錄",c:"var(--warn)"},
+    {lb:"學期平均得分率",v:allMean==null?"—":Math.round(allMean),u:allMean==null?"":"%",d:"累計 "+scored.length+" 筆計分",c:"var(--eco)"},
+    {lb:"本週 AI 協作",v:wkAI.length,u:"次",d:"先思考，再讓 AI 幫你驗證",c:"var(--ipo)"},
+    {lb:"連續學習週數",v:streak,u:"週",d:streak>=3?"太棒了，保持！":"每週至少完成一項活動",c:"var(--py)"}
+  ];
+  $("#kpis").innerHTML=kpis.map(function(k){
+    return '<div class="kpi" style="--kc:'+k.c+'"><div class="lb">'+esc(k.lb)+'</div><div class="v">'+esc(k.v)+'<small>'+esc(k.u)+'</small></div><div class="d">'+esc(k.d)+'</div></div>';
+  }).join("");
+
+  /* --- 每週趨勢圖（含開學前有紀錄的週；最多顯示 18 欄） --- */
+  var maxWk=Math.max(curWk,1);
+  var minWk=recs.length?Math.min.apply(null,recs.map(function(r){return r.wk;})):1;
+  var wkFrom=Math.min(1,minWk);
+  if(maxWk-wkFrom+1>18) wkFrom=maxWk-17;
+  var weeks=[];
+  for(var i=wkFrom;i<=maxWk;i++){
+    var wr=assess.filter(function(r){return r.wk===i;});
+    var ws=scored.filter(function(r){return r.wk===i;});
+    weeks.push({i:i,n:wr.length,ai:aiRecs.filter(function(r){return r.wk===i;}).length,pct:mean(ws.map(function(r){return r.pct;}))});
+  }
+  $("#wkSub").textContent="週次以 "+ (semStart.getMonth()+1)+"/"+semStart.getDate()+" 當週為第 1 週；W 之前以週一日期標示（開學前）。";
+  $("#wkChart").innerHTML=weeklySVG(weeks,curWk);
+
+  /* --- 各單元表 --- */
+  var byKind={};
+  assess.forEach(function(r){ (byKind[r.kind]=byKind[r.kind]||[]).push(r); });
+  var kinds=Object.keys(byKind).sort(function(a,b){ return byKind[b].length-byKind[a].length; });
+  var cls=j["class"]||{};
+  var rows='<tr><th>單元類型</th><th class="num">次數</th><th class="num">最近</th><th class="num">最佳</th><th class="num">全班中位</th><th>狀態</th><th></th></tr>';
+  kinds.forEach(function(k){
+    var arr=byKind[k], sc=arr.filter(function(r){return r.pct!=null;});
+    var last=sc.length?sc[sc.length-1].pct:null;
+    var best=sc.length?Math.max.apply(null,sc.map(function(r){return r.pct;})):null;
+    var cm=cls[k]&&cls[k].medianPct!=null?cls[k].medianPct:null;
+    var chip;
+    if(last==null||cm==null) chip='<span class="chip na">—</span>';
+    else if(last>=cm+5) chip='<span class="chip up">⬆ 領先</span>';
+    else if(last>=cm-5) chip='<span class="chip mid">➖ 持平</span>';
+    else chip='<span class="chip dn">⬇ 加強</span>';
+    var link=KIND_LINK[k]?'<a href="'+esc(KIND_LINK[k])+'" style="font-size:11.5px;font-weight:800;color:var(--accent)">去練習 →</a>':"";
+    rows+='<tr><td>'+esc(kn(k))+'</td><td class="num">'+arr.length+'</td>'+
+      '<td class="num numcell">'+(last==null?"—":Math.round(last)+"%")+'</td>'+
+      '<td class="num numcell">'+(best==null?"—":Math.round(best)+"%")+'</td>'+
+      '<td class="num numcell">'+(cm==null?"—":Math.round(cm)+"%")+'</td>'+
+      '<td>'+chip+'</td><td>'+link+'</td></tr>';
+  });
+  if(!kinds.length) rows+='<tr><td colspan="7" style="color:var(--muted)">目前還沒有評量紀錄——從 IOC 課程或課前評量開始吧！</td></tr>';
+  $("#kindTbl").innerHTML=rows;
+
+  /* --- 建議 --- */
+  $("#tips").innerHTML=makeTips(recs,assess,scored,aiRecs,byKind,cls,curWk,wkActs,streak).join("")||'<div class="tip" style="--tc:var(--ok)"><div class="ic">✅</div><div class="tx">目前沒有特別要補強的地方，持續保持每週的學習節奏！</div></div>';
+
+  /* --- 最近紀錄 --- */
+  var rec=recs.slice(-15).reverse();
+  var rrows='<tr><th>時間</th><th>週次</th><th>類型</th><th>內容</th><th class="num">分數</th></tr>';
+  rec.forEach(function(r){
+    rrows+='<tr><td class="numcell">'+esc(fmtDT(r.ts))+'</td><td>'+esc(weekLabel(r.wk))+'</td><td>'+esc(kn(r.kind))+'</td>'+
+      '<td>'+esc(detSummary(r.det,r))+'</td>'+
+      '<td class="num numcell">'+(r.ai?'<span class="chip mid">AI</span>':(r.pct==null?"—":(esc(r.score)+"/"+esc(r.max))))+'</td></tr>';
+  });
+  if(!rec.length) rrows+='<tr><td colspan="5" style="color:var(--muted)">尚無紀錄</td></tr>';
+  $("#recentTbl").innerHTML=rrows;
+  $("#metaLine").textContent=(IS_DEMO?"【示範資料】":"")+"共 "+recs.length+" 筆紀錄｜資料時間 "+(j.at?fmtDT(new Date(j.at)):fmtDT(new Date()))+"｜新作答約 1 分鐘後入庫";
+
+  $("#staleNote").innerHTML=IS_STALE?$("#staleNote").innerHTML:"";
+  $("#vLoad").classList.remove("on");
+  $("#vEmpty").hidden=true;
+  $("#vMain").hidden=false;
+  setMsg((IS_DEMO?"示範模式":"查詢完成")+"（"+fmtDT(new Date())+"）");
+}
+
+/* --- 每週趨勢 SVG（零相依） --- */
+function weeklySVG(weeks,curWk){
+  var W=Math.max(560,weeks.length*64+90), H=230;
+  var padL=44,padR=44,padT=16,padB=34;
+  var iw=W-padL-padR, ih=H-padT-padB;
+  var maxN=1; weeks.forEach(function(w){ if(w.n>maxN) maxN=w.n; });
+  maxN=Math.max(4,Math.ceil(maxN*1.15/4)*4);   /* 取 4 的倍數，讓左軸刻度為整數 */
+  var bw=Math.min(34,iw/Math.max(weeks.length,1)*0.55);
+  function x(i){ return padL+iw*(weeks.length===1?0.5:(i+0.5)/weeks.length); }
+  function yN(n){ return padT+ih*(1-n/maxN); }
+  function yP(p){ return padT+ih*(1-p/100); }
+  var s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="每週學習趨勢圖">';
+  s+='<style>text{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif}</style>';
+  [0,.25,.5,.75,1].forEach(function(t){
+    var y=padT+ih*(1-t);
+    s+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="#E5E7EB" stroke-width="1"/>';
+    s+='<text x="'+(padL-6)+'" y="'+(y+4)+'" font-size="10" fill="#9CA3AF" text-anchor="end">'+Math.round(maxN*t)+'</text>';
+    s+='<text x="'+(W-padR+6)+'" y="'+(y+4)+'" font-size="10" fill="#D97706" text-anchor="start">'+Math.round(100*t)+'</text>';
+  });
+  weeks.forEach(function(w,i){
+    var cx=x(i), isCur=w.i===curWk;
+    s+='<rect x="'+(cx-bw/2)+'" y="'+yN(w.n)+'" width="'+bw+'" height="'+Math.max(0,yN(0)-yN(w.n))+'" rx="4" fill="'+(isCur?"#0D9488":"#3B82F6")+'" opacity="0.9"/>';
+    if(w.n>0) s+='<text x="'+cx+'" y="'+(yN(w.n)-4)+'" font-size="10" fill="#1F2937" text-anchor="middle" font-weight="700">'+w.n+'</text>';
+    s+='<text x="'+cx+'" y="'+(H-padB+15)+'" font-size="10.5" fill="'+(isCur?"#0D9488":"#6B7280")+'" text-anchor="middle" font-weight="'+(isCur?"800":"400")+'">'+weekTick(w.i)+'</text>';
+    if(isCur) s+='<text x="'+cx+'" y="'+(H-padB+27)+'" font-size="9" fill="#0D9488" text-anchor="middle" font-weight="800">本週</text>';
+  });
+  var pts=weeks.map(function(w,i){ return w.pct==null?null:[x(i),yP(w.pct)]; });
+  var line="", started=false;
+  pts.forEach(function(p){ if(!p){started=false;return;} line+=(started?" L":" M")+p[0].toFixed(1)+" "+p[1].toFixed(1); started=true; });
+  if(line) s+='<path d="'+line.trim()+'" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>';
+  pts.forEach(function(p,i){ if(!p) return;
+    s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="#fff" stroke="#D97706" stroke-width="2.5"/>';
+    s+='<text x="'+p[0]+'" y="'+(p[1]-8)+'" font-size="9.5" fill="#D97706" text-anchor="middle" font-weight="800">'+Math.round(weeks[i].pct)+'%</text>';
+  });
+  s+='</svg>';
+  return s;
+}
+
+/* --- 個人化建議 --- */
+function makeTips(recs,assess,scored,aiRecs,byKind,cls,curWk,wkActs,streak){
+  var tips=[];
+  function tip(ic,html,link,label,color){
+    tips.push('<div class="tip" style="--tc:'+(color||"var(--accent)")+'"><div class="ic">'+ic+'</div><div class="tx">'+html+
+      (link?'<br><a class="act" href="'+esc(link)+'">'+esc(label||"前往")+' →</a>':"")+'</div></div>');
+  }
+  var hasPre=recs.some(function(r){ return r.kind==="presurvey"; });
+  if(!hasPre) tip("📋","還沒完成<b>課前評量</b>（27 題、約 8 分鐘、不計成績）。先完成，老師才能依你的準備度調整教學。","presurvey.html","去做課前評量","var(--eco)");
+  if(curWk>=1&&wkActs.length===0) tip("⏰","<b>本週還沒有學習紀錄</b>。從 IOC 課程模擬做一個模組，或到 AI 賦能平台推進你的專題。","ioc.html","進入 IOC 課程","var(--warn)");
+  var weak=null,gap=0;
+  Object.keys(byKind).forEach(function(k){
+    var sc=byKind[k].filter(function(r){return r.pct!=null;});
+    if(!sc.length||!cls[k]||cls[k].medianPct==null) return;
+    var last=sc[sc.length-1].pct, g=cls[k].medianPct-last;
+    if(g>gap){ gap=g; weak=k; }
+  });
+  if(weak&&gap>=15) tip("🎯","「<b>"+esc(kn(weak))+"</b>」最近得分率低於全班中位數約 "+Math.round(gap)+" 個百分點——別急，先想想哪一步卡住，再重練一次驗證自己。",KIND_LINK[weak]||null,"重練「"+kn(weak)+"」","var(--err)");
+  var wkAI=aiRecs.filter(function(r){return r.wk===curWk;}).length;
+  if(wkAI>=8&&wkActs.length<=1) tip("🤖","本週 AI 協作 "+wkAI+" 次，但完成的評量很少。記得「<b>先思考、後驗證</b>」：先寫下自己的想法，再用 AI 檢查，學習才會留在你身上。",null,null,"var(--ipo)");
+  if(streak>=3) tip("🔥","已連續 <b>"+streak+" 週</b>保持學習——穩定比爆發更重要，繼續！",null,null,"var(--ok)");
+  var doneProj=recs.some(function(r){return r.kind==="project-final";});
+  var hasProj=recs.some(function(r){return r.kind==="project";});
+  if(hasProj&&!doneProj) tip("🎨","你的<b>專題</b>已經開始但還沒完成五步驟（心智圖→IPO→Python→簡報→影音）。每週推進一步就好。","https://pjkuo.github.io/AI-empower-platform/","繼續我的專題","var(--ipo)");
+  return tips;
+}
+
+/* ================= 示範模式 ================= */
+function demoData(){
+  var now=new Date(), recs=[], id=0;
+  function push(dayAgo,kind,score,max,det,ai){
+    var d=new Date(now-dayAgo*864e5);
+    recs.push({id:"demo"+(++id),ts:d.toISOString(),app:"demo",kind:kind,score:score,max:max,ai:ai?1:0,d:det?JSON.stringify(det):""});
+  }
+  push(26,"presurvey",62,100,{stage:"pre",level:"basic"});
+  push(24,"warm",8,10,{}); push(20,"quiz",70,100,{}); push(19,"quiz",85,100,{});
+  push(17,"repair",69,100,{dev:"手機",grade:"C"}); push(13,"build",80,100,{unit:"PC"});
+  push(12,"project",2,5,{title:"智慧校園導覽",stepName:"IPO",step:2});
+  push(11,"quiz",90,100,{}); push(6,"exam",74,100,{});
+  push(5,"project",3,5,{title:"智慧校園導覽",stepName:"Python",step:3});
+  push(4,"netflow",60,100,{}); push(2,"subquiz",88,100,{});
+  push(1,"project",4,5,{title:"智慧校園導覽",stepName:"PPT",step:4});
+  push(0,"quiz",95,100,{});
+  for(var i=0;i<6;i++) push(1+i*2,"quiz","",50,null,true);
+  var mon=new Date(now); mon.setDate(mon.getDate()-((mon.getDay()+6)%7)-21);  /* 三週前的週一當第 1 週，示範才看得到多週趨勢 */
+  function z(n){return (n<10?"0":"")+n;}
+  var demoSem=mon.getFullYear()+"-"+z(mon.getMonth()+1)+"-"+z(mon.getDate());
+  return { ok:true, sid:"0000", cls:"示範",
+    records:recs, cfgSem:demoSem,
+    "class":{ quiz:{n:42,medianPct:78}, exam:{n:40,medianPct:70}, repair:{n:38,medianPct:75},
+      build:{n:36,medianPct:72}, netflow:{n:30,medianPct:74}, subquiz:{n:33,medianPct:80},
+      presurvey:{n:45,medianPct:58}, project:{n:28,medianPct:60} },
+    cfg:{semStart:demoSem}, at:now.toISOString() };
+}
+
+/* ================= 啟動 ================= */
+document.addEventListener("DOMContentLoaded",function(){
+  $("#btnQ").addEventListener("click",query);
+  $("#btnR").addEventListener("click",function(){ IS_STALE=false; $("#staleNote").innerHTML=""; query(); });
+  document.addEventListener("ae:identity",function(){ if(identity()) query(); });
+  var p; try{ p=new URLSearchParams(location.search); }catch(e){ p=null; }
+  if(p&&p.get("demo")==="1"){ IS_DEMO=true; DATA=demoData(); render(); return; }
+  if(identity()) query();
+});
+})();
+</script>
+</body>
+</html>
