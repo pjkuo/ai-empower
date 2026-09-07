@@ -54,7 +54,7 @@ function meAction_(e) {
   if (col.sid < 0 || col.kind < 0) return meJson_({ ok: false, error: 'bad header' });
 
   var qSid = meNormSid_(sid), qCls = meNormCls_(cls);
-  var mine = [], agg = {}; // agg[kind] = {by:{sid:[pct]}, all:[pct]}
+  var mine = [], agg = {}; // agg[kind] = {pcts:{sid:[..]}, all:[]}
   for (var i = 1; i < vals.length; i++) {
     var row = vals[i];
     var rCls = meNormCls_(row[col.cls]);
@@ -99,11 +99,11 @@ function meAction_(e) {
     };
   });
 
-  var out2 = {
+  var out = {
     ok: true, sid: sid, cls: cls, records: mine, 'class': classStats,
     cfg: { semStart: meCfg_(ss, 'semStart') }, at: new Date().toISOString()
   };
-  var body = JSON.stringify(out2);
+  var body = JSON.stringify(out);
   try { CacheService.getScriptCache().put(ck, body, 60); } catch (eP) {}
   return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
 }
