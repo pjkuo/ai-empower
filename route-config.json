@@ -1,5 +1,5 @@
 {
-  "mode": "auto",
+  "mode": "force-gh",
   "gh": 30,
   "gasUrl": ""
 }
