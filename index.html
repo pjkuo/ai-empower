@@ -74,7 +74,8 @@ section{margin-top:26px}
 (function(){
 "use strict";
 var NL='https://ai-empower-hub.netlify.app', GH='https://pjkuo.github.io/ai-empower';
-var here=(location.hostname==='pjkuo.github.io')?'gh':((location.hostname==='ai-empower-hub.netlify.app')?'nl':'');
+var aeH=location.hostname;
+var here=(aeH==='pjkuo.github.io')?'gh':((/\.pages\.dev$/.test(aeH)||/\.netlify\.app$/.test(aeH))?'nl':'');
 if(!here) return;
 var p; try{ p=new URLSearchParams(location.search); }catch(e){ return; }
 if(p.has('stay')||p.has('embed')) return;
@@ -94,7 +95,7 @@ function go(want){
     .then(function(){ location.replace(base+'/'+s+location.hash); })
     ['catch'](function(){ pin(here); });
 }
-var cfg={mode:'auto',gh:30,gasUrl:''};
+var cfg={mode:'auto',gh:30,gasUrl:'',nlUrl:''};
 var sidQ=digits(p.get('sid')||'');
 if(sidQ){ saveId(sidQ, p.get('cls')||''); }
 var rp=p.get('r'); rp=(rp==='gh'||rp==='nl')?rp:'';
@@ -139,6 +140,8 @@ function showGate(){
 tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'},2500)
 .then(function(r){ return r.ok? r.json():null; })['catch'](function(){ return null; })
 .then(function(j){ if(j) for(var k in j) if(k in cfg) cfg[k]=j[k];
+  if(cfg.nlUrl){ NL=String(cfg.nlUrl).replace(/\/+$/,''); }
+  try{ window.AE_NL=NL; }catch(e){}
   if(cfg.gasUrl){ return tfetch(cfg.gasUrl+(cfg.gasUrl.indexOf('?')<0?'?':'&')+'action=route&host='+here,{cache:'no-store'},2500).then(function(r){return r.ok?r.json():null;}).then(function(g){ if(g&&g.mode){ cfg.mode=g.mode; } })['catch'](function(){}); }
 })
 .then(decideAndAct)['catch'](function(){ decideAndAct(); });
@@ -347,7 +350,7 @@ btn.addEventListener('click',function(){
   var label=(odd?'單':'雙')+'號 → '+(odd?'主站':'備援站');
   if(want===here){ msg.textContent='✓ '+label+':你已在正確平台'; return; }
   msg.textContent=label+',轉往中…';
-  location.href=(want==='gh'?GH:NL)+'/?r='+want;
+  location.href=(want==='gh'?GH:(window.AE_NL||NL))+'/?r='+want;
 });
 })();
 </script>
