@@ -1,0 +1,50 @@
+## Cloudflare Pages 自訂標頭 — ai-empower（主站/備援站共用同一份原始碼）
+## GitHub Pages 會忽略本檔（無副作用）；Cloudflare Pages 會套用。
+##
+## ⚠ 與 Netlify 的重要差異：
+##   Netlify 是「後面的規則覆蓋前面」；Cloudflare Pages 則是
+##   「所有符合的規則全部套用、同名標頭以逗號串接」。
+##   因此 Cache-Control 規則不可路徑重疊，否則 /assets/* 會拿到
+##   「max-age=0, must-revalidate, max-age=3600...」這種壞掉的值。
+##   對策：/* 只放安全性標頭，快取規則各自對應不重疊的路徑。
+
+# 全站安全性標頭（不含 Cache-Control）
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+
+# 靜態資產：快取 1 小時，之後 1 天內先用舊檔再背景更新（stale-while-revalidate）
+# —— 一堂課（1–2 小時）內學生跨頁不再重複下載，隔堂即可拿到最新版
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# 頁面（HTML）：即時反映內容更新（每次進站再驗證，304 幾乎零成本）
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/404.html
+  Cache-Control: public, max-age=0, must-revalidate
+/console.html
+  Cache-Control: public, max-age=0, must-revalidate
+/ioc.html
+  Cache-Control: public, max-age=0, must-revalidate
+/manual.html
+  Cache-Control: public, max-age=0, must-revalidate
+/paper.html
+  Cache-Control: public, max-age=0, must-revalidate
+/presurvey.html
+  Cache-Control: public, max-age=0, must-revalidate
+/presurvey-teacher.html
+  Cache-Control: public, max-age=0, must-revalidate
+/stats.html
+  Cache-Control: public, max-age=0, must-revalidate
+/teacher.html
+  Cache-Control: public, max-age=0, must-revalidate
+/weekly.html
+  Cache-Control: public, max-age=0, must-revalidate
+/yt/
+  Cache-Control: public, max-age=0, must-revalidate
+/yt/index.html
+  Cache-Control: public, max-age=0, must-revalidate
