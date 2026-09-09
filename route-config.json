@@ -1,5 +1,6 @@
 {
-  "mode": "force-gh",
+  "mode": "auto",
   "gh": 30,
-  "gasUrl": ""
+  "gasUrl": "",
+  "nlUrl": "https://ai-empower-hub.pages.dev"
 }
