@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>單元評量分析｜AI 賦能教學 Hub</title>
+<meta name="description" content="IOC 課程各單元評量（暖身、隨堂、講義小測、拆裝、組裝、期中期末）集中分析：單元 × 評量得分率、週次趨勢、難點與教學建議、學生 × 單元矩陣。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/unit-analysis.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script>
+/* 教師頁面門禁：未經教師工作台（console.html）驗證者一律導回；密碼只存 sessionStorage，關閉分頁即失效 */
+(function(){ if(window.top!==window.self || /[?&]embed=1/.test(location.search)) return; try{ if(sessionStorage.getItem("ae.teacher.gate")==="1") return; }catch(e){} location.replace("console.html#unit"); })();
+</script>
+<style>
+.layout{display:grid;grid-template-columns:300px 1fr;gap:var(--gap);align-items:start;margin-top:16px}
+@media(max-width:960px){.layout{grid-template-columns:1fr}}
+.side{position:sticky;top:64px}@media(max-width:960px){.side{position:static}}
+.card+.card{margin-top:var(--gap)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px;border-top:3px solid var(--c,var(--accent))}
+.kpi b{display:block;font-size:22px;color:var(--primary);font-variant-numeric:tabular-nums}
+.kpi span{font-size:11px;color:var(--muted);display:block}
+.kpi small{font-size:11px;color:var(--ink)}
+.live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.live .dot{width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.live .dot.on{background:var(--ok);box-shadow:0 0 0 4px var(--ok-bg)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+.interp{font-size:13px;line-height:1.8;background:var(--soft);border-left:4px solid var(--primary);border-radius:8px;padding:10px 14px;margin-top:8px}
+.sp{height:140px;width:100%}
+table.data td.sm,span.sm{font-size:11px;color:var(--muted);white-space:nowrap}
+.pct{display:inline-block;min-width:42px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.pct.r{color:var(--err)}.pct.o{color:var(--warn)}.pct.g{color:var(--ok)}
+.cell{position:relative}
+.cell i{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);opacity:.5}
+.ins{list-style:none;display:grid;gap:7px;margin-top:8px}
+.ins li{font-size:12.5px;line-height:1.7;padding:8px 12px;border-radius:9px;background:var(--soft);border-left:4px solid var(--accent)}
+.ins li.bad{background:var(--err-bg);border-left-color:var(--err)}
+.ins li.warn{background:var(--warn-bg);border-left-color:var(--warn)}
+.ins li.good{background:var(--ok-bg);border-left-color:var(--ok)}
+.ktag{display:inline-block;font-size:10.5px;font-weight:800;color:#fff;border-radius:6px;padding:2px 7px;background:var(--kc,#64748B);white-space:nowrap}
+.grades{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+@media print{.side,.toolbar{display:none!important}.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href='ioc.html'>IOC 課程</a>
+      <a href='presurvey.html'>課前評量</a><a aria-current='page' href='console.html'>教師工作台</a>
+      <a href='manual.html'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="layout">
+    <div class="side">
+      <div class="card noprint">
+        <h2>📊 單元評量分析 <span class="en">Unit Assessment Analytics</span></h2>
+        <p class="sub">IOC 課程的單元評量（暖身、隨堂、講義小測、拆裝、組裝、期中期末）集中分析：哪個單元卡住、何時卡住、誰卡住。</p>
+        <label class="fld" for="tcode" style="margin-top:0">教師碼</label>
+        <input type="password" id="tcode" placeholder="教師碼（已從工作台登入者可留空）" autocomplete="off">
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btnPull">⟳ 從雲端載入</button>
+          <button class="btn btn-ghost" id="btnDemo">🧪 示範資料</button>
+        </div>
+        <label style="display:flex;gap:6px;align-items:center;font-size:12px;margin-top:10px;cursor:pointer"><input type="checkbox" id="autoRefresh"> 每 15 秒自動更新</label>
+        <div class="live" style="margin-top:6px"><span class="dot" id="dot"></span><span id="liveTxt">未連線</span></div>
+        <div class="msg" id="cloudMsg"></div>
+        <label class="fld" for="clsSel">班級</label>
+        <select id="clsSel"><option value="">全部班級</option></select>
+        <label class="fld" for="kindSel">評量類型</label>
+        <select id="kindSel"><option value="">全部類型</option></select>
+        <label class="fld" for="rangeSel">時間範圍</label>
+        <select id="rangeSel"><option value="0">全部</option><option value="7">最近 7 天</option><option value="30">最近 30 天</option><option value="sem">本學期（9/14 起）</option></select>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="btnUnitCsv">⬇️ 單元統計 CSV</button>
+          <button class="btn btn-ghost" id="btnCsv">⬇️ 學生×單元 CSV</button>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="btnRaw">⬇️ 原始 JSON</button>
+          <button class="btn btn-ghost" id="btnPrint">🖨 列印</button>
+        </div>
+        <details style="margin-top:10px;font-size:11.5px;color:var(--muted)"><summary style="cursor:pointer">進階：雲端網址</summary>
+          <input type="text" id="cloudUrl" placeholder="https://script.google.com/macros/s/…/exec" style="margin-top:6px;font-size:11px">
+          <div class="toolbar"><button class="btn btn-ghost" id="btnSaveUrl" style="font-size:11.5px;padding:5px 10px">儲存到此瀏覽器</button></div>
+        </details>
+        <p class="hint">捷徑：<a href='teacher.html' style='color:var(--accent);font-weight:700'>教師總覽</a>・<a href='stats.html' style='color:var(--accent);font-weight:700'>統計工作台</a>・<a href='ioc.html' style='color:var(--accent);font-weight:700'>IOC 課程</a></p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card empty" id="emptyCard">
+        <h2 style="justify-content:center">還沒有資料</h2>
+        <p class="sub">輸入教師碼從雲端載入，或先按「示範資料」看看這一頁長什麼樣子。</p>
+      </div>
+      <div id="dash" style="display:none">
+        <div class="card">
+          <h2>⚡ 概況 <span class="en" id="scopeTxt"></span></h2>
+          <div class="kpis" id="liveKpi"></div>
+        </div>
+
+        <div class="card">
+          <h2>🧩 各評量類型 KPI</h2>
+          <div class="kpis" id="kindKpi"></div>
+          <div class="interp" id="kindInterp"></div>
+        </div>
+
+        <div class="card">
+          <h2>📚 單元 × 評量分析 <span class="en" id="unitN"></span></h2>
+          <p class="sub">預設把得分率最低的單元排在最上面（弱點在前）。點欄位標題可改排序；等第取自各平台回報（A／B／C／D／待加強）。</p>
+          <div style="overflow-x:auto"><table class="data" id="unitTable"></table></div>
+          <p class="hint">得分率顏色：<span class="pct r">&lt;60%</span>・<span class="pct o">60–74%</span>・<span class="pct g">≥75%</span>；「AI」欄＝該單元的 AI 協作紀錄筆數（不計分）。</p>
+        </div>
+
+        <div class="card">
+          <h2>📆 週次趨勢 <span class="en">每週計分筆數與平均得分率</span></h2>
+          <svg class="sp" id="trend" viewBox="0 0 600 140" preserveAspectRatio="none" aria-label="每週計分筆數與平均得分率"></svg>
+          <p class="hint" id="trendHint">藍長條＝每週計分筆數；琥珀折線＝該週平均得分率；W1＝2026-09-14 那一週（開學），之前以日期標示。</p>
+        </div>
+
+        <div class="card">
+          <h2>🧭 難點與教學建議 <span class="en" id="insN"></span></h2>
+          <ul class="ins" id="insight"></ul>
+        </div>
+
+        <div class="card">
+          <h2>👥 學生 × 單元矩陣 <span class="en" id="matrixN"></span></h2>
+          <p class="sub">每格＝該生在該單元的平均得分率（筆數）。點欄位標題可排序；預設把總平均最低的學生排在最上面。</p>
+          <div style="overflow-x:auto"><table class="data" id="matrix"></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">國立屏東科技大學 資訊管理系 · AI 賦能教學 Hub · 單元評量分析 v1</footer>
+</main>
+
+<script src="assets/cloud.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var SEM_START="2026-09-14";                    /* 第 1 週的週一（與 weekly.html 相同基準） */
+var all=[], timer=null, sortKey="avg", sortDir=1, mSortKey="__avg", mSortDir=1;
+
+/* 單元評量的 kind（順序＝顯示順序）；其餘 kind（課前評量、專題、4C…）各有自己的儀表板，不列入 */
+var KN={warm:"暖身練習",quiz:"隨堂即時評量",subquiz:"講義小測",lab:"不插電五站",netflow:"封包流向",
+        vidq:"影音檢核題",xr:"XR 步驟",repair:"3C 拆裝實訓",build:"PC 虛擬組裝",
+        midterm:"期中線上評量",exam:"課後評量",posttest:"學習後測"};
+var EXCLUDE={presurvey:1,consensus:1,project:1,"project-run":1,"project-final":1,survey:1,assess4c:1,analysis:1,progress:1};
+var KC={warm:"#0D9488",quiz:"#3B82F6",subquiz:"#6366F1",lab:"#0EA5E9",netflow:"#0891B2",vidq:"#DB2777",
+        xr:"#7C3AED",repair:"#D97706",build:"#B45309",midterm:"#1E3A8A",exam:"#1E3A8A",posttest:"#059669"};
+var UNIT_NAME={all:"綜合（全範圍）",overview:"總覽",hardware:"硬體",software:"軟體",network:"網路",
+        packetflow:"封包流",repair:"3C 拆解","lab-hub":"實作中心",pcbuild:"虛擬組裝",assess:"即時評量",
+        midterm:"期中",exam:"期末考",aicollab:"AI 協作",retrieval:"提取練習",interleave:"交錯練習",spacing:"間隔練習"};
+var kname=function(k){return KN[k]||k;};
+var uname=function(u){return u?(UNIT_NAME[u]||u):"未標示單元";};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
+function pctOf(r){var s=Number(r.score),m=Number(r.max);return (r.score!==""&&r.score!==null&&r.score!==undefined&&!isNaN(s)&&m>0)?s/m*100:null;}
+function isAi(r,d){return pctOf(r)===null&&!!(d.model||d.system||d.user||d.action);}
+function mean(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
+function sd(a){if(a.length<2)return 0;var m=mean(a);return Math.sqrt(a.reduce(function(s,v){return s+(v-m)*(v-m);},0)/(a.length-1));}
+function cls3(p){return p===null?"":p<60?"r":p<75?"o":"g";}
+function unitOf(d){var v=d.unit||d.scope||d.dev||d.cat||d.module||"";return (typeof v==="object")?"":String(v).trim();}
+function monday(ts){var d=new Date(ts);if(isNaN(d))return null;d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d;}
+function iso(d){function z(n){return (n<10?"0":"")+n;}return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());}
+function weekLabel(monIso){var w=Math.round((Date.parse(monIso)-Date.parse(SEM_START))/(7*864e5));return w>=0?"W"+(w+1):monIso.slice(5).replace("-","/");}
+
+/* ---------- 載入 ---------- */
+function pull(silent){
+  var code=$("tcode").value.trim()||AECloud.teacherCode(); if($("tcode").value.trim()) AECloud.teacherCode(code);
+  if(!AECloud.ready()){msg("尚未設定雲端網址（進階 → 貼上 /exec 網址，或改各頁 meta）。","warn");return;}
+  if(!code){msg("請輸入教師碼。","warn");return;}
+  if(!silent)msg("讀取中…","warn");
+  AECloud.pull("",code,{incremental:true,reset:!silent}).then(function(list){
+    all=list.map(function(r){ if(typeof r.detail==="string"){try{r.detail=JSON.parse(r.detail);}catch(e){r.detail={};}} r.detail=r.detail||{}; r.sid=String(r.sid||""); r.ts=String(r.ts||""); return r; });
+    $("dot").classList.add("on"); $("liveTxt").textContent="已連線・"+new Date().toLocaleTimeString()+" 更新";
+    render(); msg("✓ 雲端共 "+all.length+" 筆。","ok");
+  }).catch(function(e){$("dot").classList.remove("on");$("liveTxt").textContent="連線失敗";msg("讀取失敗："+e.message+(e.message.indexOf("code")>=0?"（教師碼錯誤）":""),"err");});
+}
+$("btnPull").addEventListener("click",function(){pull(false);});
+$("autoRefresh").addEventListener("change",function(){if(timer){clearInterval(timer);timer=null;}if(this.checked){pull(true);timer=setInterval(function(){pull(true);},15000);}});
+$("tcode").value="";
+$("cloudUrl").value=(function(){try{return localStorage.getItem("ae.cloud.url")||"";}catch(e){return "";}})();
+$("btnSaveUrl").addEventListener("click",function(){AECloud.setUrl($("cloudUrl").value);msg("已儲存。","ok");});
+$("clsSel").addEventListener("change",render); $("kindSel").addEventListener("change",render); $("rangeSel").addEventListener("change",render);
+$("btnPrint").addEventListener("click",function(){window.print();});
+
+/* ---------- 範圍 ---------- */
+function scope(){
+  var c=$("clsSel").value, k=$("kindSel").value, rv=$("rangeSel").value;
+  var since=rv==="sem"?SEM_START:(Number(rv)?new Date(Date.now()-Number(rv)*864e5).toISOString():"");
+  return all.filter(function(r){return !EXCLUDE[r.kind]&&(!c||r.cls===c)&&(!k||r.kind===k)&&(!since||r.ts>=since);});
+}
+function refreshSel(){
+  var cur=$("clsSel").value,set={};all.forEach(function(r){if(r.cls&&!EXCLUDE[r.kind])set[r.cls]=1;});
+  $("clsSel").innerHTML='<option value="">全部班級</option>'+Object.keys(set).sort().map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join("");$("clsSel").value=cur;
+  var ck=$("kindSel").value,ks={};all.forEach(function(r){if(!EXCLUDE[r.kind])ks[r.kind]=1;});
+  var order=Object.keys(KN).filter(function(k){return ks[k];}).concat(Object.keys(ks).filter(function(k){return !KN[k];}).sort());
+  $("kindSel").innerHTML='<option value="">全部類型</option>'+order.map(function(k){return '<option value="'+esc(k)+'">'+esc(kname(k))+'</option>';}).join("");$("kindSel").value=ck;
+}
+
+/* ---------- 聚合 ---------- */
+var SEP="", lastRows=[], lastStu=[], lastCols=[];
+function aggregate(recs){
+  var G={}, stu={}, weeks={}, aiN=0, scoredN=0;
+  recs.forEach(function(r){
+    var d=r.detail||{}, p=pctOf(r), ai=isAi(r,d), u=unitOf(d), key=r.kind+SEP+u;
+    var g=G[key]=G[key]||{key:key,kind:r.kind,unit:u,n:0,ai:0,ps:[],stu:{},grades:{},last:""};
+    g.n++; if(r.sid)g.stu[r.sid]=1; if(r.ts>g.last)g.last=r.ts;
+    if(ai){g.ai++;aiN++;}
+    if(p!==null){
+      scoredN++; g.ps.push(p);
+      if(d.grade&&typeof d.grade==="string")g.grades[d.grade]=(g.grades[d.grade]||0)+1;
+      var mo=monday(r.ts); if(mo){var wk=iso(mo),w=weeks[wk]=weeks[wk]||{n:0,sum:0};w.n++;w.sum+=p;}
+      if(r.sid){var s=stu[r.sid]=stu[r.sid]||{sid:r.sid,cls:r.cls,units:{},sum:0,c:0,last:""};
+        var su=s.units[key]=s.units[key]||{sum:0,c:0};su.sum+=p;su.c++;s.sum+=p;s.c++;if(r.ts>s.last)s.last=r.ts;}
+    }
+  });
+  var rows=Object.keys(G).map(function(k){var g=G[k];
+    return {key:g.key,kind:g.kind,unit:g.unit,n:g.n,ai:g.ai,c:g.ps.length,stuN:Object.keys(g.stu).length,
+      avg:g.ps.length?mean(g.ps):null,sd:g.ps.length>1?sd(g.ps):0,low:g.ps.filter(function(p){return p<60;}).length,
+      grades:g.grades,last:g.last};});
+  return {rows:rows,stu:stu,weeks:weeks,aiN:aiN,scoredN:scoredN};
+}
+
+/* ---------- 主渲染 ---------- */
+function render(){
+  refreshSel();
+  var recs=scope();
+  if(!all.length){$("emptyCard").style.display="block";$("dash").style.display="none";return;}
+  $("emptyCard").style.display="none";$("dash").style.display="block";
+  var A=aggregate(recs);
+  lastRows=A.rows;
+
+  /* 概況 KPI */
+  var stuN=Object.keys(A.stu).length, unitSet={};A.rows.forEach(function(r){if(r.unit)unitSet[r.kind+SEP+r.unit]=1;});
+  var avgAll=(function(){var s=0,c=0;recs.forEach(function(r){var p=pctOf(r);if(p!==null){s+=p;c++;}});return c?Math.round(s/c):null;})();
+  $("scopeTxt").textContent=($("clsSel").value||"全部班級")+"・"+($("kindSel").value?kname($("kindSel").value):"全部類型");
+  $("liveKpi").innerHTML='<div class="kpi"><b>'+recs.length+'</b><span>期間筆數</span></div>'+
+    '<div class="kpi"><b>'+A.scoredN+'</b><span>計分筆數</span></div>'+
+    '<div class="kpi"><b>'+stuN+'</b><span>參與學生</span></div>'+
+    '<div class="kpi"><b>'+Object.keys(unitSet).length+'</b><span>涵蓋單元</span></div>'+
+    '<div class="kpi" style="--c:var(--warn)"><b>'+(avgAll===null?"—":avgAll+"%")+'</b><span>整體平均得分率</span></div>'+
+    '<div class="kpi" style="--c:#7C3AED"><b>'+A.aiN+'</b><span>AI 協作紀錄</span></div>';
+
+  /* 各評量類型 KPI */
+  var byKind={};recs.forEach(function(r){(byKind[r.kind]=byKind[r.kind]||[]).push(r);});
+  var korder=Object.keys(KN).filter(function(k){return byKind[k];}).concat(Object.keys(byKind).filter(function(k){return !KN[k];}).sort());
+  $("kindKpi").innerHTML=korder.map(function(k){var rs=byKind[k],ps=rs.map(pctOf).filter(function(p){return p!==null;}),sids={};rs.forEach(function(r){if(r.sid)sids[r.sid]=1;});
+    var m=ps.length?Math.round(mean(ps)):null;
+    return '<div class="kpi" style="--c:'+(KC[k]||"#94A3B8")+'"><span>'+esc(kname(k))+'</span><b>'+(m===null?rs.length:m+"%")+'</b><small>'+(m===null?"筆（未計分）":ps.length+" 筆・")+Object.keys(sids).length+' 人'+(ps.length>1?"・SD "+Math.round(sd(ps)):"")+'</small></div>';}).join("")||'<div class="kpi"><span>—</span><b>0</b><small>此範圍沒有單元評量紀錄</small></div>';
+  var known=Object.keys(KN).filter(function(k){return !byKind[k];}).map(kname);
+  $("kindInterp").innerHTML=korder.length?("目前有 "+korder.map(function(k){return kname(k)+" "+byKind[k].length+" 筆";}).join("、")+"。"+(known.length?" 尚未有紀錄："+known.join("、")+"（平台接上後會自動出現）。":"")):"此範圍內沒有單元評量紀錄。";
+
+  renderUnitTable();
+  drawTrend(A.weeks);
+  renderInsight(A);
+  renderMatrix(A);
+}
+
+/* ---------- 單元 × 評量表 ---------- */
+function kindTag(k){return '<span class="ktag" style="--kc:'+(KC[k]||"#64748B")+'">'+esc(kname(k))+'</span>';}
+function gradeTxt(g){var order=["A","B","C","D","待加強"],ks=order.filter(function(x){return g[x];}).concat(Object.keys(g).filter(function(x){return order.indexOf(x)<0;}));
+  return ks.length?ks.map(function(x){return esc(x)+"×"+g[x];}).join(" "):"—";}
+function renderUnitTable(){
+  var rows=lastRows.slice().sort(function(a,b){
+    var A=a[sortKey],B=b[sortKey];
+    if(sortKey==="avg"){if(A===null&&B===null)return 0;if(A===null)return 1;if(B===null)return -1;}
+    return (A>B?1:A<B?-1:0)*sortDir;});
+  var cols=[["avg","平均得分率"],["sd","SD"],["c","計分筆"],["ai","AI"],["stuN","人數"],["low","<60%"]];
+  var h='<thead><tr><th>評量類型</th><th>單元</th>'+cols.map(function(c){return '<th class="num" style="cursor:pointer" data-k="'+c[0]+'">'+c[1]+(sortKey===c[0]?(sortDir>0?" ▲":" ▼"):"")+'</th>';}).join("")+'<th>等第分布</th><th>最後活動</th></tr></thead><tbody>';
+  rows.forEach(function(r){var a=r.avg===null?null:Math.round(r.avg);
+    h+='<tr><td>'+kindTag(r.kind)+'</td><td><b>'+esc(uname(r.unit))+'</b></td>'+
+      '<td class="num cell"><span class="pct '+cls3(a)+'">'+(a===null?"—":a+"%")+'</span><i style="width:'+(a||0)+'%"></i></td>'+
+      '<td class="num">'+(r.c>1?Math.round(r.sd):"—")+'</td><td class="num">'+r.c+'</td><td class="num">'+(r.ai||"")+'</td><td class="num">'+r.stuN+'</td>'+
+      '<td class="num"'+(r.low?' style="color:var(--err);font-weight:800"':'')+'>'+(r.low||"")+'</td>'+
+      '<td class="grades">'+gradeTxt(r.grades)+'</td><td class="sm">'+esc((r.last||"").slice(5,10))+'</td></tr>';});
+  $("unitTable").innerHTML=h+"</tbody>"; $("unitN").textContent=rows.length+" 個單元×評量組合";
+  Array.prototype.forEach.call($("unitTable").querySelectorAll("th[data-k]"),function(th){th.addEventListener("click",function(){var k=th.dataset.k;if(sortKey===k)sortDir=-sortDir;else{sortKey=k;sortDir=k==="avg"?1:-1;}renderUnitTable();});});
+}
+
+/* ---------- 週次趨勢 ---------- */
+function drawTrend(weeks){
+  var mons=[],cur=monday(new Date());
+  for(var i=11;i>=0;i--){var d=new Date(cur);d.setDate(d.getDate()-i*7);mons.push(iso(d));}
+  var W=600,H=140,bw=W/12,mx=1;
+  mons.forEach(function(m){if(weeks[m]&&weeks[m].n>mx)mx=weeks[m].n;});
+  var s="",pts=[],semX=null;
+  mons.forEach(function(m,i){
+    var w=weeks[m],n=w?w.n:0,avg=w&&w.n?w.sum/w.n:null,h=n/mx*80,x=i*bw;
+    if(m===iso(monday(SEM_START+"T12:00:00")))semX=x;
+    s+='<rect x="'+(x+5)+'" y="'+(104-h)+'" width="'+(bw-10)+'" height="'+h+'" rx="3" fill="#3B82F6" opacity="'+(i===11?1:.55)+'"/>';
+    if(n)s+='<text x="'+(x+bw/2)+'" y="'+(100-h)+'" text-anchor="middle" font-size="10" fill="#374151">'+n+'</text>';
+    s+='<text x="'+(x+bw/2)+'" y="120" text-anchor="middle" font-size="9" fill="#6B7280">'+weekLabel(m)+'</text>';
+    if(avg!==null)pts.push([x+bw/2,104-avg*.9,Math.round(avg)]);
+  });
+  if(semX!==null)s+='<line x1="'+semX+'" y1="6" x2="'+semX+'" y2="112" stroke="#D97706" stroke-dasharray="4 3" stroke-width="1.5"/><text x="'+(semX+3)+'" y="14" font-size="9" fill="#D97706" font-weight="700">開學</text>';
+  if(pts.length){s+='<polyline points="'+pts.map(function(p){return p[0]+","+p[1];}).join(" ")+'" fill="none" stroke="#F59E0B" stroke-width="2.5"/>';
+    pts.forEach(function(p){s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.5" fill="#F59E0B"/><text x="'+p[0]+'" y="'+(p[1]-7)+'" text-anchor="middle" font-size="9" fill="#B45309" font-weight="700">'+p[2]+'</text>';});}
+  $("trend").innerHTML=s;
+}
+
+/* ---------- 難點與教學建議 ---------- */
+function renderInsight(A){
+  var out=[];
+  var weak=A.rows.filter(function(r){return r.c>=3&&r.avg!==null&&r.avg<60;}).sort(function(a,b){return a.avg-b.avg;});
+  var strong=A.rows.filter(function(r){return r.c>=3&&r.avg!==null&&r.avg>=85;});
+  weak.forEach(function(r){out.push({lv:"bad",t:"<b>"+esc(kname(r.kind))+"・"+esc(uname(r.unit))+"</b> 平均 "+Math.round(r.avg)+"%（"+r.c+" 筆、"+r.stuN+" 人）→ 建議課堂重講該單元關鍵概念，並指定 <a href='ioc.html' style='color:var(--accent);font-weight:700'>IOC 模組</a> 重練後再測一次。"});});
+  var lowBits=[];A.rows.forEach(function(r){var bad=(r.grades["D"]||0)+(r.grades["待加強"]||0);if(bad)lowBits.push(esc(kname(r.kind))+"・"+esc(uname(r.unit))+" "+bad+" 筆");});
+  if(lowBits.length)out.push({lv:"warn",t:"等第「D／待加強」："+lowBits.join("；")+" → 從逐人矩陣找出是誰，安排補救或同儕教學。"});
+  A.rows.forEach(function(r){if(r.ai>0&&r.avg!==null&&r.c>=2&&r.avg<60)out.push({lv:"warn",t:"<b>"+esc(kname(r.kind))+"・"+esc(uname(r.unit))+"</b> 有 "+r.ai+" 筆 AI 協作但平均僅 "+Math.round(r.avg)+"% → 留意是否「先問 AI、未先思考」，課堂示範「先思考後驗證」流程。"});});
+  strong.forEach(function(r){out.push({lv:"good",t:"<b>"+esc(kname(r.kind))+"・"+esc(uname(r.unit))+"</b> 平均 "+Math.round(r.avg)+"%（"+r.c+" 筆）掌握良好，可加深題目或讓高分群帶討論。"});});
+  var thin=A.rows.filter(function(r){return r.c>0&&r.c<3;});
+  if(thin.length)out.push({lv:"",t:"樣本尚少（不足 3 筆，暫不下結論）："+thin.map(function(r){return esc(kname(r.kind))+"・"+esc(uname(r.unit));}).join("、")+"。"});
+  if(!out.length)out.push({lv:"good",t:"目前各單元表現平穩，沒有平均低於 60% 的單元。"});
+  $("insight").innerHTML=out.map(function(i){return '<li class="'+i.lv+'">'+i.t+'</li>';}).join("");
+  $("insN").textContent=out.length+" 則";
+}
+
+/* ---------- 學生 × 單元矩陣 ---------- */
+function renderMatrix(A){
+  var cols=A.rows.slice().sort(function(a,b){return b.c-a.c;}).slice(0,12).map(function(r){return r.key;});
+  lastCols=cols;
+  lastStu=Object.keys(A.stu).map(function(s){return A.stu[s];});
+  var rows=lastStu.slice().sort(function(a,b){
+    function val(s){if(mSortKey==="__avg")return s.c?s.sum/s.c:null;var u=s.units[mSortKey];return u&&u.c?u.sum/u.c:null;}
+    var x=val(a),y=val(b);if(x===null&&y===null)return 0;if(x===null)return 1;if(y===null)return -1;return (x-y)*mSortDir;});
+  var h='<thead><tr><th>學號</th><th>班級</th><th class="num" style="cursor:pointer" data-k="__avg">總平均'+(mSortKey==="__avg"?(mSortDir>0?" ▲":" ▼"):"")+'</th>'+
+    cols.map(function(k){var p=k.split(SEP);return '<th class="num" style="cursor:pointer" data-k="'+esc(k)+'"><span class="sm">'+esc(kname(p[0]))+'</span><br>'+esc(uname(p[1]))+(mSortKey===k?(mSortDir>0?" ▲":" ▼"):"")+'</th>';}).join("")+'<th>最後活動</th></tr></thead><tbody>';
+  rows.forEach(function(s){var avg=s.c?Math.round(s.sum/s.c):null;
+    h+='<tr><td><b>'+esc(s.sid)+'</b></td><td class="sm">'+esc(s.cls||"")+'</td><td class="num"><span class="pct '+cls3(avg)+'">'+(avg===null?"—":avg+"%")+'</span></td>'+
+      cols.map(function(k){var u=s.units[k];if(!u||!u.c)return '<td class="num"><span class="sm">—</span></td>';var p=Math.round(u.sum/u.c);
+        return '<td class="num cell"><span class="pct '+cls3(p)+'">'+p+'%</span> <span class="sm">('+u.c+')</span><i style="width:'+p+'%"></i></td>';}).join("")+
+      '<td class="sm">'+esc((s.last||"").slice(0,10))+'</td></tr>';});
+  $("matrix").innerHTML=h+"</tbody>"; $("matrixN").textContent=rows.length+" 人";
+  Array.prototype.forEach.call($("matrix").querySelectorAll("th[data-k]"),function(th){th.addEventListener("click",function(){var k=th.dataset.k;if(mSortKey===k)mSortDir=-mSortDir;else{mSortKey=k;mSortDir=1;}renderMatrix(A);});});
+}
+
+/* ---------- 匯出 ---------- */
+function dl(name,content,type){var b=new Blob([content],{type:type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},0);}
+$("btnRaw").addEventListener("click",function(){dl("unit_raw_"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(scope(),null,1),"application/json");});
+$("btnUnitCsv").addEventListener("click",function(){
+  var lines=[["kind","kind_name","unit","unit_name","avg_pct","sd","scored_n","ai_n","students","below60","last"].join(",")];
+  lastRows.forEach(function(r){lines.push([r.kind,kname(r.kind),r.unit,uname(r.unit),r.avg===null?"":Math.round(r.avg),r.c>1?Math.round(r.sd):"",r.c,r.ai,r.stuN,r.low,r.last].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(","));});
+  dl("unit_stats_"+new Date().toISOString().slice(0,10)+".csv","﻿"+lines.join("\r\n"),"text/csv;charset=utf-8");});
+$("btnCsv").addEventListener("click",function(){
+  var head=["sid","class","avg_pct"].concat(lastCols.map(function(k){var p=k.split(SEP);return kname(p[0])+"·"+uname(p[1]);}),["last"]);
+  var lines=[head.join(",")];
+  lastStu.forEach(function(s){var avg=s.c?Math.round(s.sum/s.c):"";
+    lines.push([s.sid,s.cls||"",avg].concat(lastCols.map(function(k){var u=s.units[k];return u&&u.c?Math.round(u.sum/u.c):"";}),[s.last]).map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(","));});
+  dl("unit_matrix_"+new Date().toISOString().slice(0,10)+".csv","﻿"+lines.join("\r\n"),"text/csv;charset=utf-8");});
+
+/* ---------- 示範資料（模擬；固定種子，重按結果相同） ---------- */
+$("btnDemo").addEventListener("click",loadDemo);
+function loadDemo(){
+  var seed=42;function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+  function clip(v,a,b){return Math.max(a,Math.min(b,v));}
+  function grade(p){return p>=85?"A":p>=70?"B":p>=60?"C":"待加強";}
+  var out=[],CLS=["資管一A 計算機概論","車輛一A 數位科技與AI應用"];
+  var day=function(off){return new Date(Date.now()-off*864e5+Math.floor(rnd()*10)*36e5).toISOString();};
+  function rec(id,off,kind,pct,max,det,sid,cls){var sc=pct===null?"":Math.round(pct/100*max);
+    out.push(AECloud.record({id:id,ts:day(off),app:"ioc-sim",kind:kind,sid:sid,cls:cls,score:pct===null?"":sc,max:max,detail:det}));}
+  for(var i=0;i<32;i++){
+    var sid=String(5001+i+(i%2?1000:0)), cls=CLS[i%2], base=clip(58+rnd()*34,40,95);
+    var off={hardware:2,software:-5,network:-16,all:-4}; /* 單元難度差 */
+    ["retrieval","interleave","spacing"].forEach(function(u,j){ if(rnd()<.7){var p=clip(base+6+rnd()*14-7,20,100);rec("dw"+sid+j,42-j*3,"warm",p,10,{unit:u,grade:grade(p)},sid,cls);} });
+    ["hardware","software","network","all"].forEach(function(u,j){ var times=u==="all"?1:2;
+      for(var t=0;t<times;t++){ if(rnd()<.85){var p=clip(base+off[u]+rnd()*20-10,15,100);rec("dq"+sid+u+t,38-j*6-t*3,"quiz",p,100,{scope:u,unit:u,level:"all",grade:grade(p)},sid,cls);} } });
+    ["CPU 中央處理器","記憶體與儲存","作業系統","網路基礎"].forEach(function(u,j){ if(rnd()<.6){var p=clip(base+8+rnd()*16-8,25,100);rec("ds"+sid+j,30-j*4,"subquiz",p,100,{unit:u,grade:grade(p)},sid,cls);} });
+    ["手機","筆電"].forEach(function(u,j){ if(rnd()<(j?0.45:0.8)){var p=clip(base-4+rnd()*22-11,15,100);rec("dr"+sid+j,24-j*3,"repair",p,100,{dev:u,unit:u,grade:grade(p)},sid,cls);} });
+    if(rnd()<.7){var pb=clip(base-2+rnd()*18-9,20,100);rec("db"+sid,16,"build",pb,100,{unit:"pcbuild",grade:grade(pb)},sid,cls);}
+    if(rnd()<.5){var pn=clip(base-18+rnd()*20-10,10,100);rec("dn"+sid,12,"netflow",pn,100,{unit:"packetflow",grade:grade(pn)},sid,cls);}
+    if(rnd()<.9){var pm=clip(base-5+rnd()*16-8,20,100);rec("dm"+sid,6,"midterm",pm,100,{unit:"all",grade:grade(pm)},sid,cls);}
+    var aiK=Math.floor(rnd()*(base<62?6:3)); for(var a2=0;a2<aiK;a2++) rec("da"+sid+a2,35-a2*5,"quiz",null,100,{action:"ai",model:"demo",user:"（示範）詢問單元觀念",unit:["hardware","software","network"][a2%3]},sid,cls);
+  }
+  all=out; $("dot").classList.remove("on"); $("liveTxt").textContent="示範資料（非雲端）"; render(); msg("已載入示範資料 "+out.length+" 筆（32 位學生 × 8 種單元評量，含 AI 協作紀錄）。","ok");
+}
+
+/* ---------- 啟動 ---------- */
+if(/[?&]demo=1/.test(location.search)) loadDemo();
+else if(AECloud.ready()&&AECloud.teacherCode()) pull(true);
+})();
+</script>
+</body>
+</html>
