@@ -1,0 +1,48 @@
+name: patch-pct
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: apply
+        run: |
+          python3 - <<'PYEOF'
+          import io, sys
+          REPL = [
+           ("teacher.html",
+            'function pctOf(r){var s=Number(r.score),m=Number(r.max);return (!isNaN(s)&&m>0)?s/m*100:null;}',
+            'function pctOf(r){if(r.score===""||r.score==null)return null;var s=Number(r.score),m=Number(r.max);if(isNaN(s)||!(m>0))return null;if(s<=m)return s/m*100;return s<=100?s:null;}'),
+           ("weekly.html",
+            'function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; return Math.max(0,Math.min(100,s/m*100)); }',
+            'function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; if(s>m) return s<=100?s:null; return Math.max(0,Math.min(100,s/m*100)); }'),
+           ("unit-analysis.html",
+            'function pctOf(r){var s=Number(r.score),m=Number(r.max);return (r.score!==""&&r.score!==null&&r.score!==undefined&&!isNaN(s)&&m>0)?s/m*100:null;}',
+            'function pctOf(r){if(r.score===""||r.score==null)return null;var s=Number(r.score),m=Number(r.max);if(isNaN(s)||!(m>0))return null;if(s<=m)return s/m*100;return s<=100?s:null;}'),
+          ]
+          changed = 0
+          for path, old, new in REPL:
+              s = io.open(path, encoding="utf-8").read()
+              n = s.count(old)
+              if n == 0 and s.count(new) == 1:
+                  print(path, "already patched"); continue
+              assert n == 1, "%s: old string found %d times" % (path, n)
+              io.open(path, "w", encoding="utf-8", newline="").write(s.replace(old, new, 1))
+              changed += 1
+              print(path, "patched")
+          print("changed:", changed)
+          PYEOF
+      - name: commit
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add teacher.html weekly.html unit-analysis.html
+            git commit -m "pctOf 百分比制修正：score>max 且 ≤100 視為百分比（IOC warm/subquiz 送 score=%、max=題數），未計分紀錄不再算 0 分；teacher/weekly/unit-analysis 三頁同步"
+            git push
+          fi
