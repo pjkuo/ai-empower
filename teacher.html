@@ -172,7 +172,7 @@ var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",
 var kname=function(k){return KN[k]||k;};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
-function pctOf(r){var s=Number(r.score),m=Number(r.max);return (!isNaN(s)&&m>0)?s/m*100:null;}
+function pctOf(r){if(r.score===""||r.score==null)return null;var s=Number(r.score),m=Number(r.max);if(isNaN(s)||!(m>0))return null;if(s<=m)return s/m*100;return s<=100?s:null;}
 function mean(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
 function sd(a){if(a.length<2)return 0;var m=mean(a);return Math.sqrt(a.reduce(function(s,v){return s+(v-m)*(v-m);},0)/(a.length-1));}
 function corr(x,y){var n=x.length;if(n<3)return null;var mx=mean(x),my=mean(y),sxy=0,sxx=0,syy=0;for(var i=0;i<n;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)*(x[i]-mx);syy+=(y[i]-my)*(y[i]-my);}return sxx&&syy?sxy/Math.sqrt(sxx*syy):null;}

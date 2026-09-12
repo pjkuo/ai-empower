@@ -204,7 +204,7 @@ function identity(){
   return null;
 }
 function fmtDT(d){ function z(n){return (n<10?"0":"")+n;} return (d.getMonth()+1)+"/"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes()); }
-function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; return Math.max(0,Math.min(100,s/m*100)); }
+function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; if(s>m) return s<=100?s:null; return Math.max(0,Math.min(100,s/m*100)); }
 function median(a){ if(!a.length) return null; var b=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(b.length/2); return b.length%2?b[i]:(b[i-1]+b[i])/2; }
 function mean(a){ if(!a.length) return null; var s=0; for(var i=0;i<a.length;i++) s+=a[i]; return s/a.length; }
 function kn(k){ return KIND_NAME[k]||k; }

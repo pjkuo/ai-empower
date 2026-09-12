@@ -168,7 +168,7 @@ var kname=function(k){return KN[k]||k;};
 var uname=function(u){return u?(UNIT_NAME[u]||u):"未標示單元";};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
-function pctOf(r){var s=Number(r.score),m=Number(r.max);return (r.score!==""&&r.score!==null&&r.score!==undefined&&!isNaN(s)&&m>0)?s/m*100:null;}
+function pctOf(r){if(r.score===""||r.score==null)return null;var s=Number(r.score),m=Number(r.max);if(isNaN(s)||!(m>0))return null;if(s<=m)return s/m*100;return s<=100?s:null;}
 function isAi(r,d){return pctOf(r)===null&&!!(d.model||d.system||d.user||d.action);}
 function mean(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
 function sd(a){if(a.length<2)return 0;var m=mean(a);return Math.sqrt(a.reduce(function(s,v){return s+(v-m)*(v-m);},0)/(a.length-1));}
