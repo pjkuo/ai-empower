@@ -17,7 +17,7 @@
 | `assets/cloud.js` ＋ `gas/Code.gs` | 共用雲端資料層：統一記錄模型 `{v,id,ts,app,kind,sid,name,cls,score,max,detail}`，一份試算表、每 kind 一張工作表；`<meta name="cc-cloud-url">（已填：AKfycbz7…/exec，試算表「ai-empower 評量資料庫」）` 未填時自動退回本機＋佇列。`action=push`（POST）、`list`／`summary`（教師碼＝Code.gs 的 TEACHER_CODE；前端不保存答案，console.html 以 `list&kind=__auth__` 向後端驗證，通過後只存 sessionStorage）、`class`（去識別化全班課前作答）、`ping` |
 | `console.html` | 教師工作台：密碼 UI（雲端驗證、不記住）＋五分頁（teacher／presurvey-teacher／unit-analysis／stats／paper 以同源 iframe `?embed=1` 嵌入，隱藏各頁導覽列），雲端連線狀態、另開、登出 |
 | `teacher.html` | 教師總覽：雲端所有 kind 集中一頁——即時動態、各平台 KPI、4C 前後測 paired t、課前→期末複測、平台間相關矩陣、需關注名單、逐人矩陣（CSV）、整合建議；內建 8 種平台示範資料 |
-| `unit-analysis.html` | 單元評量分析（教師）：IOC 單元評量（暖身／隨堂／講義小測／不插電／封包流／拆裝／組裝／期中期末）依 `detail.unit` 聚合——單元 × 評量得分率表（弱點在前、可排序）、週次趨勢（W1＝9/14）、難點與教學建議、學生 × 單元矩陣；CSV／JSON 匯出；`?demo=1` 示範模式（32 位學生 × 8 種評量，含 AI 協作紀錄） |
+| `unit-analysis.html` | 單元評量分析（教師）：IOC 單元評量（暖身／隨堂／講義小測／不插電／封包流／拆裝／組裝／期中期末）依 `detail.unit` 聚合——單元 × 評量得分率表（弱點在前、可排序）、週次趨勢（W1＝9/14）、難點與教學建議、學生 × 單元矩陣、逐週學習查核（學生末 4 碼 × 週次、逐週累計總平均、全班列）；單元統計／學生×單元／逐週明細／逐週累計 CSV 與 JSON 匯出；`?demo=1` 示範模式（32 位學生 × 8 種評量，含 AI 協作紀錄） |
 | `presurvey-teacher.html` | 課前評量教師儀表板：貼回覆碼／匯入 JSON／CSV → 準備度分群、五向度、各班、12 條判準建議、18 週逐週調整、答對率、分布、逐人清單；匯出 JSON／CSV；一鍵帶到 `stats.html`（scheme `presurvey`） |
 | `stats.html` | 統計分析：匯入 4C 評量 JSON／運算思維 JSON／CSV → 配對 t、Cohen's dz（Hedges gz）、95% CI、Cronbach's α、前後測比較圖、CSV 匯出 |
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
@@ -63,3 +63,4 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 新增 `unit-analysis.html`：修復教師工作台「單元評量分析」分頁 404——console.html 的五分頁原本就指向 `unit-analysis.html`，但此檔一直不存在，點分頁即載入 404.html。
 - 聚合鍵：`detail.unit`（後備 `scope`／`dev`／`cat`／`module`）；已知單元代碼有中文名對照（retrieval＝提取練習、packetflow＝封包流…）。未計分且 detail 含 `model`／`user`／`action` 的紀錄視為 AI 協作紀錄，另計不入平均。
 - 門禁與 teacher.html 相同（未經 console 驗證導回 `console.html#unit`）；`?embed=1` 供工作台內嵌；週次以 `2026-09-14` 為 W1（與 weekly.html 同基準）。
+- v1.1（同日）：新增「逐週學習查核」——學生（末 4 碼學號）× 週次矩陣（每週平均＋逐週累計總平均、全班週平均／累計列、可排序）、側欄「單元」篩選；輸出統計檔案記錄末 4 碼學號：逐週明細 CSV（每生 × 每單元 × 每週得分紀錄＋逐週累計）與逐週累計 CSV（寬表，對應畫面矩陣）。

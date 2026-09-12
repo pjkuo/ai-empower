@@ -82,11 +82,17 @@ table.data td.sm,span.sm{font-size:11px;color:var(--muted);white-space:nowrap}
         <select id="clsSel"><option value="">全部班級</option></select>
         <label class="fld" for="kindSel">評量類型</label>
         <select id="kindSel"><option value="">全部類型</option></select>
+        <label class="fld" for="unitSel">單元</label>
+        <select id="unitSel"><option value="">全部單元</option></select>
         <label class="fld" for="rangeSel">時間範圍</label>
         <select id="rangeSel"><option value="0">全部</option><option value="7">最近 7 天</option><option value="30">最近 30 天</option><option value="sem">本學期（9/14 起）</option></select>
         <div class="toolbar">
           <button class="btn btn-ghost" id="btnUnitCsv">⬇️ 單元統計 CSV</button>
           <button class="btn btn-ghost" id="btnCsv">⬇️ 學生×單元 CSV</button>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="btnWeekCsv">⬇️ 逐週明細 CSV</button>
+          <button class="btn btn-ghost" id="btnCumCsv">⬇️ 逐週累計 CSV</button>
         </div>
         <div class="toolbar">
           <button class="btn btn-ghost" id="btnRaw">⬇️ 原始 JSON</button>
@@ -131,6 +137,13 @@ table.data td.sm,span.sm{font-size:11px;color:var(--muted);white-space:nowrap}
         </div>
 
         <div class="card">
+          <h2>📅 逐週學習查核（學生 × 週次） <span class="en" id="weeklyN"></span></h2>
+          <p class="sub">每格＝該生（末 4 碼學號）該週平均得分率（筆數）；「累計」＝由最早紀錄逐週累計的總平均。配合左側「評量類型／單元」篩選可查單一單元的逐週表現；每單元逐週得分紀錄的完整明細見「逐週明細 CSV」。</p>
+          <div style="overflow-x:auto"><table class="data" id="weekly"></table></div>
+          <p class="hint">末列＝全班該週平均與全班逐週累計平均。點「累計」或任一週欄位標題可排序；預設累計最低者在前，方便優先查核。</p>
+        </div>
+
+        <div class="card">
           <h2>🧭 難點與教學建議 <span class="en" id="insN"></span></h2>
           <ul class="ins" id="insight"></ul>
         </div>
@@ -143,7 +156,7 @@ table.data td.sm,span.sm{font-size:11px;color:var(--muted);white-space:nowrap}
       </div>
     </div>
   </div>
-  <footer class="footer">國立屏東科技大學 資訊管理系 · AI 賦能教學 Hub · 單元評量分析 v1</footer>
+  <footer class="footer">國立屏東科技大學 資訊管理系 · AI 賦能教學 Hub · 單元評量分析 v1.1</footer>
 </main>
 
 <script src="assets/cloud.js"></script>
@@ -152,7 +165,7 @@ table.data td.sm,span.sm{font-size:11px;color:var(--muted);white-space:nowrap}
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var SEM_START="2026-09-14";                    /* 第 1 週的週一（與 weekly.html 相同基準） */
-var all=[], timer=null, sortKey="avg", sortDir=1, mSortKey="__avg", mSortDir=1;
+var all=[], timer=null, sortKey="avg", sortDir=1, mSortKey="__avg", mSortDir=1, wSortKey="__cum", wSortDir=1, lastAgg=null;
 
 /* 單元評量的 kind（順序＝顯示順序）；其餘 kind（課前評量、專題、4C…）各有自己的儀表板，不列入 */
 var KN={warm:"暖身練習",quiz:"隨堂即時評量",subquiz:"講義小測",lab:"不插電五站",netflow:"封包流向",
@@ -195,14 +208,14 @@ $("autoRefresh").addEventListener("change",function(){if(timer){clearInterval(ti
 $("tcode").value="";
 $("cloudUrl").value=(function(){try{return localStorage.getItem("ae.cloud.url")||"";}catch(e){return "";}})();
 $("btnSaveUrl").addEventListener("click",function(){AECloud.setUrl($("cloudUrl").value);msg("已儲存。","ok");});
-$("clsSel").addEventListener("change",render); $("kindSel").addEventListener("change",render); $("rangeSel").addEventListener("change",render);
+$("clsSel").addEventListener("change",render); $("kindSel").addEventListener("change",render); $("unitSel").addEventListener("change",render); $("rangeSel").addEventListener("change",render);
 $("btnPrint").addEventListener("click",function(){window.print();});
 
 /* ---------- 範圍 ---------- */
 function scope(){
-  var c=$("clsSel").value, k=$("kindSel").value, rv=$("rangeSel").value;
+  var c=$("clsSel").value, k=$("kindSel").value, u=$("unitSel").value, rv=$("rangeSel").value;
   var since=rv==="sem"?SEM_START:(Number(rv)?new Date(Date.now()-Number(rv)*864e5).toISOString():"");
-  return all.filter(function(r){return !EXCLUDE[r.kind]&&(!c||r.cls===c)&&(!k||r.kind===k)&&(!since||r.ts>=since);});
+  return all.filter(function(r){return !EXCLUDE[r.kind]&&(!c||r.cls===c)&&(!k||r.kind===k)&&(!u||unitOf(r.detail||{})===u)&&(!since||r.ts>=since);});
 }
 function refreshSel(){
   var cur=$("clsSel").value,set={};all.forEach(function(r){if(r.cls&&!EXCLUDE[r.kind])set[r.cls]=1;});
@@ -210,6 +223,9 @@ function refreshSel(){
   var ck=$("kindSel").value,ks={};all.forEach(function(r){if(!EXCLUDE[r.kind])ks[r.kind]=1;});
   var order=Object.keys(KN).filter(function(k){return ks[k];}).concat(Object.keys(ks).filter(function(k){return !KN[k];}).sort());
   $("kindSel").innerHTML='<option value="">全部類型</option>'+order.map(function(k){return '<option value="'+esc(k)+'">'+esc(kname(k))+'</option>';}).join("");$("kindSel").value=ck;
+  var cu=$("unitSel").value,us={};all.forEach(function(r){if(EXCLUDE[r.kind])return;var u=unitOf(r.detail||{});if(u)us[u]=1;});
+  var uorder=Object.keys(us).sort(function(a,b){return uname(a)<uname(b)?-1:1;});
+  $("unitSel").innerHTML='<option value="">全部單元</option>'+uorder.map(function(u){return '<option value="'+esc(u)+'">'+esc(uname(u))+'</option>';}).join("");$("unitSel").value=cu;
 }
 
 /* ---------- 聚合 ---------- */
@@ -224,9 +240,12 @@ function aggregate(recs){
     if(p!==null){
       scoredN++; g.ps.push(p);
       if(d.grade&&typeof d.grade==="string")g.grades[d.grade]=(g.grades[d.grade]||0)+1;
-      var mo=monday(r.ts); if(mo){var wk=iso(mo),w=weeks[wk]=weeks[wk]||{n:0,sum:0};w.n++;w.sum+=p;}
-      if(r.sid){var s=stu[r.sid]=stu[r.sid]||{sid:r.sid,cls:r.cls,units:{},sum:0,c:0,last:""};
-        var su=s.units[key]=s.units[key]||{sum:0,c:0};su.sum+=p;su.c++;s.sum+=p;s.c++;if(r.ts>s.last)s.last=r.ts;}
+      var mo=monday(r.ts), wk=mo?iso(mo):"";
+      if(wk){var w=weeks[wk]=weeks[wk]||{n:0,sum:0};w.n++;w.sum+=p;}
+      if(r.sid){var s=stu[r.sid]=stu[r.sid]||{sid:r.sid,cls:r.cls,units:{},weeks:{},uw:{},sum:0,c:0,last:""};
+        var su=s.units[key]=s.units[key]||{sum:0,c:0};su.sum+=p;su.c++;s.sum+=p;s.c++;if(r.ts>s.last)s.last=r.ts;
+        if(wk){var sw=s.weeks[wk]=s.weeks[wk]||{sum:0,c:0};sw.sum+=p;sw.c++;
+          var uu=s.uw[key+"|"+wk]=s.uw[key+"|"+wk]||{sum:0,c:0};uu.sum+=p;uu.c++;}}
     }
   });
   var rows=Object.keys(G).map(function(k){var g=G[k];
@@ -243,7 +262,7 @@ function render(){
   if(!all.length){$("emptyCard").style.display="block";$("dash").style.display="none";return;}
   $("emptyCard").style.display="none";$("dash").style.display="block";
   var A=aggregate(recs);
-  lastRows=A.rows;
+  lastRows=A.rows; lastAgg=A;
 
   /* 概況 KPI */
   var stuN=Object.keys(A.stu).length, unitSet={};A.rows.forEach(function(r){if(r.unit)unitSet[r.kind+SEP+r.unit]=1;});
@@ -267,8 +286,38 @@ function render(){
 
   renderUnitTable();
   drawTrend(A.weeks);
+  renderWeekly(A);
   renderInsight(A);
   renderMatrix(A);
+}
+
+/* ---------- 逐週學習查核（學生 × 週次；逐週累計總平均） ---------- */
+function renderWeekly(A){
+  var mons=Object.keys(A.weeks).sort();
+  var stus=Object.keys(A.stu).map(function(k){return A.stu[k];});
+  function cumOf(s){return s.c?s.sum/s.c:null;}
+  function wkAvg(s,m){var w=s.weeks[m];return w&&w.c?w.sum/w.c:null;}
+  var rows=stus.slice().sort(function(a,b){
+    var x=wSortKey==="__cum"?cumOf(a):wkAvg(a,wSortKey), y=wSortKey==="__cum"?cumOf(b):wkAvg(b,wSortKey);
+    if(x===null&&y===null)return 0;if(x===null)return 1;if(y===null)return -1;return (x-y)*wSortDir;});
+  var h='<thead><tr><th>末4碼學號</th><th>班級</th>'+mons.map(function(m){return '<th class="num" style="cursor:pointer" data-w="'+m+'">'+weekLabel(m)+(wSortKey===m?(wSortDir>0?" ▲":" ▼"):"")+'</th>';}).join("")+'<th class="num" style="cursor:pointer" data-w="__cum">累計'+(wSortKey==="__cum"?(wSortDir>0?" ▲":" ▼"):"")+'</th></tr></thead><tbody>';
+  rows.forEach(function(s){
+    var cum=0,cn=0;
+    h+='<tr><td><b>'+esc(s.sid)+'</b></td><td class="sm">'+esc(s.cls||"")+'</td>';
+    mons.forEach(function(m){var w=s.weeks[m];
+      if(!w||!w.c){h+='<td class="num"><span class="sm">—</span></td>';return;}
+      var p=Math.round(w.sum/w.c);cum+=w.sum;cn+=w.c;
+      h+='<td class="num"><span class="pct '+cls3(p)+'">'+p+'%</span> <span class="sm">('+w.c+')</span></td>';});
+    var ca=cn?Math.round(cum/cn):null;
+    h+='<td class="num"><span class="pct '+cls3(ca)+'">'+(ca===null?"—":ca+"%")+'</span> <span class="sm">('+cn+')</span></td></tr>';});
+  var ts=0,tc=0;
+  h+='<tr style="background:var(--soft);font-weight:800"><td>全班</td><td class="sm">週平均／累計</td>';
+  mons.forEach(function(m){var w=A.weeks[m],p=w&&w.n?Math.round(w.sum/w.n):null;if(w){ts+=w.sum;tc+=w.n;}
+    h+='<td class="num">'+(p===null?'<span class="sm">—</span>':'<span class="pct '+cls3(p)+'">'+p+'%</span><br><span class="sm">累計 '+(tc?Math.round(ts/tc):"—")+'%</span>')+'</td>';});
+  var ta=tc?Math.round(ts/tc):null;
+  h+='<td class="num"><span class="pct '+cls3(ta)+'">'+(ta===null?"—":ta+"%")+'</span> <span class="sm">('+tc+')</span></td></tr>';
+  $("weekly").innerHTML=h+"</tbody>"; $("weeklyN").textContent=rows.length+" 人・"+mons.length+" 週";
+  Array.prototype.forEach.call($("weekly").querySelectorAll("th[data-w]"),function(th){th.addEventListener("click",function(){var k2=th.dataset.w;if(wSortKey===k2)wSortDir=-wSortDir;else{wSortKey=k2;wSortDir=1;}renderWeekly(A);});});
 }
 
 /* ---------- 單元 × 評量表 ---------- */
@@ -351,6 +400,7 @@ function renderMatrix(A){
 
 /* ---------- 匯出 ---------- */
 function dl(name,content,type){var b=new Blob([content],{type:type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},0);}
+function csvq(v){return '"'+String(v).replace(/"/g,'""')+'"';}
 $("btnRaw").addEventListener("click",function(){dl("unit_raw_"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(scope(),null,1),"application/json");});
 $("btnUnitCsv").addEventListener("click",function(){
   var lines=[["kind","kind_name","unit","unit_name","avg_pct","sd","scored_n","ai_n","students","below60","last"].join(",")];
@@ -362,6 +412,32 @@ $("btnCsv").addEventListener("click",function(){
   lastStu.forEach(function(s){var avg=s.c?Math.round(s.sum/s.c):"";
     lines.push([s.sid,s.cls||"",avg].concat(lastCols.map(function(k){var u=s.units[k];return u&&u.c?Math.round(u.sum/u.c):"";}),[s.last]).map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(","));});
   dl("unit_matrix_"+new Date().toISOString().slice(0,10)+".csv","﻿"+lines.join("\r\n"),"text/csv;charset=utf-8");});
+/* 逐週明細：每位學生（末4碼學號）× 每單元 × 每週的得分紀錄與逐週累計總平均 */
+$("btnWeekCsv").addEventListener("click",function(){
+  if(!lastAgg)return;
+  var lines=[["sid_last4","class","week","week_start","kind","kind_name","unit","unit_name","n","avg_pct","cum_n","cum_avg_pct"].join(",")];
+  var mons=Object.keys(lastAgg.weeks).sort();
+  Object.keys(lastAgg.stu).sort().forEach(function(sid){var s=lastAgg.stu[sid];
+    var keys={};Object.keys(s.uw).forEach(function(k2){keys[k2.split("|")[0]]=1;});
+    Object.keys(keys).sort().forEach(function(key){
+      var p2=key.split(SEP),cum=0,cn=0;
+      mons.forEach(function(m){var u=s.uw[key+"|"+m];if(!u||!u.c)return;cum+=u.sum;cn+=u.c;
+        lines.push([s.sid,s.cls||"",weekLabel(m),m,p2[0],kname(p2[0]),p2[1],uname(p2[1]),u.c,Math.round(u.sum/u.c),cn,Math.round(cum/cn)].map(csvq).join(","));});
+    });
+  });
+  dl("unit_weekly_"+new Date().toISOString().slice(0,10)+".csv","﻿"+lines.join("\r\n"),"text/csv;charset=utf-8");});
+/* 逐週累計：每位學生（末4碼學號）逐週平均與逐週累計總平均（寬表，對應畫面矩陣） */
+$("btnCumCsv").addEventListener("click",function(){
+  if(!lastAgg)return;
+  var mons=Object.keys(lastAgg.weeks).sort();
+  var head=["sid_last4","class"];mons.forEach(function(m){head.push(weekLabel(m)+"_週平均",weekLabel(m)+"_累計");});head.push("總平均","總筆數");
+  var lines=[head.map(csvq).join(",")];
+  Object.keys(lastAgg.stu).sort().forEach(function(sid){var s=lastAgg.stu[sid];
+    var row=[s.sid,s.cls||""],cum=0,cn=0;
+    mons.forEach(function(m){var w=s.weeks[m];if(w&&w.c){cum+=w.sum;cn+=w.c;row.push(Math.round(w.sum/w.c),Math.round(cum/cn));}else row.push("",cn?Math.round(cum/cn):"");});
+    row.push(cn?Math.round(cum/cn):"",cn);
+    lines.push(row.map(csvq).join(","));});
+  dl("unit_weekly_cum_"+new Date().toISOString().slice(0,10)+".csv","﻿"+lines.join("\r\n"),"text/csv;charset=utf-8");});
 
 /* ---------- 示範資料（模擬；固定種子，重按結果相同） ---------- */
 $("btnDemo").addEventListener("click",loadDemo);
