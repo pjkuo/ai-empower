@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>運算思維四大技巧練習｜AI 賦能教學 Hub</title>
+<meta name="description" content="以校園生活為例的運算思維四大技巧練習（拆解、找規律、抽象化、演算法）：線上表單為主要入口、紙本 DOC 為備援，不計評分、以學生練習為主；教師端提供圖表與文字分析審閱學習評量結果。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/ct-practice.html">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+.hero{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;border-radius:var(--radius);padding:24px 26px;margin-top:16px}
+.hero h1{font-size:26px;line-height:1.35;margin-bottom:8px}
+.hero p{font-size:13.5px;opacity:.92;line-height:1.75;max-width:74ch}
+.hero .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.hero .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700}
+.hero .pill.warn{background:var(--warn-bg);color:#92400E;border-color:transparent}
+
+.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:var(--gap);margin-top:var(--gap)}
+.sk{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;border-top:4px solid var(--c)}
+.sk .n{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;font-weight:700;color:var(--c);letter-spacing:2px}
+.sk h3{font-size:19px;color:var(--ink);margin:4px 0 2px}
+.sk .en{font-size:10.5px;letter-spacing:1.6px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.sk .def{font-size:13px;color:var(--ink);margin-top:9px;font-weight:700}
+.sk .ex{font-size:12.5px;color:var(--muted);line-height:1.7;margin-top:7px}
+.sk .ex b{color:var(--ink)}
+.sk .do{margin-top:10px;background:var(--soft);border-radius:9px;padding:8px 10px;font-size:12px;color:var(--ink);line-height:1.6}
+.sk .do i{font-style:normal;color:var(--c);font-weight:800}
+
+.entries{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-top:var(--gap)}
+@media(max-width:860px){.entries{grid-template-columns:1fr}}
+.qrwrap{display:flex;gap:16px;align-items:flex-start;margin-top:10px}
+.qrwrap img{width:132px;height:132px;border:1px solid var(--line);border-radius:10px;background:#fff;flex:0 0 132px}
+.qrwrap .t{flex:1;min-width:0}
+.short{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;font-weight:700;color:var(--primary);background:var(--soft);border-radius:8px;padding:6px 11px;margin-top:8px;word-break:break-all}
+.rowlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.mirror{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:560px){.mirror{grid-template-columns:1fr}}
+.mirror a{display:block;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-decoration:none}
+.mirror a:hover{border-color:var(--accent)}
+.mirror b{display:block;font-size:13px;color:var(--primary)}
+.mirror span{font-size:11px;color:var(--muted);word-break:break-all}
+.mirror .badge{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:2px 8px;margin-bottom:4px}
+
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:760px){.steps3{grid-template-columns:1fr}}
+.st3{background:var(--soft);border-radius:10px;padding:11px 13px}
+.st3 b{display:block;font-size:13px;color:var(--primary);margin-bottom:3px}
+.st3 span{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* ---- teacher ---- */
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-top:12px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px;border-top:3px solid var(--c,var(--accent))}
+.kpi b{display:block;font-size:23px;color:var(--primary);font-variant-numeric:tabular-nums}
+.kpi span{font-size:11px;color:var(--muted);display:block}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-top:var(--gap)}
+@media(max-width:900px){.charts{grid-template-columns:1fr}}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.analysis p{font-size:13px;line-height:1.85;color:var(--ink);margin-bottom:10px}
+.analysis p b{color:var(--primary)}
+.analysis .flag{background:var(--warn-bg);border-radius:9px;padding:10px 12px;color:#92400E}
+.analysis .good{background:var(--ok-bg);border-radius:9px;padding:10px 12px;color:#065F46}
+.wordgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
+.wl{background:var(--soft);border-radius:10px;padding:10px 12px}
+.wl h4{font-size:12.5px;color:var(--primary);margin-bottom:6px}
+.wl ol{margin:0;padding-left:18px}
+.wl li{font-size:12px;color:var(--ink);line-height:1.75}
+.wl li i{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+.tblwrap{overflow:auto;max-height:420px;margin-top:10px}
+.hide{display:none !important}
+.note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:8px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽" id="nav">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="ioc.html">IOC 課程</a>
+      <a href="presurvey.html">課前評量</a>
+      <a aria-current="page" href="ct-practice.html">運算思維練習</a>
+      <a href="console.html">教師工作台</a>
+      <a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap" style="padding-bottom:40px">
+
+<!-- ==================== 學生練習 ==================== -->
+<section id="stu">
+  <div class="hero">
+    <h1>運算思維四大技巧練習<br><span style="font-size:16px;font-weight:600;opacity:.9">拆解 · 找規律 · 抽象化 · 演算法　—　以校園生活為例</span></h1>
+    <p>不用寫程式，也不用背定義。這份練習拿你每天在做的事——搶票、排隊吃飯、揪團出遊、辦社團活動——當題目，把四個技巧各練一次。判準只有一個：<b>這一步換別人照做，做得出來嗎？</b></p>
+    <div class="pills">
+      <span class="pill warn">★ 不計評分</span>
+      <span class="pill">以練習為主</span>
+      <span class="pill">約 12–15 分鐘</span>
+      <span class="pill">線上表單 or 紙本皆可</span>
+    </div>
+  </div>
+
+  <div class="skills">
+    <div class="sk" style="--c:#2E5496">
+      <div class="n">SKILL 01</div><h3>拆解</h3><div class="en">DECOMPOSITION</div>
+      <div class="def">把一件大事，切成一口一口做得完的小事。</div>
+      <div class="ex">校園實例｜<b>演唱會搶票</b>：「搶到票」不是一個動作，是開賣前四件事——會員實名、付款綁定、座位順位表、對時與裝置準備。</div>
+      <div class="do"><i>你要做的：</i>把「搶票成功」拆成四步，並標出最不能省的一步。</div>
+    </div>
+    <div class="sk" style="--c:#0F7A76">
+      <div class="n">SKILL 02</div><h3>找規律</h3><div class="en">PATTERN RECOGNITION</div>
+      <div class="def">從一堆資料裡，看出一再重複出現的事。</div>
+      <div class="ex">校園實例｜<b>排隊美食</b>：尖峰要排 40 分鐘、離峰只要 5 分鐘。規律不是猜的，是連記三天記錄出來的。</div>
+      <div class="do"><i>你要做的：</i>寫出你要記錄的三個欄位，再把規律寫成一句可驗證的話。</div>
+    </div>
+    <div class="sk" style="--c:#6B4D9E">
+      <div class="n">SKILL 03</div><h3>抽象化</h3><div class="en">ABSTRACTION</div>
+      <div class="def">忽略不重要的細節，只留下解決問題需要的資訊。</div>
+      <div class="ex">校園實例｜<b>社團擺攤</b>：企劃書只要攤位、人力、時段三件事就能動起來；海報配色和社服顏色，這一步先不管。</div>
+      <div class="do"><i>你要做的：</i>說出這題「只需要留下哪兩項」，其他一律忽略。</div>
+    </div>
+    <div class="sk" style="--c:#B0821E">
+      <div class="n">SKILL 04</div><h3>演算法</h3><div class="en">ALGORITHM</div>
+      <div class="def">寫出一步一步、誰照做都會得到相同結果的明確步驟。</div>
+      <div class="ex">校園實例｜<b>揪團出遊</b>：日期沒定就訂不了車也訂不了房；再加上「下雨怎麼辦、有人退出怎麼辦」的 IF…THEN 備案。</div>
+      <div class="do"><i>你要做的：</i>找出卡住所有人的那一件事，並寫兩條 IF…THEN 備案。</div>
+    </div>
+  </div>
+
+  <div class="entries">
+    <div class="card">
+      <h2>🟢 練習入口・主要<span class="tag" style="background:var(--ok-bg);color:#065F46">線上表單</span></h2>
+      <div class="sub">手機掃碼即可作答，送出後自動彙整到教師端；答完可再編輯。</div>
+      <div class="qrwrap">
+        <img id="qrimg" alt="運算思維四大技巧練習線上表單 QR code" src="assets/img/ct-qr.svg">
+        <div class="t">
+          <div style="font-size:12.5px;color:var(--muted);line-height:1.7">掃不到？直接輸入短網址：</div>
+          <a class="short" id="shortUrl" href="https://da.gd/q0L2y" target="_blank" rel="noopener">da.gd/q0L2y</a>
+          <div class="rowlinks">
+            <a class="btn btn-primary" id="btnForm" href="https://docs.google.com/forms/d/e/1FAIpQLSdfXQZwqlCVHn-nny4lKaMn-Q6rQ1qsZQF3kO_4MRO1OEsoDg/viewform" target="_blank" rel="noopener">開始練習 →</a>
+            <button class="btn btn-ghost" id="btnCopy" type="button">複製網址</button>
+          </div>
+          <div class="note">送出的內容只用於課堂教學診斷，<b>不列入學期成績</b>。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🟡 練習入口・備援<span class="tag" style="background:var(--warn-bg);color:#92400E">紙本 DOC／PDF</span></h2>
+      <div class="sub">網路不通、表單開不起來，或老師要現場發紙本時使用。內容與線上版完全相同。</div>
+      <div class="mirror" style="grid-template-columns:1fr">
+        <a href="ct-worksheet.html">
+          <span class="badge" style="background:var(--ok-bg);color:#065F46">免下載・立即可印</span>
+          <b>🖨 開啟列印版練習單（網頁）</b><span>A4 直式一頁，按一下就能印；沒有 Word 也能用</span></a>
+      </div>
+      <div class="mirror" id="docs">
+        <a href="assets/doc/ct-practice-worksheet.docx" download>
+          <span class="badge" style="background:var(--accent-soft);color:var(--primary)">可編輯</span>
+          <b>⬇ 練習單 DOCX</b><span>assets/doc/ct-practice-worksheet.docx</span></a>
+        <a href="assets/doc/ct-practice-worksheet.pdf" download>
+          <span class="badge" style="background:var(--soft);color:var(--muted)">列印用</span>
+          <b>⬇ 練習單 PDF</b><span>assets/doc/ct-practice-worksheet.pdf</span></a>
+      </div>
+      <div class="note">紙本作答後，可由學生自行補填線上表單，或由教師拍照存檔；兩種方式都算完成練習。</div>
+
+      <h2 style="margin-top:18px">🌐 平台入口</h2>
+      <div class="sub">主要站連不上時，改用備援站，內容一致。</div>
+      <div class="mirror">
+        <a id="siteMain" href="https://ai-empower-hub.pages.dev/ct-practice.html">
+          <span class="badge" style="background:var(--ok-bg);color:#065F46">主要平台</span>
+          <b>AI 賦能教學 Hub 正式站</b><span id="siteMainU">ai-empower-hub.pages.dev</span></a>
+        <a href="https://pjkuo.github.io/ai-empower/ct-practice.html">
+          <span class="badge" style="background:var(--warn-bg);color:#92400E">備援平台</span>
+          <b>GitHub Pages 備援站</b><span>pjkuo.github.io/ai-empower</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:var(--gap)">
+    <h2>怎麼進行<span class="tag" style="background:var(--accent-soft);color:var(--primary)">15 分鐘・三輪</span></h2>
+    <div class="steps3">
+      <div class="st3"><b>① 個人 5 分鐘</b><span>選 2 題動筆寫。寫得<strong>具體</strong>比寫得漂亮重要——能照著做的才算數。</span></div>
+      <div class="st3"><b>② 兩人 6 分鐘</b><span>交換看，互相問一句：「這一步換我做，做得出來嗎？」找出對方可以再拆細的地方。</span></div>
+      <div class="st3"><b>③ 全班 4 分鐘</b><span>舉手分享 30 秒，說出你改了哪一個<strong>步驟</strong>或哪一個<strong>參數</strong>。</span></div>
+    </div>
+    <div class="note">教師端會看到全班的完成度與具體度統計，用來決定下一節課要補哪一個技巧；<b>個別作答不評分、不排名</b>。</div>
+  </div>
+</section>
+
+<!-- ==================== 教師審閱 ==================== -->
+<section id="tea" class="hide">
+  <div class="card" style="margin-top:16px">
+    <h2>運算思維四大技巧練習・學習結果審閱<span class="tag" style="background:var(--warn-bg);color:#92400E">不計評分</span></h2>
+    <div class="sub">資料來源：雲端統一記錄 <code>kind=ctpractice</code>（由 Google 表單經 <code>gas/ct-practice-patch.gs</code> 推送）。所有指標為<strong>教學診斷用</strong>，非學期成績。</div>
+    <div class="bar">
+      <button class="btn btn-primary" id="btnPull" type="button">☁ 讀取雲端資料</button>
+      <button class="btn btn-ghost" id="btnDemo" type="button">▶ 載入示範資料</button>
+      <button class="btn btn-ghost" id="btnCsv" type="button">⬇ 匯出逐人 CSV</button>
+      <span class="live"><span class="dot" id="tdot"></span><span id="tmsg">尚未讀取</span></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <div class="charts">
+    <div class="card chart"><h2>四大技巧・具體度</h2>
+      <div class="sub">「換別人照做，做得出來嗎」的可操作性指標（0–100），非分數。</div>
+      <div id="c_skill"></div>
+      <div class="legend"><span><i style="background:#2E5496"></i>拆解</span><span><i style="background:#0F7A76"></i>找規律</span><span><i style="background:#6B4D9E"></i>抽象化</span><span><i style="background:#B0821E"></i>演算法</span></div>
+    </div>
+    <div class="card chart"><h2>填答完整度分布</h2>
+      <div class="sub">每位學生已填欄位佔全部欄位的比例。</div>
+      <div id="c_comp"></div>
+    </div>
+    <div class="card chart"><h2>單選題答案分布</h2>
+      <div class="sub">左：搶票最不能省的一步｜右：出遊最先要確定的任務。反映學生對「前置條件／相依關係」的直覺。</div>
+      <div id="c_choice"></div>
+    </div>
+    <div class="card chart"><h2>每日提交趨勢</h2>
+      <div class="sub">看得出是課堂當場完成，還是拖到課後才補。</div>
+      <div id="c_trend"></div>
+    </div>
+  </div>
+
+  <div class="card analysis" style="margin-top:var(--gap)">
+    <h2>文字分析與教學建議</h2>
+    <div class="sub">依下列判準自動生成，供教師採納／修改／退回（HITL）。</div>
+    <div id="analysis"></div>
+    <div class="wordgrid" id="words"></div>
+  </div>
+
+  <div class="card" style="margin-top:var(--gap)">
+    <h2>逐人明細</h2>
+    <div class="sub">學號僅顯示末 4 碼；完整名單請用 CSV 匯出。</div>
+    <div class="tblwrap"><table class="data" id="tbl"></table></div>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/cloud.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var Q=function(s,r){return (r||document).querySelector(s);};
+
+var SKILLS=[
+  {k:"decompose",zh:"拆解",c:"#2E5496"},
+  {k:"pattern",  zh:"找規律",c:"#0F7A76"},
+  {k:"abstract", zh:"抽象化",c:"#6B4D9E"},
+  {k:"algorithm",zh:"演算法",c:"#B0821E"}
+];
+var FORM_URL=$("btnForm").href;
+var EMBED=/[?&]embed=1/.test(location.search);
+var DEMO=/[?&]demo=1/.test(location.search);
+var wantTeacher=EMBED||/[?&]mode=teacher/.test(location.search)||location.hash==="#teacher";
+
+/* ---------- 模式 ---------- */
+function setMode(teacher){
+  $("stu").classList.toggle("hide",!!teacher);
+  $("tea").classList.toggle("hide",!teacher);
+  if(teacher&&EMBED) $("nav").style.display="none";
+}
+if(wantTeacher){
+  var ok=EMBED;
+  if(!ok){ try{ ok=sessionStorage.getItem("ae.teacher.gate")==="1"; }catch(e){} }
+  if(!ok){ location.replace("console.html#ct"); }
+  else setMode(true);
+}else setMode(false);
+
+/* ---------- 學生頁小工具 ---------- */
+$("btnCopy").addEventListener("click",function(){
+  var t=$("shortUrl").href;
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t);
+  this.textContent="已複製 ✓"; var b=this; setTimeout(function(){b.textContent="複製網址";},1600);
+});
+/* DOC／PDF 尚未放進 assets/doc/ 時自動隱藏那兩個磚，避免學生點到 404 */
+(function(){
+  var box=$("docs"); if(!box) return;
+  var links=[].slice.call(box.querySelectorAll("a")), left=links.length;
+  links.forEach(function(a){
+    var x=new XMLHttpRequest();
+    try{ x.open("HEAD",a.getAttribute("href"),true); }catch(e){ return; }
+    x.onload=function(){ if(x.status>=400) a.style.display="none"; done(); };
+    x.onerror=function(){ a.style.display="none"; done(); };
+    x.send();
+  });
+  function done(){ if(--left>0) return;
+    if(!links.filter(function(a){return a.style.display!=="none";}).length) box.style.display="none"; }
+})();
+
+/* 主要平台網址若 route-config.json 有設定就以它為準 */
+(function(){
+  try{
+    var x=new XMLHttpRequest(); x.open("GET","route-config.json",true);
+    x.onload=function(){ try{ var j=JSON.parse(x.responseText); if(j&&j.nlUrl){
+      var u=j.nlUrl.replace(/\/+$/,"")+"/ct-practice.html";
+      $("siteMain").href=u; $("siteMainU").textContent=u.replace(/^https?:\/\//,"").replace(/\/ct-practice\.html$/,"");
+    } }catch(e){} };
+    x.send();
+  }catch(e){}
+})();
+
+/* ================= 教師端 ================= */
+var ROWS=[];
+
+function pctSafe(a,b){ return b?Math.round(a*100/b):0; }
+function mean(a){ return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:0; }
+function med(a){ if(!a.length) return 0; var s=a.slice().sort(function(x,y){return x-y;}); var m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+function tail4(sid){ var s=String(sid||""); return s.length>4?s.slice(-4):s; }
+
+/* 由統一記錄取出本頁需要的欄位（相容缺欄） */
+function normalise(recs){
+  var out=[];
+  (recs||[]).forEach(function(r){
+    var d=r.detail||{};
+    if(r.kind&&r.kind!=="ctpractice") return;
+    var sk={};
+    SKILLS.forEach(function(s){
+      var o=(d.skills||{})[s.k]||{};
+      sk[s.k]={done:+o.done||0,total:+o.total||0,spec:+o.spec||0};
+    });
+    out.push({
+      sid:r.sid||"", name:r.name||"", cls:r.cls||"", ts:r.ts||"",
+      completion:(d.completion!=null?+d.completion:(+r.score||0)),
+      chars:+d.chars||0, skills:sk,
+      critical:(d.choice||{}).critical||"", blocker:(d.choice||{}).blocker||"",
+      pattern:d.pattern||{}, fields:d.fields||[], keeps:d.keeps||[],
+      rules:d.rules||{}, texts:d.texts||{}, selfCheck:+d.selfCheck||0, peer:+d.peer||0
+    });
+  });
+  /* 同一學號取最新一筆 */
+  var by={}; out.forEach(function(r){ if(!by[r.sid]||r.ts>by[r.sid].ts) by[r.sid]=r; });
+  return Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return a.ts<b.ts?-1:1;});
+}
+
+/* ---------- 圖表（純 inline SVG，無 CDN） ---------- */
+function svg(w,h,inner){ return '<svg viewBox="0 0 '+w+' '+h+'" role="img" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>'; }
+function txt(x,y,s,o){ o=o||{};
+  return '<text x="'+x+'" y="'+y+'" font-size="'+(o.size||11)+'" fill="'+(o.fill||"#64748B")+'"'
+    +(o.anchor?' text-anchor="'+o.anchor+'"':'')+(o.bold?' font-weight="700"':'')+'>'+esc(s)+'</text>'; }
+
+function chartSkill(rows){
+  var W=520,H=196,L=74,R=24,T=16,BH=26,GAP=14;
+  var s='';
+  SKILLS.forEach(function(sk,i){
+    var v=Math.round(mean(rows.map(function(r){return r.skills[sk.k].spec;})));
+    var y=T+i*(BH+GAP), max=W-L-R, w=Math.max(2,Math.round(max*v/100));
+    s+='<rect x="'+L+'" y="'+y+'" width="'+max+'" height="'+BH+'" rx="5" fill="#EEF2F7"/>';
+    s+='<rect x="'+L+'" y="'+y+'" width="'+w+'" height="'+BH+'" rx="5" fill="'+sk.c+'"/>';
+    s+=txt(L-8,y+BH/2+4,sk.zh,{anchor:"end",fill:"#0F172A",bold:1,size:12.5});
+    s+=txt(L+w+7,y+BH/2+4,v,{fill:sk.c,bold:1,size:12.5});
+  });
+  s+='<line x1="'+L+'" y1="'+(T-4)+'" x2="'+L+'" y2="'+(H-14)+'" stroke="#CBD5E1"/>';
+  s+=txt(L,H-2,"0",{size:10})+txt(W-R,H-2,"100",{anchor:"end",size:10});
+  return svg(W,H,s);
+}
+
+function chartHist(rows){
+  var W=520,H=200,L=36,B=34,T=14,R=14;
+  var bins=[0,0,0,0,0], lab=["0–20","21–40","41–60","61–80","81–100"];
+  rows.forEach(function(r){ var i=Math.min(4,Math.floor(Math.max(0,r.completion-0.01)/20)); if(r.completion<=0)i=0; bins[i]++; });
+  var mx=Math.max.apply(null,bins.concat([1]));
+  var bw=(W-L-R)/5, s='';
+  bins.forEach(function(v,i){
+    var h=Math.round((H-T-B)*v/mx), x=L+i*bw+8, y=H-B-h;
+    s+='<rect x="'+x+'" y="'+y+'" width="'+(bw-16)+'" height="'+Math.max(h,1)+'" rx="4" fill="'+(i<2?"#DC2626":i<3?"#D97706":"#1E3A8A")+'"/>';
+    s+=txt(x+(bw-16)/2,y-5,v,{anchor:"middle",bold:1,fill:"#0F172A"});
+    s+=txt(x+(bw-16)/2,H-B+16,lab[i],{anchor:"middle",size:10.5});
+  });
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="#CBD5E1"/>';
+  s+=txt(L-6,H-B+16,"人數",{anchor:"end",size:10});
+  return svg(W,H,s);
+}
+
+function chartChoice(rows){
+  var W=520,H=200,s='';
+  function group(field,labels,ox,title,color){
+    var cnt={}; labels.forEach(function(l){cnt[l]=0;});
+    rows.forEach(function(r){ var v=r[field]; if(cnt[v]!=null) cnt[v]++; });
+    var mx=Math.max.apply(null,labels.map(function(l){return cnt[l];}).concat([1]));
+    var bw=48,B=36,T=30,gh=H-T-B;
+    s+=txt(ox+2*bw,T-12,title,{anchor:"middle",bold:1,fill:"#0F172A",size:11.5});
+    labels.forEach(function(l,i){
+      var h=Math.round(gh*cnt[l]/mx), x=ox+i*bw+6, y=H-B-h;
+      s+='<rect x="'+x+'" y="'+y+'" width="'+(bw-14)+'" height="'+Math.max(h,1)+'" rx="4" fill="'+color+'" opacity="'+(0.45+0.55*cnt[l]/mx)+'"/>';
+      s+=txt(x+(bw-14)/2,y-5,cnt[l],{anchor:"middle",bold:1,fill:"#0F172A",size:11});
+      s+=txt(x+(bw-14)/2,H-B+15,l.replace(/^(STEP|TASK) /,""),{anchor:"middle",size:10.5});
+    });
+    s+='<line x1="'+ox+'" y1="'+(H-B)+'" x2="'+(ox+4*bw)+'" y2="'+(H-B)+'" stroke="#CBD5E1"/>';
+  }
+  group("critical",["STEP 1","STEP 2","STEP 3","STEP 4"],26,"最不能省的一步",  "#2E5496");
+  group("blocker", ["TASK A","TASK B","TASK C","TASK D"],290,"最先要確定的任務","#B0821E");
+  return svg(W,H,s);
+}
+
+function chartTrend(rows){
+  var W=520,H=200,L=40,R=16,T=18,B=34,s='';
+  var by={}; rows.forEach(function(r){ var d=(r.ts||"").slice(0,10); if(d) by[d]=(by[d]||0)+1; });
+  var keys=Object.keys(by).sort();
+  if(!keys.length) return svg(W,H,txt(W/2,H/2,"尚無資料",{anchor:"middle"}));
+  var mx=Math.max.apply(null,keys.map(function(k){return by[k];}));
+  var gw=W-L-R, gh=H-T-B;
+  var pts=keys.map(function(k,i){
+    var x=L+(keys.length===1?gw/2:gw*i/(keys.length-1));
+    var y=H-B-gh*by[k]/mx; return [x,y,k,by[k]];
+  });
+  [0,0.5,1].forEach(function(f){ var y=H-B-gh*f; s+='<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#EEF2F7"/>'
+    +txt(L-6,y+4,Math.round(mx*f),{anchor:"end",size:10}); });
+  s+='<polyline fill="none" stroke="#1E3A8A" stroke-width="2.5" points="'+pts.map(function(p){return p[0]+","+p[1];}).join(" ")+'"/>';
+  pts.forEach(function(p){
+    s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="#1E3A8A"/>';
+    s+=txt(p[0],p[1]-9,p[3],{anchor:"middle",bold:1,fill:"#0F172A",size:10.5});
+    s+=txt(p[0],H-B+16,p[2].slice(5),{anchor:"middle",size:10});
+  });
+  return svg(W,H,s);
+}
+
+/* ---------- 關鍵詞頻率（中文以詞表比對，避免斷詞相依） ---------- */
+var LEX={
+  "找規律欄位":{src:function(r){return (r.fields||[]).join(" ");},
+    words:["星期","時段","時間","人數","排隊","天氣","日期","假日","下課","尖峰","分鐘","週末","月份","地點","價格"]},
+  "THEN 動作":{src:function(r){return [(r.rules||{}).thenAct,(r.rules||{}).ifRain,(r.rules||{}).ifDrop].join(" ");},
+    words:["改","換","取消","延後","提前","通知","重訂","改期","室內","退款","找人","加價","備案","轉","再等","放棄","分攤","改線上"]},
+  "留下的資訊":{src:function(r){return (r.keeps||[]).join(" ");},
+    words:["時間","人數","距離","價格","星期","等待","地點","天氣","名額","座位","車程","預算"]}
+};
+function wordTable(rows){
+  var html="";
+  Object.keys(LEX).forEach(function(name){
+    var L=LEX[name], cnt={};
+    L.words.forEach(function(w){cnt[w]=0;});
+    rows.forEach(function(r){ var t=L.src(r)||""; L.words.forEach(function(w){ if(t.indexOf(w)>=0) cnt[w]++; }); });
+    var top=L.words.map(function(w){return [w,cnt[w]];}).filter(function(p){return p[1]>0;})
+      .sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+    html+='<div class="wl"><h4>'+esc(name)+'　出現最多的詞</h4><ol>'
+      +(top.length?top.map(function(p){return "<li>"+esc(p[0])+" <i>× "+p[1]+"</i></li>";}).join("")
+                  :"<li style=\"color:var(--muted)\">尚無資料</li>")+"</ol></div>";
+  });
+  return html;
+}
+
+/* ---------- 文字分析 ---------- */
+function analyse(rows){
+  var n=rows.length;
+  if(!n) return '<p class="flag">尚無資料。按「讀取雲端資料」，或先用「載入示範資料」看報表長什麼樣子。</p>';
+  var sp={}; SKILLS.forEach(function(s){ sp[s.k]=Math.round(mean(rows.map(function(r){return r.skills[s.k].spec;}))); });
+  var comp=Math.round(mean(rows.map(function(r){return r.completion;})));
+  var weakest=SKILLS.slice().sort(function(a,b){return sp[a.k]-sp[b.k];})[0];
+  var best=SKILLS.slice().sort(function(a,b){return sp[b.k]-sp[a.k];})[0];
+  var numMins=rows.filter(function(r){return /\d/.test((r.pattern||{}).mins||"");}).length;
+  var dupKeep=rows.filter(function(r){var k=r.keeps||[];return k[0]&&k[0]===k[1];}).length;
+  var shortThen=rows.filter(function(r){return (((r.rules||{}).thenAct)||"").length<4;}).length;
+  var low=rows.filter(function(r){return r.completion<50;});
+  var critTop=(function(){ var c={}; rows.forEach(function(r){ if(r.critical) c[r.critical]=(c[r.critical]||0)+1; });
+    var k=Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0]; return k?{k:k,n:c[k]}:null; })();
+  var blockTop=(function(){ var c={}; rows.forEach(function(r){ if(r.blocker) c[r.blocker]=(c[r.blocker]||0)+1; });
+    var k=Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0]; return k?{k:k,n:c[k]}:null; })();
+
+  var h="";
+  h+='<p><b>整體。</b>本次共 '+n+' 人提交，平均填答完整度 <b>'+comp+'%</b>。四大技巧具體度：拆解 '+sp.decompose
+    +'、找規律 '+sp.pattern+'、抽象化 '+sp.abstract+'、演算法 '+sp.algorithm
+    +'。最穩的是<b>'+best.zh+'</b>（'+sp[best.k]+'），最需要補的是<b>'+weakest.zh+'</b>（'+sp[weakest.k]+'）。</p>';
+
+  if(sp.pattern<60||numMins<n*0.6){
+    h+='<p class="flag"><b>找規律：規律寫成印象，不是資料。</b>只有 '+numMins+'/'+n
+      +' 人在「大約要等幾分鐘」填得出數字，其餘停留在「很多人」「很久」這類描述。'
+      +'建議下一節課花 3 分鐘全班共同記錄一次（星期／時段／等待分鐘），讓學生親眼看到「可驗證的一句話」和「印象」的差別。</p>';
+  }else{
+    h+='<p class="good"><b>找規律：已經會用數字說話。</b>'+numMins+'/'+n+' 人寫得出可驗證的等待時間，規律陳述有資料支撐。</p>';
+  }
+  if(shortThen>n*0.3){
+    h+='<p class="flag"><b>演算法：THEN 不是動作。</b>'+shortThen+'/'+n
+      +' 人的 THEN 只寫了一個狀態或形容詞（例如「很麻煩」），沒有寫出下一步要做什麼。'
+      +'建議下次直接要求 THEN 必須以動詞開頭，並當場請兩位同學互換照做一次。</p>';
+  }
+  if(dupKeep>n*0.2){
+    h+='<p class="flag"><b>抽象化：取捨沒有真的發生。</b>'+dupKeep+'/'+n
+      +' 人填的兩項「要留下的資訊」實質重複，代表還沒練到「主動丟掉不需要的東西」。'
+      +'建議用反向提問：「這題有哪三件事就算不知道也不影響決定？」</p>';
+  }
+  if(sp.decompose>=70){
+    h+='<p class="good"><b>拆解：步驟切得開。</b>多數學生能把一件事切成四個可執行步驟，並說得出最不能省的一步。</p>';
+  }
+  if(critTop) h+='<p><b>前置條件的直覺。</b>「搶票最不能省」最多人選 <b>'+esc(critTop.k)+'</b>（'+critTop.n+' 人）。'
+    +(critTop.k==="STEP 1"?'集中在第一步，與演算法「前置條件先滿足」的觀念一致，可直接接到 IPO 的 Input 概念。'
+                          :'不是集中在第一步，值得請幾位同學說明理由，順勢帶出「相依關係」。')+'</p>';
+  if(blockTop) h+='<p><b>相依關係的直覺。</b>出遊題最多人認為 <b>'+esc(blockTop.k)+'</b> 必須最先確定（'+blockTop.n
+    +' 人）。可請該組上台畫出箭頭，讓全班看見「誰卡誰」。</p>';
+  if(low.length) h+='<p class="flag"><b>需要關注：</b>'+low.length+' 位學生完成度低於 50%（'
+    +low.slice(0,12).map(function(r){return tail4(r.sid);}).join("、")+(low.length>12?" 等":"")
+    +'）。多半不是不會，是沒動筆；下次改成「先兩人一起寫第 1 題」再各自完成。</p>';
+
+  h+='<p><b>下一步（建議）。</b>把 '+weakest.zh+' 拉到課堂前 5 分鐘重講一次，用同一個校園情境示範一遍，'
+    +'再讓學生只重寫那一題；其餘三個技巧維持現行節奏即可。本頁指標為練習診斷，<b>不作為評分依據</b>。</p>';
+  return h;
+}
+
+/* ---------- 版面渲染 ---------- */
+function render(){
+  var rows=ROWS;
+  var cls={}; rows.forEach(function(r){ if(r.cls) cls[r.cls]=1; });
+  var sp={}; SKILLS.forEach(function(s){ sp[s.k]=Math.round(mean(rows.map(function(r){return r.skills[s.k].spec;}))); });
+  var kv=[
+    ["提交人數",rows.length,"#1E3A8A"],
+    ["班級數",Object.keys(cls).length,"#3B82F6"],
+    ["平均完成度",Math.round(mean(rows.map(function(r){return r.completion;})))+"%","#059669"],
+    ["平均具體度",Math.round(mean(SKILLS.map(function(s){return sp[s.k];}))),"#0D9488"],
+    ["完成度<50%",rows.filter(function(r){return r.completion<50;}).length+" 人","#DC2626"],
+    ["中位字數",Math.round(med(rows.map(function(r){return r.chars;}))),"#D97706"]
+  ];
+  $("kpis").innerHTML=kv.map(function(k){
+    return '<div class="kpi" style="--c:'+k[2]+'"><b>'+esc(k[1])+'</b><span>'+esc(k[0])+'</span></div>';
+  }).join("");
+  $("c_skill").innerHTML=chartSkill(rows);
+  $("c_comp").innerHTML=chartHist(rows);
+  $("c_choice").innerHTML=chartChoice(rows);
+  $("c_trend").innerHTML=chartTrend(rows);
+  $("analysis").innerHTML=analyse(rows);
+  $("words").innerHTML=wordTable(rows);
+
+  var head='<thead><tr><th>學號末4碼</th><th>班級</th><th>完成度</th>'
+    +SKILLS.map(function(s){return "<th>"+s.zh+"</th>";}).join("")
+    +'<th>最不能省</th><th>最先確定</th><th>字數</th><th>自評</th><th>互評</th><th>提交時間</th></tr></thead>';
+  var body=rows.map(function(r){
+    return "<tr><td>"+esc(tail4(r.sid))+"</td><td>"+esc(r.cls)+"</td><td>"+r.completion+"%</td>"
+      +SKILLS.map(function(s){return "<td>"+r.skills[s.k].spec+"</td>";}).join("")
+      +"<td>"+esc(r.critical)+"</td><td>"+esc(r.blocker)+"</td><td>"+r.chars+"</td>"
+      +"<td>"+r.selfCheck+"/3</td><td>"+(r.peer?"✓":"—")+"</td><td>"+esc((r.ts||"").replace("T"," ").slice(0,16))+"</td></tr>";
+  }).join("");
+  $("tbl").innerHTML=head+"<tbody>"+(body||'<tr><td colspan="12" style="color:var(--muted)">尚無資料</td></tr>')+"</tbody>";
+}
+
+function status(on,msg){ $("tdot").style.background=on?"var(--ok)":"var(--dim)"; $("tmsg").textContent=msg; }
+
+/* ---------- 示範資料 ---------- */
+function demo(){
+  var rnd=function(seed){ var s=seed; return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; };
+  var R=rnd(20260913), out=[], clss=["資管一甲","資管一乙"];
+  var STEPS=["STEP 1","STEP 2","STEP 3","STEP 4"], TASKS=["TASK A","TASK B","TASK C","TASK D"];
+  var fieldPool=[["星期","時段","排隊人數"],["時間","人數","天氣"],["星期","尖峰","等待分鐘"],["日期","時段",""]];
+  var thenPool=["改買第三順位區","立刻通知群組改期","改成室內備案","放棄這場改下一場","很麻煩","再說"];
+  for(var i=0;i<34;i++){
+    var good=R()>0.28;
+    var comp=good?70+Math.round(R()*30):25+Math.round(R()*40);
+    var mk=function(base){ return Math.max(0,Math.min(100,Math.round(base+(R()*30-15)))); };
+    var f=fieldPool[Math.floor(R()*fieldPool.length)];
+    out.push({
+      v:2,kind:"ctpractice",sid:"41134"+String(100+i),name:"",cls:clss[i%2],
+      ts:new Date(2026,8,13+Math.floor(R()*4),9+Math.floor(R()*9),Math.floor(R()*59)).toISOString(),
+      score:comp,max:100,
+      detail:{unit:"CT四大技巧練習",graded:false,completion:comp,chars:40+Math.round(R()*260),
+        skills:{decompose:{done:4,total:4,spec:mk(good?78:46)},
+                pattern:{done:5,total:6,spec:mk(good?58:34)},
+                abstract:{done:2,total:3,spec:mk(good?66:40)},
+                algorithm:{done:5,total:7,spec:mk(good?62:38)}},
+        choice:{critical:STEPS[R()<0.5?0:Math.floor(R()*4)],blocker:TASKS[R()<0.45?0:Math.floor(R()*4)]},
+        pattern:{weekday:"三",hour:R()<0.7?"14:30":"下午",mins:R()<0.55?String(5+Math.floor(R()*30)):"很久"},
+        fields:f,keeps:R()<0.25?["時間","時間"]:["時段","等待分鐘"],
+        rules:{thenAct:thenPool[Math.floor(R()*thenPool.length)],ifRain:"改成室內走春日大道",ifDrop:"重算分攤金額並通知"},
+        texts:{},selfCheck:Math.floor(R()*4),peer:R()<0.7?1:0}
+    });
+  }
+  return out;
+}
+
+/* ---------- 事件 ---------- */
+$("btnDemo").addEventListener("click",function(){
+  ROWS=normalise(demo()); render(); status(true,"示範資料（34 人）・非真實作答");
+});
+$("btnPull").addEventListener("click",function(){ pull(); });
+$("btnCsv").addEventListener("click",function(){
+  var head=["sid_tail4","cls","completion"].concat(SKILLS.map(function(s){return "spec_"+s.k;}))
+    .concat(["critical","blocker","chars","selfCheck","peer","ts"]);
+  var lines=[head.join(",")].concat(ROWS.map(function(r){
+    return [tail4(r.sid),r.cls,r.completion].concat(SKILLS.map(function(s){return r.skills[s.k].spec;}))
+      .concat([r.critical,r.blocker,r.chars,r.selfCheck,r.peer,r.ts]).map(function(v){
+        var s=String(v==null?"":v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+      }).join(",");
+  }));
+  var blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="ct-practice_"+new Date().toISOString().slice(0,10)+".csv"; a.click();
+});
+
+function pull(){
+  if(!window.AECloud||!AECloud.ready()){ status(false,"尚未設定雲端網址"); return; }
+  var code=AECloud.teacherCode();
+  if(!code){ status(false,"請由教師工作台進入（需教師密碼）"); return; }
+  status(false,"讀取中…");
+  AECloud.pull("ctpractice",code).then(function(recs){
+    ROWS=normalise(recs); render();
+    status(true,"雲端已讀取・"+ROWS.length+" 人（去重後）");
+  }).catch(function(e){ status(false,"讀取失敗："+e.message); });
+}
+
+/* 初始 */
+if(!$("tea").classList.contains("hide")){
+  if(DEMO){ ROWS=normalise(demo()); render(); status(true,"示範資料（34 人）・非真實作答"); }
+  else { render(); if(window.AECloud&&AECloud.ready()&&AECloud.teacherCode()) pull(); else status(false,"尚未讀取"); }
+}
+})();
+</script>
+</body>
+</html>
