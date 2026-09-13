@@ -15,7 +15,7 @@
 | `presurvey.html` | 課前評量（學生）：27 題六向度、回覆碼 `PS1.<base64>`、本機自存；`?stage=post` 為期末複測（T＋C 11 題） |
 | `weekly.html` | 我的學習週報（學生自查）：學號後 4 碼＋班級查自己的每週活動、成績趨勢、與全班中位數對照及建議；`?demo=1` 示範模式；需後端 v3.2 `action=me`（見 `gas/me-patch.gs`） |
 | `assets/identity.js` | 共同身分：入口頁「我是誰」小卡（`[data-aeid]` 容器），`ae.identity.v1`；外站連結自動附 `?sid=&cls=`；`AEId.get/set/clear` |
-| `assets/bridge.js` | 舊站一行接入：`<script src="…/assets/bridge.js" data-app="…">`，攝截 CCLOUD.push／qadd／addRecord／舊 Apps Script 送出 → 轉統一記錄鏡射到雲端；身分由 ?sid=&cls= 或小卡取得；`AEBridge.push()` |
+| `assets/bridge.js` | 舊站一行接入：`<script src="…/assets/bridge.js" data-app="…">`，攔截 CCLOUD.push／qadd／addRecord／舊 Apps Script 送出 → 轉統一記錄鏡射到雲端；身分由 ?sid=&cls= 或小卡取得；`AEBridge.push()` |
 | `assets/cloud.js` ＋ `gas/Code.gs` | 共用雲端資料層：統一記錄模型 `{v,id,ts,app,kind,sid,name,cls,score,max,detail}`，一份試算表、每 kind 一張工作表；`<meta name="cc-cloud-url">（已填：AKfycbz7…/exec，試算表「ai-empower 評量資料庫」）` 未填時自動退回本機＋佇列。`action=push`（POST）、`list`／`summary`（教師碼＝Code.gs 的 TEACHER_CODE；前端不保存答案，console.html 以 `list&kind=__auth__` 向後端驗證，通過後只存 sessionStorage）、`class`（去識別化全班課前作答）、`ping` |
 | `console.html` | 教師工作台：密碼 UI（雲端驗證、不記住）＋五分頁（teacher／presurvey-teacher／unit-analysis／stats／paper 以同源 iframe `?embed=1` 嵌入，隱藏各頁導覽列），雲端連線狀態、另開、登出 |
 | `teacher.html` | 教師總覽：雲端所有 kind 集中一頁——即時動態、各平台 KPI、4C 前後測 paired t、課前→期末複測、平台間相關矩陣、需關注名單、逐人矩陣（CSV）、整合建議；內建 8 種平台示範資料 |
