@@ -10,6 +10,8 @@
 |------|------|
 | `index.html` | 入口：AI 賦能專題創作（主）、IOC 課程（次）、評量統計、論文生成，連接所有現有平台 |
 | `ioc.html` | IOC 模擬平台次頁：iframe 同源嵌入 `IOC-platform/student.html`，12 模組 chip 一鍵切換（hash 直通，不重載） |
+| `ct-practice.html` | 運算思維四大技巧練習（學生＋教師雙模式）：以校園生活為例（演唱會搶票／排隊美食／揪團出遊／社團擺攤）各練拆解、找規律、抽象化、演算法一次，**不計評分**；主要入口＝線上 Google 表單（內嵌 QR＋短網址 da.gd/q0L2y），備援＝`ct-worksheet.html` 列印版與 `assets/doc/ct-practice-worksheet.docx`；`?embed=1`／`#teacher`（需經 console 驗證）進教師審閱：四技巧具體度、完成度分布、單選題分布、每日趨勢四張 inline SVG 圖，加自動生成的文字分析與教學建議、關鍵詞頻率、逐人明細與 CSV；`?demo=1` 示範模式 |
+| `ct-worksheet.html` | 練習單列印版（A4 直式一頁）：`@page A4` ＋ 縮放，按「列印」即出紙本；沒有 Word 也能用，為 `ct-practice.html` 的備援入口 |
 | `presurvey.html` | 課前評量（學生）：27 題六向度、回覆碼 `PS1.<base64>`、本機自存；`?stage=post` 為期末複測（T＋C 11 題） |
 | `weekly.html` | 我的學習週報（學生自查）：學號後 4 碼＋班級查自己的每週活動、成績趨勢、與全班中位數對照及建議；`?demo=1` 示範模式；需後端 v3.2 `action=me`（見 `gas/me-patch.gs`） |
 | `assets/identity.js` | 共同身分：入口頁「我是誰」小卡（`[data-aeid]` 容器），`ae.identity.v1`；外站連結自動附 `?sid=&cls=`；`AEId.get/set/clear` |
@@ -64,3 +66,10 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 聚合鍵：`detail.unit`（後備 `scope`／`dev`／`cat`／`module`）；已知單元代碼有中文名對照（retrieval＝提取練習、packetflow＝封包流…）。未計分且 detail 含 `model`／`user`／`action` 的紀錄視為 AI 協作紀錄，另計不入平均。
 - 門禁與 teacher.html 相同（未經 console 驗證導回 `console.html#unit`）；`?embed=1` 供工作台內嵌；週次以 `2026-09-14` 為 W1（與 weekly.html 同基準）。
 - v1.1（同日）：新增「逐週學習查核」——學生（末 4 碼學號）× 週次矩陣（每週平均＋逐週累計總平均、全班週平均／累計列、可排序）、側欄「單元」篩選；輸出統計檔案記錄末 4 碼學號：逐週明細 CSV（每生 × 每單元 × 每週得分紀錄＋逐週累計）與逐週累計 CSV（寬表，對應畫面矩陣）。
+
+## 2026-09-13 更新（運算思維四大技巧練習）
+- 新增 `ct-practice.html`：學生練習頁＋教師審閱頁合一（`?embed=1` 由教師工作台內嵌，`#teacher` 需 `ae.teacher.gate`）。
+- 新增 `ct-worksheet.html`（A4 列印版練習單，免下載）、`assets/doc/ct-practice-worksheet.docx`（可編輯紙本）、`assets/img/ct-qr.svg`（表單 QR）。
+- 新增 `gas/ct-practice-patch.gs`：Google 表單 `onFormSubmit` → 統一記錄（`kind=ctpractice`，`score`＝填答完整度％、`detail.graded=false`）→ push 進「ai-empower 評量資料庫」；另有 `backfillAll()` 補推、`pingCloud()` 自測。
+- `console.html` 新增第 6 分頁「運算思維練習」（`#ct`）；`index.html` 於「問卷・評量・統計分析」區新增卡片與導覽連結。
+- 「具體度」定義見 `specificity()`：以「換別人照做，做得出來嗎」為判準（THEN 是否為可執行動作、等待時間是否寫得出數字、兩項「要留下的資訊」是否重複），**僅供教學診斷，不作為評分依據**。
