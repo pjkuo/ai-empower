@@ -84,6 +84,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
       <button class="tab on" data-t="teacher">📡 教師總覽</button>
       <button class="tab" data-t="presurvey">📋 課前評量儀表板</button>
       <button class="tab" data-t="unit">📊 單元評量分析</button>
+      <button class="tab" data-t="ct">🧩 運算思維練習</button>
       <button class="tab" data-t="stats">📈 統計分析</button>
       <button class="tab" data-t="paper">📝 論文生成</button>
       <span class="spacer"></span>
@@ -95,6 +96,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
       <iframe id="f_teacher" title="教師總覽" class="on"></iframe>
       <iframe id="f_presurvey" title="課前評量儀表板"></iframe>
       <iframe id="f_unit" title="單元評量分析"></iframe>
+      <iframe id="f_ct" title="運算思維四大技巧練習"></iframe>
       <iframe id="f_stats" title="統計分析"></iframe>
       <iframe id="f_paper" title="論文生成"></iframe>
     </div>
@@ -107,7 +109,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var KEY="ae.teacher.gate";
-var SRC={teacher:"teacher.html",presurvey:"presurvey-teacher.html",unit:"unit-analysis.html",stats:"stats.html",paper:"paper.html"};
+var SRC={teacher:"teacher.html",presurvey:"presurvey-teacher.html",unit:"unit-analysis.html",ct:"ct-practice.html",stats:"stats.html",paper:"paper.html"};
 var loaded={};
 
 function unlock(code){

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>運算思維四大技巧練習單（列印版）｜AI 賦能教學 Hub</title>
+<style>
+
+  :root{
+    --ink:#14231E; --ink2:#3F5149; --mut:#7C8C85; --rule:#D7DEDA;
+    --band:#F3F7F4; --paper:#FFFFFF;
+    --c1:#2E5496; --c1b:#EAF0F9;
+    --c2:#0F7A76; --c2b:#E6F4F2;
+    --c3:#9A6F16; --c3b:#FBF3E0;
+    --grn:#10312A; --gold:#C08F1E;
+    --cjk:'Microsoft JhengHei','微軟正黑體','Noto Sans TC','PingFang TC',sans-serif;
+    --mono:ui-monospace,Menlo,Consolas,'Courier New',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;}
+  .sheet{width:1240px;height:1754px;margin:0 auto;position:relative;transform-origin:top center;}
+  @media screen and (max-width:1300px){ .sheet{transform:scale(var(--s,1))} }
+  .toolbar{max-width:1240px;margin:14px auto 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    font-family:var(--cjk);font-size:13px;color:#3F5149;padding:0 12px}
+  .toolbar a,.toolbar button{font-family:inherit;font-size:13px;font-weight:700;text-decoration:none;
+    border:1px solid #D7DEDA;border-radius:9px;padding:8px 14px;background:#fff;color:#10312A;cursor:pointer}
+  .toolbar .p{background:#10312A;color:#fff;border-color:#10312A}
+  @page{size:A4 portrait;margin:0}
+  @media print{ .toolbar{display:none!important} html,body{width:210mm} .sheet{transform:scale(.6401);transform-origin:top left;} }
+  body{font-family:var(--cjk);color:var(--ink);background:var(--paper);
+       -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .page{padding:38px 46px 30px;height:100%;display:flex;flex-direction:column;}
+
+  /* ---------- header ---------- */
+  header{display:flex;justify-content:space-between;align-items:flex-start;}
+  .kick{font-family:var(--mono);font-size:11px;letter-spacing:2.6px;color:var(--gold);}
+  h1{font-size:38px;font-weight:900;letter-spacing:1px;margin-top:9px;color:var(--grn);}
+  h1 em{font-style:normal;color:var(--c3);}
+  .lead{margin-top:9px;font-size:14.5px;color:var(--ink2);letter-spacing:.3px;}
+  .idbox{border:1.5px solid var(--rule);border-radius:9px;padding:11px 14px 9px;min-width:296px;}
+  .idbox .t{font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:var(--mut);margin-bottom:7px;}
+  .idrow{display:flex;gap:12px;margin-bottom:8px;}
+  .idf{flex:1;font-size:11.5px;color:var(--ink2);}
+  .idf i{font-style:normal;display:inline-block;border-bottom:1.2px solid var(--ink);width:62px;height:15px;margin-left:4px;}
+  .idf.w i{width:96px;}
+
+  /* ---------- pillar strip ---------- */
+  .pill{margin-top:16px;display:flex;align-items:center;gap:9px;
+        border:1.5px solid var(--rule);border-radius:9px;padding:10px 16px;background:var(--band);}
+  .pill .lb{font-size:11.5px;font-weight:900;color:var(--grn);letter-spacing:1px;white-space:nowrap;}
+  .pc{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:14px;white-space:nowrap;}
+  .pd{font-size:12px;color:var(--ink2);}
+  .sep{color:var(--rule);}
+
+  /* ---------- how ---------- */
+  .how{margin-top:15px;display:flex;gap:0;border:1.5px solid var(--grn);border-radius:9px;overflow:hidden;}
+  .how .hh{background:var(--grn);color:#fff;padding:10px 15px;display:flex;flex-direction:column;justify-content:center;min-width:118px;}
+  .how .hh b{font-size:14px;letter-spacing:1px;}
+  .how .hh span{font-family:var(--mono);font-size:9px;letter-spacing:1.6px;color:#CFE0D8;margin-top:2px;}
+  .how .hs{flex:1;display:flex;align-items:center;padding:0 16px;gap:14px;}
+  .hstep{flex:1;display:flex;align-items:flex-start;gap:8px;}
+  .hstep .n{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:var(--grn);
+            width:19px;height:19px;border-radius:50%;text-align:center;line-height:19px;flex:0 0 19px;margin-top:1px;}
+  .hstep p{font-size:12px;line-height:1.45;color:var(--ink2);}
+  .hstep p b{color:var(--ink);}
+
+  /* ---------- exercise ---------- */
+  .ex{margin-top:17px;border:1.6px solid var(--rule);border-radius:10px;overflow:hidden;}
+  .exh{display:flex;align-items:center;gap:12px;padding:9px 15px;}
+  .exn{font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;width:29px;height:29px;
+       border-radius:7px;text-align:center;line-height:29px;flex:0 0 29px;}
+  .ext{font-size:19px;font-weight:900;letter-spacing:.5px;}
+  .exp{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:1px;padding:3px 11px;border-radius:13px;white-space:nowrap;}
+  .exb{padding:14px 18px 15px;}
+  .sit{font-size:12.5px;color:var(--ink2);line-height:1.5;padding-left:11px;border-left:2.5px solid var(--rule);}
+  .sit b{color:var(--ink);}
+  .qq{margin-top:13px;font-size:13.5px;font-weight:700;}
+  .qq u{text-decoration:none;font-family:var(--mono);font-size:11.5px;margin-right:6px;}
+
+  .boxes{display:flex;align-items:center;gap:0;margin-top:10px;}
+  .wbox{flex:1;height:68px;border:1.4px solid var(--rule);border-radius:7px;background:#FBFDFC;position:relative;}
+  .wbox span{position:absolute;top:3px;left:7px;font-family:var(--mono);font-size:9px;color:var(--mut);}
+  .arw{flex:0 0 28px;text-align:center;font-size:15px;color:var(--mut);}
+
+  .grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px 46px;margin-top:10px;}
+  .gbox{height:62px;border:1.4px solid var(--rule);border-radius:7px;background:#FBFDFC;position:relative;}
+  .gbox span{position:absolute;top:3px;left:7px;font-family:var(--mono);font-size:9px;color:var(--mut);}
+
+  .line{margin-top:12px;font-size:13.5px;color:var(--ink);display:flex;align-items:baseline;flex-wrap:wrap;gap:0 4px;}
+  .line b{font-family:var(--mono);font-size:12px;font-weight:700;}
+  .line b.zh{font-family:var(--cjk);font-size:13.5px;}
+  .bl{display:inline-block;border-bottom:1.4px dotted #9AA8A2;height:25px;}
+  .bl.s{width:70px;} .bl.m{width:142px;} .bl.l{width:228px;} .bl.xl{width:300px;}
+
+  .hint{margin-top:13px;background:var(--band);border-radius:7px;padding:9px 14px;
+        font-size:12px;color:var(--mut);line-height:1.5;}
+  .hint b{color:var(--ink2);}
+
+  /* ---------- bonus ---------- */
+  .bonus{margin-top:17px;display:flex;border:1.5px solid var(--grn);border-radius:9px;overflow:hidden;}
+  .bonus .bh{background:var(--grn);color:#fff;padding:11px 15px;display:flex;flex-direction:column;
+             justify-content:center;min-width:150px;}
+  .bonus .bh b{font-size:14px;letter-spacing:1px;}
+  .bonus .bh span{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:#CFE0D8;margin-top:2px;}
+  .bonus .bs{flex:1;padding:9px 16px 10px;}
+  .bonus .bt{font-size:12.5px;color:var(--ink2);}
+  .bonus .bt b{color:var(--ink);}
+  .bcols{display:flex;gap:18px;margin-top:6px;}
+  .bcol{flex:1;}
+  .bcol i{font-style:normal;display:block;font-size:11px;color:var(--mut);}
+  .bcol u{text-decoration:none;display:block;border-bottom:1.4px dotted #9AA8A2;height:22px;}
+
+  /* ---------- footer ---------- */
+  .foot{margin-top:16px;display:flex;gap:12px;}
+  .fc{flex:1;border:1.5px solid var(--rule);border-radius:9px;padding:12px 16px 13px;}
+  .fc.gold{border-color:#E3CE93;background:#FDF9EF;}
+  .fc h4{font-size:13px;font-weight:900;color:var(--grn);letter-spacing:.6px;}
+  .fc h4 em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--mut);margin-left:6px;letter-spacing:1.4px;}
+  .fc p{margin-top:6px;font-size:11.5px;color:var(--ink2);line-height:1.55;}
+  .ck{margin-top:7px;font-size:11.5px;color:var(--ink2);line-height:1.85;}
+  .ck i{font-style:normal;display:inline-block;width:12px;height:12px;border:1.4px solid var(--ink2);
+        border-radius:2px;margin-right:6px;vertical-align:-1px;}
+
+  .sig{margin-top:14px;display:flex;justify-content:space-between;align-items:center;
+       font-family:var(--mono);font-size:9.5px;letter-spacing:1.7px;color:var(--mut);}
+  .sig .zh{font-family:var(--cjk);letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="p" type="button" onclick="window.print()">🖨 列印這張練習單</button>
+  <a href="ct-practice.html">← 回練習說明頁</a>
+  <a href="assets/doc/ct-practice-worksheet.docx" download>⬇ DOCX（可編輯）</a>
+  <a href="assets/doc/ct-practice-worksheet.pdf" download>⬇ PDF</a>
+  <span style="color:#7C8C85">A4 直式一頁・不計評分・建議用 Chrome 列印</span>
+</div>
+<div class="sheet">
+<div class="page">
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <div>
+      <div class="kick">COMPUTATIONAL THINKING · EVERYDAY PRACTICE SHEET 03</div>
+      <h1>日常生活裡的<em>運算思維</em>　練習單</h1>
+      <div class="lead">承接前兩張圖卡（Google Maps 導航／泡麵演算法）——這次換你動手拆解自己最在乎的三件事。</div>
+    </div>
+    <div class="idbox">
+      <div class="t">STUDENT / 基本資料</div>
+      <div class="idrow">
+        <div class="idf w">系級<i></i></div>
+        <div class="idf">姓名<i></i></div>
+      </div>
+      <div class="idrow" style="margin-bottom:0;">
+        <div class="idf w">學號<i></i></div>
+        <div class="idf">組別<i></i></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= PILLAR STRIP ================= -->
+  <div class="pill">
+    <span class="lb">四把工具</span>
+    <span class="pc" style="background:var(--c1b);color:var(--c1);">拆解</span>
+    <span class="pd">切成小步驟</span><span class="sep">｜</span>
+    <span class="pc" style="background:var(--c2b);color:var(--c2);">找規律</span>
+    <span class="pd">看出重複出現的事</span><span class="sep">｜</span>
+    <span class="pc" style="background:#F1ECF9;color:#6B4D9E;">抽象化</span>
+    <span class="pd">只留下有用的資訊</span><span class="sep">｜</span>
+    <span class="pc" style="background:var(--c3b);color:var(--c3);">演算法</span>
+    <span class="pd">寫出誰都照做得出來的步驟</span>
+  </div>
+
+  <!-- ================= HOW ================= -->
+  <div class="how">
+    <div class="hh"><b>怎麼進行</b><span>15 MIN · 3 ROUNDS</span></div>
+    <div class="hs">
+      <div class="hstep"><span class="n">1</span><p><b>個人 5 分鐘</b>　選 2 題動筆寫，不用寫得漂亮，寫得<b>具體</b>就好。</p></div>
+      <div class="hstep"><span class="n">2</span><p><b>兩人 6 分鐘</b>　交換學習單，互相問：「這一步<b>換我做</b>，做得出來嗎？」</p></div>
+      <div class="hstep"><span class="n">3</span><p><b>全班 4 分鐘</b>　舉手分享 30 秒，說出你改了<b>哪個步驟或參數</b>。</p></div>
+    </div>
+  </div>
+
+  <!-- ================= EX 1 ================= -->
+  <div class="ex">
+    <div class="exh" style="background:var(--c1b);">
+      <div class="exn" style="background:var(--c1);">01</div>
+      <div class="ext" style="color:var(--c1);">演唱會搶票：90 秒完售，你的流程寫好了嗎？</div>
+      <div class="exp" style="background:#fff;color:var(--c1);border:1.2px solid #C3D3EA;">拆解 × 演算法</div>
+    </div>
+    <div class="exb">
+      <div class="sit">中午 12:00 準時開賣，熱門場次 <b>90 秒完售</b>。你和三個朋友說好要一起去，但只有你負責搶。</div>
+
+      <div class="qq"><u>A.</u>把「搶票成功」拆成<b>開賣前一定要先做完</b>的四件事，依先後順序填入：</div>
+      <div class="boxes">
+        <div class="wbox"><span>STEP 1</span></div><div class="arw">&#10230;</div>
+        <div class="wbox"><span>STEP 2</span></div><div class="arw">&#10230;</div>
+        <div class="wbox"><span>STEP 3</span></div><div class="arw">&#10230;</div>
+        <div class="wbox"><span>STEP 4</span></div>
+      </div>
+
+      <div class="line"><b>B.</b>　<b class="zh">備案規則：</b><b>IF</b><span class="bl" style="width:262px;"></span><b>THEN</b><span class="bl" style="width:352px;"></span></div>
+      <div class="line"><b>C.</b>　這四步裡，<b class="zh">最不能省</b>的是第<span class="bl s"></span>步，因為<span class="bl" style="width:512px;"></span></div>
+
+      <div class="hint"><b>卡住了？</b>　搶票拚的不是手速，是「開賣前你把多少決定先做完」——會員實名、付款綁定、座位順位表、對時。把臨場要想的事全部提前變成寫好的步驟，這就是<b>演算法</b>。</div>
+    </div>
+  </div>
+
+  <!-- ================= EX 2 ================= -->
+  <div class="ex">
+    <div class="exh" style="background:var(--c2b);">
+      <div class="exn" style="background:var(--c2);">02</div>
+      <div class="ext" style="color:var(--c2);">排隊美食：怎麼吃得到，又不用站一小時？</div>
+      <div class="exp" style="background:#fff;color:var(--c2);border:1.2px solid #B9DBD8;">找規律 × 抽象化</div>
+    </div>
+    <div class="exb">
+      <div class="sit">那家你一直想吃的人氣店，尖峰要排 <b>40 分鐘</b>，離峰只要 5 分鐘。你不想再站在騎樓下滑手機。</div>
+
+      <div class="qq"><u>A.</u>要找出「不用排」的時段，你會連續記錄哪<b>三個</b>資料欄位？</div>
+      <div class="boxes">
+        <div class="wbox"><span>欄位 1</span></div><div class="arw">&#183;</div>
+        <div class="wbox"><span>欄位 2</span></div><div class="arw">&#183;</div>
+        <div class="wbox"><span>欄位 3</span></div>
+      </div>
+
+      <div class="line"><b>B.</b>　把規律寫成一句<b class="zh">可以被驗證</b>的話：「每週<span class="bl s"></span>的<span class="bl s"></span>點左右，大約要等<span class="bl s"></span>分鐘。」</div>
+      <div class="line"><b>C.</b>　<b class="zh">抽象化：</b>這題只需要留下<span class="bl m"></span>和<span class="bl m"></span>，其他（裝潢、評分、誰在排）全部忽略。</div>
+
+      <div class="hint"><b>卡住了？</b>　規律不是猜出來的，是<b>記錄</b>出來的。連記三天就會發現尖峰非常固定——外送 App 的「預估等待時間」，用的正是同一招。</div>
+    </div>
+  </div>
+
+  <!-- ================= EX 3 ================= -->
+  <div class="ex">
+    <div class="exh" style="background:var(--c3b);">
+      <div class="exn" style="background:var(--c3);">03</div>
+      <div class="ext" style="color:var(--c3);">揪團出遊：五個人一天行程，怎麼喬才不會爛尾？</div>
+      <div class="exp" style="background:#fff;color:var(--c3);border:1.2px solid #E3CE93;">相依關係 × 條件判斷</div>
+    </div>
+    <div class="exb">
+      <div class="sit">五個人想去墾丁玩一天。有人要打工、有人沒駕照，天氣預報還說<b>可能下雨</b>。群組已經聊了三天，什麼都沒訂。</div>
+
+      <div class="qq"><u>A.</u>寫下四件必辦的事，再<b>用筆畫箭頭</b>，把「一定要先確定，別人才能動」的連起來：</div>
+      <div class="grid4">
+        <div class="gbox"><span>TASK A</span></div>
+        <div class="gbox"><span>TASK B</span></div>
+        <div class="gbox"><span>TASK C</span></div>
+        <div class="gbox"><span>TASK D</span></div>
+      </div>
+
+      <div class="line"><b>B.</b>　<b>IF</b> 當天下雨 <b>THEN</b><span class="bl" style="width:232px;"></span>；<b>IF</b> 有人臨時不去 <b>THEN</b><span class="bl" style="width:232px;"></span></div>
+      <div class="line"><b>C.</b>　<b class="zh">檢查點：</b>出發前<span class="bl s"></span>天，最後確認<span class="bl" style="width:600px;"></span></div>
+
+      <div class="hint"><b>卡住了？</b>　揪團最常爛在「大家都在等別人先決定」。日期沒定就訂不了車、也訂不了房——這叫<b>相依關係</b>。找出卡住所有人的那一件，先把它定下來。</div>
+    </div>
+  </div>
+
+  <!-- ================= BONUS ================= -->
+  <div class="bonus">
+    <div class="bh"><b>延伸挑戰</b><span>BONUS · SOCIAL CLUB</span></div>
+    <div class="bs">
+      <div class="bt">挑一件你這學期<b>真的要辦</b>的社團活動（迎新、擺攤、成發），把上面三招各用一次：</div>
+      <div class="bcols">
+        <div class="bcol"><i>我要拆解的是</i><u></u></div>
+        <div class="bcol"><i>我要記錄的規律是</i><u></u></div>
+        <div class="bcol"><i>我的備案 IF…THEN 是</i><u></u></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <div class="foot">
+    <div class="fc">
+      <h4>兩人互評<em>PEER CHECK</em></h4>
+      <p>交換學習單，在對方最「像演算法」的一句話上打圈，並在旁邊寫下一句理由：<b>換我照做，做得出來嗎？</b></p>
+      <div class="ck"><i></i>我看得懂對方每一步在做什麼　<i></i>我找得到對方可以再拆細的一步</div>
+      <div class="line" style="margin-top:8px;font-size:12px;"><b class="zh">理由：</b><span class="bl" style="width:420px;"></span></div>
+    </div>
+    <div class="fc gold">
+      <h4>我的自我檢核<em>SELF CHECK</em></h4>
+      <div class="ck">
+        <i></i>我能把一件生活日常拆成有先後的步驟<br>
+        <i></i>我能寫出一條 IF…THEN… 的判斷規則<br>
+        <i></i>我能說出一個「記錄得到、驗證得了」的規律
+      </div>
+      <p style="margin-top:6px;"><b>繳交：</b>完成後拍照上傳 Moodle 本週作業區。</p>
+    </div>
+  </div>
+
+  <div class="sig">
+    <span class="zh">屏東科技大學．計算機概論｜運算思維單元　練習單 03</span>
+    <span>CT &#215; EVERYDAY LIFE — PRACTICE 03</span>
+    <span>CC BY-NC-SA 4.0</span>
+  </div>
+
+</div>
+</div>
+<script>
+(function(){function fit(){var s=Math.min(1,(document.documentElement.clientWidth-24)/1240);document.querySelector(".sheet").style.setProperty("--s",s);document.querySelector(".sheet").style.height=(1754*s)+"px";}fit();addEventListener("resize",fit);})();
+</script>
+</body>
+</html>
