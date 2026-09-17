@@ -26,6 +26,21 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .chipbar .spacer{flex:1}
 .chipbar .ext{font-size:11.5px;font-weight:700;color:var(--muted)}
 .chipbar .ext:hover{color:var(--primary)}
+/* 生活科技應用練習與作業（硬體單元課前練習＋課後作業）註記列 */
+.hwubar{background:#fbf3dc;border-bottom:1px solid #e0b44a;position:sticky;top:96px;z-index:29}
+.hwubar .wrap{display:flex;align-items:center;gap:10px;padding:7px 18px;flex-wrap:wrap}
+.hwubar .tag{font-size:12.5px;font-weight:800;color:#7a5b12;white-space:nowrap}
+.hwubar .desc{font-size:11.5px;color:#6b5a30;line-height:1.5}
+.hwubar .desc b{color:#5c4409}
+.hwubar .spacer{flex:1}
+.hwubar .go{font-size:12px;font-weight:800;color:#4a3608;background:#e0b44a;
+  border-radius:16px;padding:6px 14px;white-space:nowrap;transition:.14s}
+.hwubar .go:hover{filter:brightness(1.06)}
+@media(max-width:720px){
+  .hwubar{position:static}
+  .hwubar .desc{display:none}
+  .hwubar .spacer{flex:0 0 4px}
+}
 /* 手機：模組列改單行橫向捲動，外部連結移到列尾一起捲 */
 @media(max-width:720px){
   .chipbar .wrap{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
@@ -38,7 +53,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
   .chipbar .ext{flex:0 0 auto;white-space:nowrap}
 }
 .stage{flex:1;display:flex;min-height:0}
-.stage iframe{flex:1;width:100%;border:0;min-height:calc(100vh - 110px)}
+.stage iframe{flex:1;width:100%;border:0;min-height:calc(100vh - 154px)}
 .fallback{margin:40px auto;max-width:520px;text-align:center;display:none}
 .loader{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;
   justify-content:center;background:var(--bg);z-index:5;transition:opacity .4s}
@@ -77,6 +92,15 @@ body{display:flex;flex-direction:column;min-height:100vh}
     <a class="ext" href="https://pjkuo.github.io/IOC-platform/" target="_blank" rel="noopener">課程總覽 ↗</a>
     <a class="ext" href="https://pjkuo.github.io/IOC-platform/teacher.html" target="_blank" rel="noopener">教師版 ↗</a>
     <a class="ext" href="https://pjkuo.github.io/IOC-platform/student.html" target="_blank" rel="noopener" title="在新分頁開啟完整版">全螢幕 ↗</a>
+  </div>
+</div>
+
+<div class="hwubar" aria-label="生活科技應用練習與作業">
+  <div class="wrap">
+    <span class="tag">🔮 生活科技應用練習與作業</span>
+    <span class="desc">硬體單元：<b>課前練習</b> 8 題先思考（不計分）・<b>課後作業</b> 12 題後驗證（計分＋把握度，成績自動上雲端）</span>
+    <span class="spacer"></span>
+    <a class="go" href="https://pjkuo.github.io/IOC-platform/hw-unit.html" target="_blank" rel="noopener">前往練習與作業 ↗</a>
   </div>
 </div>
 
