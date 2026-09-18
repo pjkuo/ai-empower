@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>校園情境卡 IPOS 拆解問卷｜AI 賦能教學 Hub</title>
+<meta name="description" content="計算機概論與實習課堂任務問卷：從超商自助結帳、圖書館自助借還等校園情境，判斷資訊服務的輸入 I、處理 P、輸出 O、儲存 S。沒有對錯，依真實想法作答。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/ipos-survey.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="校園情境卡 IPOS 拆解問卷｜AI 賦能教學 Hub">
+<meta property="og:description" content="從校園生活情境判斷 輸入 I → 處理 P → 輸出 O → 儲存 S，課堂任務問卷。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<style>
+body{display:flex;flex-direction:column;min-height:100vh}
+/* 任務說明列 */
+.taskbar{background:#eef4e9;border-bottom:1px solid #b8d19a;position:sticky;top:52px;z-index:30}
+.taskbar .wrap{display:flex;align-items:center;gap:10px;padding:8px 18px;flex-wrap:wrap}
+.taskbar .tag{font-size:12.5px;font-weight:800;color:#3d6017;white-space:nowrap}
+.taskbar .desc{font-size:11.5px;color:#4c5d38;line-height:1.5}
+.taskbar .desc b{color:#33500f}
+.taskbar .spacer{flex:1}
+.taskbar .ext{font-size:12px;font-weight:800;color:#2f4a10;background:#c4dd9f;
+  border-radius:16px;padding:6px 14px;white-space:nowrap;transition:.14s}
+.taskbar .ext:hover{filter:brightness(1.05)}
+@media(max-width:720px){
+  .taskbar{position:static}
+  .taskbar .desc{display:none}
+  .taskbar .spacer{flex:0 0 4px}
+}
+.stage{flex:1;display:flex;min-height:0;position:relative}
+.stage iframe{flex:1;width:100%;border:0;min-height:calc(100vh - 110px)}
+.fallback{margin:40px auto;max-width:520px;text-align:center;display:none}
+.loader{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px;align-items:center;
+  justify-content:center;background:var(--bg);z-index:5;transition:opacity .4s}
+.loader.hide{opacity:0;pointer-events:none}
+.loader .spin{width:42px;height:42px;border:4px solid var(--line);border-top-color:var(--primary);
+  border-radius:50%;animation:sp 1s linear infinite}
+.loader p{font-size:13px;color:var(--muted);font-weight:700}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.loader .spin{animation:none}}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span>
+    </a>
+    <div class="navlinks">
+      <a href="./">入口</a>
+      <a href='ioc.html'>IOC 課程</a>
+      <a href='presurvey.html'>課前評量</a><a href='ct-practice.html'>運算思維練習</a><a href='weekly.html'>我的學習</a><a href='console.html'>教師工作台</a>
+      <a href='manual.html'>手冊</a>
+    </div>
+  </div>
+</nav>
+
+<div class="taskbar" aria-label="課堂任務說明">
+  <div class="wrap">
+    <span class="tag">🗂 校園情境卡 IPOS 拆解</span>
+    <span class="desc">從超商自助結帳、圖書館自助借還等校園情境，判斷 <b>輸入 I → 處理 P → 輸出 O → 儲存 S</b>。沒有對錯、依真實想法作答；請填<b>學號</b>以便與課堂紀錄配對。</span>
+    <span class="spacer"></span>
+    <a class="ext" href="https://ap.surveymars.com/q/7XchtP96e" target="_blank" rel="noopener" title="在新分頁開啟問卷">全螢幕開啟 ↗</a>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="loader" id="loader" aria-hidden="true"><div class="spin"></div><p>問卷載入中…</p></div>
+  <iframe id="survey" title="校園情境卡 IPOS 拆解問卷"
+          src="https://ap.surveymars.com/q/7XchtP96e?collect=12&width=912&height=700&source=iframe&s=t"
+          allow="fullscreen"></iframe>
+</div>
+<div class="fallback card" id="fb">
+  <h2>問卷載入中…</h2>
+  <p class="sub">若長時間沒有出現內容，可能是網路受限或嵌入被阻擋，請改用
+    <a href="https://ap.surveymars.com/q/7XchtP96e" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700">直接開啟問卷</a>。</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var iframe=document.getElementById("survey"), loaded=false;
+  iframe.addEventListener("load",function(){
+    loaded=true;
+    var l=document.getElementById("loader");
+    if(l){ l.classList.add("hide"); setTimeout(function(){ l.remove(); },450); }
+  });
+  setTimeout(function(){
+    if(!loaded){
+      document.getElementById("fb").style.display="block";
+      var l=document.getElementById("loader");
+      if(l){ l.classList.add("hide"); setTimeout(function(){ l.remove(); },450); }
+    }
+  },8000);
+})();
+</script>
+</body>
+</html>

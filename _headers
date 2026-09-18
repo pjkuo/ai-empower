@@ -30,6 +30,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /ioc.html
   Cache-Control: public, max-age=0, must-revalidate
+/ipos-survey.html
+  Cache-Control: public, max-age=0, must-revalidate
 /manual.html
   Cache-Control: public, max-age=0, must-revalidate
 /paper.html
