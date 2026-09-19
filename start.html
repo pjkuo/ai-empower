@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的起點報告｜ai-empower</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學平台">
+<meta property="og:title" content="我的起點報告｜ai-empower">
+<meta property="og:description" content="做完課前評量，馬上看自己的起點：六向度分析、學習型態與你的第一步建議。高三→大一銜接專用。">
+<meta name="description" content="做完課前評量，馬上看自己的起點：六向度分析、學習型態與你的第一步建議。高三→大一銜接專用。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/start.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/presurvey-questions.js"></script>
+<style>
+/* ---- 我的起點報告 專頁樣式 ---- */
+.phead{background:linear-gradient(120deg,var(--primary),var(--primary-2) 55%,#5B6FE0);color:#fff;border-radius:18px;padding:22px 24px;box-shadow:var(--shadow);margin:18px 0;position:relative;overflow:hidden}
+.phead>*{position:relative;z-index:1}
+.phead h1{font-size:21px;line-height:1.3}
+.phead h1 .en{font-size:12px;font-weight:600;opacity:.9;margin-left:8px}
+.phead p{font-size:13px;opacity:.93;margin-top:6px;max-width:760px}
+.phead .idrow{margin-top:12px;max-width:620px}
+.stgrid{display:grid;gap:14px;grid-template-columns:1fr;max-width:860px;margin:0 auto}
+.stcard{background:var(--card,#fff);border:1px solid var(--line,#e2e8f0);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+.stcard h2{font-size:16.5px;margin-bottom:10px}
+.lvl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.lvl .big{font-size:34px;font-weight:900}
+.lvl .r{font-size:14px;color:var(--muted,#64748b)}
+.lvl .desc{font-size:14px;flex:1 1 260px;line-height:1.6}
+.dim{margin:9px 0}
+.dim .lab{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:3px}
+.dim .bar{height:12px;border-radius:6px;background:var(--line,#e5e7eb);overflow:hidden}
+.dim .bar i{display:block;height:100%;border-radius:6px}
+.dim .weak{color:#b45309;font-weight:700}
+.stepbtns{display:grid;gap:10px;grid-template-columns:1fr;margin-top:8px}
+@media(min-width:620px){.stepbtns{grid-template-columns:repeat(2,1fr)}}
+.stepbtn{display:block;background:var(--primary);color:#fff;border-radius:12px;padding:13px 16px;text-decoration:none;font-weight:800;font-size:15.5px;box-shadow:var(--shadow)}
+.stepbtn small{display:block;font-weight:500;font-size:12px;opacity:.9;margin-top:3px}
+.stepbtn.alt{background:#0D9488}.stepbtn.warn{background:#B45309}
+.rhythm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;font-size:12.5px}
+@media(max-width:560px){.rhythm{grid-template-columns:repeat(2,1fr)}}
+.rhythm .cell{background:var(--bg2,#f8fafc);border:1px solid var(--line,#e2e8f0);border-radius:10px;padding:10px 6px}
+.rhythm .cell b{display:block;font-size:14px;margin-bottom:2px}
+.empty{ text-align:center;padding:28px 16px}
+.empty .go{display:inline-block;margin-top:14px;background:var(--eco,#0D9488);color:#fff;padding:13px 22px;border-radius:12px;text-decoration:none;font-weight:800;font-size:16px}
+.src{font-size:11.5px;color:var(--muted,#94a3b8);text-align:right;margin-top:6px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main class="wrap" style="max-width:900px;margin:0 auto;padding:0 16px 40px">
+  <header class="phead">
+    <h1>📍 我的起點報告<span class="en">Where You Start</span></h1>
+    <p>做完課前評量，這裡馬上告訴你：你的起點在哪、哪裡先補強、第一步做什麼。只查得到自己的結果，別人看不到。</p>
+    <div class="idrow" data-aeid></div>
+    <div style="margin-top:10px"><button id="btnGo" class="btn" style="background:#fff;color:var(--primary);border:0;border-radius:10px;padding:9px 18px;font-weight:800;cursor:pointer">看我的起點 →</button>
+    <span id="stMsg" style="font-size:12.5px;margin-left:8px;opacity:.95"></span></div>
+  </header>
+
+  <div id="stEmpty" class="stcard empty hide">
+    <h2>還沒有你的課前評量紀錄</h2>
+    <p style="font-size:14px;color:var(--muted,#64748b);margin-top:6px">先花 8 分鐘做完 27 題（不計成績），交卷後回到這頁就能看到你的起點報告。</p>
+    <a class="go" href="presurvey.html">先去做課前評量 →</a>
+  </div>
+
+  <div id="stBody" class="stgrid hide">
+    <section class="stcard">
+      <h2>① 你的起點</h2>
+      <div class="lvl">
+        <span class="big" id="lvName">—</span>
+        <span class="r">整體準備度 <b id="lvR">—</b>／100</span>
+        <span class="desc" id="lvDesc"></span>
+      </div>
+      <div class="src" id="lvSrc"></div>
+    </section>
+
+    <section class="stcard">
+      <h2>② 六向度分析<span style="font-size:12px;color:var(--muted,#64748b);font-weight:500;margin-left:8px">低於 60 的向度建議先補強</span></h2>
+      <div id="dims"></div>
+    </section>
+
+    <section class="stcard">
+      <h2>③ 你的第一步</h2>
+      <p id="trackLead" style="font-size:14px;line-height:1.7;margin-bottom:10px"></p>
+      <div class="stepbtns" id="steps"></div>
+    </section>
+
+    <section class="stcard">
+      <h2>④ 前四週固定節奏（跟著做就對了）</h2>
+      <div class="rhythm">
+        <div class="cell"><b>1️⃣ 暖身</b>單元暖身小題<br>喚醒先備知識</div>
+        <div class="cell"><b>2️⃣ 模擬</b>互動模擬操作<br>先動手、先思考</div>
+        <div class="cell"><b>3️⃣ 小測</b>講義隨堂小測<br>後驗證、補漏洞</div>
+        <div class="cell"><b>4️⃣ 週報</b>週末看週報<br>確認自己有跟上</div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted,#64748b);margin-top:10px">每週入口都一樣：首頁「本週學習」。做完會自動記錄，<a href="weekly.html">我的學習週報</a> 隨時可查。</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var DEMO=/[?&]demo=1/.test(location.search);
+
+/* 依向度給補強資源（弱向度 → 對應第一步按鈕） */
+var FIX={
+  T:{t:"運算思維四大技巧練習",d:"12–15 分鐘，用校園情境練拆解與規律",u:"ct-practice.html"},
+  C:{t:"IOC 硬體＋網路模組",d:"先把電腦與網路常識補起來",u:"ioc.html#hardware"},
+  H:{t:"非資訊科系入門教材",d:"零基礎友善，從頭把概念建起來",u:"https://pjkuo.github.io/mindmap-to-ipo/"},
+  A:{t:"AI 賦能專題創作（新生四步驟）",d:"老師代管金鑰，照著卡片做一次就會",u:"https://pjkuo.github.io/AI-empower-platform/"},
+  D:{t:"新手上路（手冊＋導覽影片）",d:"3 分鐘看懂平台怎麼用",u:"manual.html"},
+  L:{t:"我的學習週報",d:"了解自己的學習節奏，照建議調整",u:"weekly.html"}
+};
+var TRACK={
+  starter:{lead:"你屬於「起步型」——別擔心，這門課從零教起。先做下面 1–2 個補強，再進本週學習，四週後你會追上大家。",extra:[]},
+  steady:{lead:"你屬於「穩健型」——基礎沒問題，照標準節奏走：每週「暖身 → 模擬 → 小測 → 週報」即可穩穩前進。",extra:[]},
+  advanced:{lead:"你屬於「進階型」——基礎很好，標準進度之外，建議提前開始專題創作，把時間花在做作品上。",extra:[{t:"提前開始：專題四步驟",d:"心智圖 → IPO → Python → 簡報影音",u:"https://pjkuo.github.io/AI-empower-platform/",cls:"alt"}]}
+};
+
+function bars(dims){
+  var h="";
+  PS.DIMS.forEach(function(d){
+    if(d.key==="L")return; /* 學習偏好不打分數條（weight 0） */
+    var v=dims&&dims[d.key]!=null?Math.round(dims[d.key]):null;
+    h+='<div class="dim"><div class="lab"><span>'+d.name+'</span><span'+(v!==null&&v<60?' class="weak"':'')+'>'+(v===null?"—":v+(v<60?"（建議補強）":""))+'</span></div>'+
+       '<div class="bar"><i style="width:'+(v||0)+'%;background:'+d.color+'"></i></div></div>';
+  });
+  return h;
+}
+function render(R,dims,srcNote){
+  var lv=PS.levelOf(R), L=PS.LEVELS[lv];
+  $("lvName").textContent=L.name; $("lvName").style.color=L.color;
+  $("lvR").textContent=(R==null?"—":Math.round(R));
+  $("lvDesc").textContent=L.desc;
+  $("lvSrc").textContent=srcNote||"";
+  $("dims").innerHTML=dims?bars(dims):'<p style="font-size:13px;color:var(--muted,#64748b)">這台裝置沒有你的作答明細，只能顯示整體準備度；用交卷時的那台裝置開啟可看完整六向度。</p>';
+  var tk=TRACK[lv]; $("trackLead").textContent=tk.lead;
+  var weak=[];
+  if(dims) PS.DIMS.forEach(function(d){ if(d.key!=="L"&&dims[d.key]!=null&&dims[d.key]<60) weak.push(d.key); });
+  weak.sort(function(a,b){return dims[a]-dims[b];});
+  var btns="";
+  weak.slice(0,lv==="starter"?3:2).forEach(function(k){var f=FIX[k];btns+='<a class="stepbtn warn" href="'+f.u+'">🔧 '+f.t+'<small>'+f.d+'</small></a>';});
+  tk.extra.forEach(function(e){btns+='<a class="stepbtn '+(e.cls||"")+'" href="'+e.u+'">🚀 '+e.t+'<small>'+e.d+'</small></a>';});
+  btns+='<a class="stepbtn" href="ioc.html">🖥 進入本週學習<small>暖身 → 模擬 → 小測，每週固定節奏</small></a>';
+  $("steps").innerHTML=btns;
+  $("stEmpty").classList.add("hide"); $("stBody").classList.remove("hide"); $("stMsg").textContent="";
+}
+function showEmpty(msg){ $("stEmpty").classList.remove("hide"); $("stBody").classList.add("hide"); $("stMsg").textContent=msg||""; }
+
+/* 資料來源 1：本機作答紀錄（交卷那台裝置，最完整） */
+function fromLocal(sid){
+  try{
+    var all=JSON.parse(localStorage.getItem(PS.STORE_KEY)||"[]");
+    var mine=all.filter(function(r){return String(r.sid)===String(sid);});
+    if(!mine.length) return null;
+    var rec=mine[mine.length-1], sc=PS.scoreResponse(rec.ans);
+    return {R:sc.R,dims:sc.dims,src:"來源：本機作答紀錄（"+String(rec.ts||"").slice(0,10)+"）"};
+  }catch(e){return null;}
+}
+/* 資料來源 2：雲端 me API（跨裝置；detail 若含 dims 一併顯示） */
+function fromCloud(sid,cls){
+  var m=document.querySelector('meta[name="cc-cloud-url"]');
+  var u=m?m.getAttribute("content"):"";
+  if(!/^https?:/.test(u)) return Promise.resolve(null);
+  return fetch(u+"?action=me&sid="+encodeURIComponent(sid)+"&cls="+encodeURIComponent(cls||""))
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(!j||!j.ok||!j.records) return null;
+      var ps=j.records.filter(function(r){return r.kind==="presurvey";});
+      if(!ps.length) return null;
+      var last=ps[ps.length-1], dims=null;
+      try{ var d=JSON.parse(last.d||"{}"); if(d&&d.dims) dims=d.dims; }catch(e){}
+      var R=parseFloat(last.score); if(!isFinite(R)) R=null;
+      return {R:R,dims:dims,src:"來源：雲端紀錄（"+String(last.ts||"").slice(0,10)+"）"};
+    })
+    .catch(function(){return null;});
+}
+function go(){
+  if(DEMO){
+    var demo=PS.demoData(11)[0], sc=PS.scoreResponse(demo.ans);
+    render(sc.R,sc.dims,"示範資料（?demo=1）"); return;
+  }
+  var id=(window.AEId&&AEId.get())||null;
+  if(!id||!id.sid){ showEmpty("先在上方填學號後 4 碼＋班級。"); return; }
+  var loc=fromLocal(id.sid);
+  if(loc){ render(loc.R,loc.dims,loc.src); return; }
+  $("stMsg").textContent="查詢雲端中…";
+  fromCloud(id.sid,id.cls).then(function(c){
+    if(c) render(c.R,c.dims,c.src);
+    else showEmpty("雲端沒有你的課前評量紀錄。");
+  });
+}
+$("btnGo").addEventListener("click",go);
+document.addEventListener("ae:identity",function(){ /* 身分卡填完自動查 */ if((window.AEId&&AEId.get())||DEMO) go(); });
+window.addEventListener("DOMContentLoaded",function(){ if(DEMO||((window.AEId&&AEId.get())&&(fromLocal(AEId.get().sid)))) go(); });
+})();
+</script>
+</body>
+</html>

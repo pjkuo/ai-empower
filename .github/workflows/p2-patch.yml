@@ -1,0 +1,18 @@
+name: p2-patch
+on: push
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: ${{ contains(github.event.head_commit.message, 'p2-run') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/p2_patch.py
+      - run: |
+          git config user.name "pjkuo"
+          git config user.email "kuo0615@gmail.com"
+          git rm -q .github/workflows/p2-patch.yml .github/p2_patch.py
+          git add -A
+          git commit -m "P2 起點報告串接：課前評量卡與交卷畫面加「我的起點報告」直達；bridge.js 註解錯字修正" -m "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_0132fkQFFpgYs7gD13EjefU8"
+          git push
