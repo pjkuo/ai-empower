@@ -1,0 +1,18 @@
+name: p0-patch
+on: push
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: ${{ contains(github.event.head_commit.message, 'p0-run') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/p0_patch.py
+      - run: |
+          git config user.name "pjkuo"
+          git config user.email "kuo0615@gmail.com"
+          git rm -q .github/workflows/p0-patch.yml .github/p0_patch.py
+          git add -A
+          git commit -m "P0 學生首頁精簡：首屏 4 大鈕（本週學習／專題創作／我的週報／新手上路）＋週次提示；教師與研究卡片移入頁尾摺疊專區；Router 與 aeParity 未動" -m "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_0132fkQFFpgYs7gD13EjefU8"
+          git push
