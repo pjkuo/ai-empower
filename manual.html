@@ -195,7 +195,7 @@
         <tr><td>逐人矩陣</td><td>學號 × 平台，可排序、匯出 CSV</td></tr>
         <tr><td>整合建議</td><td>依雲端目前有哪些 kind，列出各平台尚待接上的作法與送出格式</td></tr>
       </table>
-      <div class="tip">💡 <b>其他平台一行接上</b>：舊站 <code>&lt;/body&gt;</code> 前加 <code>&lt;script src="https://ai-empower-hub.netlify.app/assets/bridge.js" data-app="ioc-sim"&gt;&lt;/script&gt;</code>。橋接會自動把 <code>CCLOUD.push</code>／<code>qadd</code>／<code>addRecord</code>／對舊 Apps Script 的送出轉成統一記錄鏡射到同一資料庫，原本行為不變；新程式可呼叫 <code>AEBridge.push({kind, score, max, detail})</code>。kind：assess4c／quiz／midterm／exam／repair／build／project／survey。</div>
+      <div class="tip">💡 <b>其他平台一行接上</b>：舊站 <code>&lt;/body&gt;</code> 前加 <code>&lt;script src="https://pjkuo.github.io/ai-empower/assets/bridge.js" data-app="ioc-sim"&gt;&lt;/script&gt;</code>。橋接會自動把 <code>CCLOUD.push</code>／<code>qadd</code>／<code>addRecord</code>／對舊 Apps Script 的送出轉成統一記錄鏡射到同一資料庫，原本行為不變；新程式可呼叫 <code>AEBridge.push({kind, score, max, detail})</code>。kind：assess4c／quiz／midterm／exam／repair／build／project／survey。</div>
       <div class="tip">🪪 <b>共同身分</b>：入口頁「我是誰」小卡填一次學號後 4 碼＋班級（存在本機），課前評量自動帶入；從 Hub 連到舊站的連結會自動附 <code>?sid=&amp;cls=</code>，舊站的橋接腳本接收後同樣自動帶入，沒有身分時會彈出小卡請學生填。</div>
 
       <h2 id="s4">4　教師研究者篇：HOTL 論文內文生成器</h2>
