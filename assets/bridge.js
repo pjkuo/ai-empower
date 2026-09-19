@@ -7,7 +7,7 @@
    做什麼：不改變舊站任何行為，只「鏡射」一份評量紀錄到 Hub 雲端資料庫。
    - 身分：網址 ?sid=&cls= → 本站 ae.identity.v1 → 嗅探舊鍵（cc_identity／cc_progress_v1／fourC_frontend_v2）
            → 都沒有且未設 data-quiet 時右下角小卡請學生填一次。
-   - 攝截（原行為不變）：CCLOUD.push()／qadd()／addRecord()／saveRecord()／submitAssess()，
+   - 攔截（原行為不變）：CCLOUD.push()／qadd()／addRecord()／saveRecord()／submitAssess()，
      以及對「舊 Apps Script」（script.google.com，非本 Hub 端點）的 fetch。
    - 轉換：統一紀錄模型 {v:2,id,ts,app,kind,sid,name,cls,score,max,detail}；
      kind 依關鍵字對應（exam/final→exam、midterm→midterm、stage+scores→assess4c、
@@ -132,7 +132,7 @@
   window.addEventListener("online", flush);
   setTimeout(function () { if (getQ().length) flush(); }, 2500);
 
-  /* ---------- 攝截舊站上傳（原行為不變，多鏡射一份） ---------- */
+  /* ---------- 攔截舊站上傳（原行為不變，多鏡射一份） ---------- */
   function wrap(objName, fnName, kindHint) {
     var host = objName ? window[objName] : window;
     if (!host || typeof host[fnName] !== "function" || host[fnName].__aeb) return false;
