@@ -1,6 +1,6 @@
 /* ============================================================
-   ai-empower 後端 v3.3 追加：學生自查 API「action=me」（me-patch）
-   2026-09-07 首版 · 2026-09-21 v3.3 班級正規化（canonical class）
+   ai-empower 後端 v3.4 追加：學生自查 API「action=me」（me-patch）
+   2026-09-07 首版 · 2026-09-21 v3.3 班級正規化（canonical class）· v3.4 得分率與前端 pctOf 對齊
 
    ── 安裝（一次，約 2 分鐘）──────────────────────────────
    1. 開啟 Apps Script 專案（試算表「ai-empower 評量資料庫」→ 擴充功能 → Apps Script）。
@@ -28,6 +28,11 @@
        ・車輛‧機械一A（數位科技與AI應用）＝ 含 車輛 / 機械 / 數位科技 之各種寫法
      比對與全班統計都用 canonical 鍵，確保學生查得齊、且跨系仍分開（隱私不變）。
      只收斂「大一」兩門課的班級；資管4A/三A 等其他班級原樣保留、互不混入。
+
+   ★ v3.4 得分率對齊：IOC 新制 kind（warm/subquiz/live/xr/vidq）上傳格式為「score＝百分比、max＝題數」
+     （例 warm 67/6＝六題對四成）。舊版全班統計以 score/max*100 再夾 0–100，會把 67/6 算成 100，
+     全班中位數被膨脹（實測 warm 全班中位 100 → 正確 63）。mePct_() 改與前端 weekly.html 的 pctOf 完全一致：
+     score>max 時視為百分比（≤100 才採計），否則 score/max*100 夾 0–100。
 
    detail 僅節錄前 400 字元；AI 協作紀錄（detail.action="ai"）只回旗標 ai:1，
    不回提示語內容。cls=LOADTEST 一律拒絕。緩衝區未落地的最新紀錄
@@ -74,10 +79,9 @@ function meAction_(e) {
     var score = row[col.score], max = row[col.max];
 
     if (!isAI) { // 全班去識別化統計（僅計分紀錄）
-      var s = parseFloat(score), m = parseFloat(max);
-      if (isFinite(s) && isFinite(m) && m > 0) {
+      var pct = mePct_(score, max);            // v3.4：與前端 pctOf 同一套規則
+      if (pct !== null) {
         var a = agg[kind] || (agg[kind] = { by: {}, all: [] });
-        var pct = Math.max(0, Math.min(100, s / m * 100));
         a.all.push(pct);
         (a.by[rSid] = a.by[rSid] || []).push(pct);
       }
@@ -122,6 +126,15 @@ function meJson_(o) {
 }
 function meEmpty_(sid, cls, ss) {
   return { ok: true, sid: sid, cls: cls, records: [], 'class': {}, cfg: { semStart: meCfg_(ss, 'semStart') }, at: new Date().toISOString() };
+}
+/* ★ v3.4 得分率（與 weekly.html 的 pctOf 逐字對齊）：
+   score>max → 視為「百分比格式」（IOC warm/subquiz/live/xr/vidq：score＝%、max＝題數），≤100 才採計；
+   否則 score/max*100 夾 0–100。score/max 非數值或 max≤0 → null（不計分）。 */
+function mePct_(score, max) {
+  var s = parseFloat(score), m = parseFloat(max);
+  if (!isFinite(s) || !isFinite(m) || m <= 0) return null;
+  if (s > m) return s <= 100 ? s : null;
+  return Math.max(0, Math.min(100, s / m * 100));
 }
 function meNormSid_(v) { // 試算表把 0615 存成數字時補回前導零（與前端 cloud.js normRec 一致）
   var s = String(v == null ? '' : v).trim();
