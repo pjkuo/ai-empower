@@ -177,7 +177,8 @@ var KIND_NAME = {
   midterm:"期中線上評量", repair:"3C 拆裝實訓", build:"PC 虛擬組裝", project:"專題步驟",
   "project-run":"程式執行", "project-final":"專題完成", survey:"問卷", assess4c:"4C 素養評量",
   warm:"暖身練習", subquiz:"講義小測", lab:"不插電五站", netflow:"封包流向",
-  vidq:"影音檢核題", xr:"XR 步驟", analysis:"學習分析", posttest:"學習後測"
+  vidq:"影音檢核題", xr:"XR 步驟", analysis:"學習分析", posttest:"學習後測",
+  ctpractice:"CT 四大技巧練習", live:"課堂即時互動"
 };
 var KIND_LINK = {
   presurvey:"presurvey.html", consensus:"presurvey.html",
@@ -185,7 +186,8 @@ var KIND_LINK = {
   warm:"ioc.html", subquiz:"ioc.html", lab:"ioc.html", netflow:"ioc.html", vidq:"ioc.html", xr:"ioc.html",
   project:"https://pjkuo.github.io/AI-empower-platform/", "project-run":"https://pjkuo.github.io/AI-empower-platform/",
   "project-final":"https://pjkuo.github.io/AI-empower-platform/",
-  assess4c:"https://pjkuo.github.io/AICT-assess-platform/"
+  assess4c:"https://pjkuo.github.io/AICT-assess-platform/",
+  ctpractice:"ct-practice.html", live:"ioc.html"
 };
 var CACHE_KEY = "ae.weekly.last.v1";
 
@@ -205,6 +207,8 @@ function identity(){
 }
 function fmtDT(d){ function z(n){return (n<10?"0":"")+n;} return (d.getMonth()+1)+"/"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes()); }
 function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; if(s>m) return s<=100?s:null; return Math.max(0,Math.min(100,s/m*100)); }
+/* 分數顯示：IOC 新制 kind（warm/subquiz/live/xr/vidq）score＝百分比、max＝題數 → 顯示「67%（6題）」而非易誤讀的 67/6 */
+function fmtScore(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(isFinite(s)&&isFinite(m)&&s>m) return esc(Math.round(s))+"%（"+esc(m)+"題）"; return esc(r.score)+"/"+esc(r.max); }
 function median(a){ if(!a.length) return null; var b=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(b.length/2); return b.length%2?b[i]:(b[i-1]+b[i])/2; }
 function mean(a){ if(!a.length) return null; var s=0; for(var i=0;i<a.length;i++) s+=a[i]; return s/a.length; }
 function kn(k){ return KIND_NAME[k]||k; }
@@ -372,13 +376,25 @@ function render(){
   rec.forEach(function(r){
     rrows+='<tr><td class="numcell">'+esc(fmtDT(r.ts))+'</td><td>'+esc(weekLabel(r.wk))+'</td><td>'+esc(kn(r.kind))+'</td>'+
       '<td>'+esc(detSummary(r.det,r))+'</td>'+
-      '<td class="num numcell">'+(r.ai?'<span class="chip mid">AI</span>':(r.pct==null?"—":(esc(r.score)+"/"+esc(r.max))))+'</td></tr>';
+      '<td class="num numcell">'+(r.ai?'<span class="chip mid">AI</span>':(r.pct==null?"—":fmtScore(r)))+'</td></tr>';
   });
   if(!rec.length) rrows+='<tr><td colspan="5" style="color:var(--muted)">尚無紀錄</td></tr>';
   $("#recentTbl").innerHTML=rrows;
   $("#metaLine").textContent=(IS_DEMO?"【示範資料】":"")+"共 "+recs.length+" 筆紀錄｜資料時間 "+(j.at?fmtDT(new Date(j.at)):fmtDT(new Date()))+"｜新作答約 1 分鐘後入庫";
 
-  $("#staleNote").innerHTML=IS_STALE?$("#staleNote").innerHTML:"";
+  /* --- 查無紀錄時的診斷提示（把「靜默 0 筆」變成可行動的說明） --- */
+  if(IS_STALE){ /* 離線快取：保留 catch 內已寫入的 staleNote */ }
+  else if(!IS_DEMO && recs.length===0){
+    var qid=identity()||{};
+    $("#staleNote").innerHTML=
+      '<div class="stale" style="display:block;line-height:1.7">'+
+      '查無「<b>'+esc(qid.sid||"?")+'</b>／<b>'+esc(qid.cls||"未填班級")+'</b>」的紀錄。可能原因：'+
+      '① 班級名稱與作答時不一致（請用小卡「修改」重選你上課的班級）；'+
+      '② 學號後 4 碼輸入錯誤；'+
+      '③ 剛作答完，資料約 1 分鐘後入庫，可按「⟳ 更新」再試。'+
+      '</div>';
+  }
+  else { $("#staleNote").innerHTML=""; }
   $("#vLoad").classList.remove("on");
   $("#vEmpty").hidden=true;
   $("#vMain").hidden=false;
