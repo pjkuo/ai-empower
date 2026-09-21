@@ -1,6 +1,6 @@
 /* ============================================================
-   ai-empower 後端 v3.4 追加：學生自查 API「action=me」（me-patch）
-   2026-09-07 首版 · 2026-09-21 v3.3 班級正規化（canonical class）· v3.4 得分率與前端 pctOf 對齊
+   ai-empower 後端 v3.5 追加：學生自查 API「action=me」（me-patch）
+   2026-09-07 首版 · 2026-09-21 v3.3 班級正規化 · v3.4 得分率對齊 pctOf · v3.5 學號全碼→後4碼、無年級資管寫法歸大一
 
    ── 安裝（一次，約 2 分鐘）──────────────────────────────
    1. 開啟 Apps Script 專案（試算表「ai-empower 評量資料庫」→ 擴充功能 → Apps Script）。
@@ -34,6 +34,12 @@
      全班中位數被膨脹（實測 warm 全班中位 100 → 正確 63）。mePct_() 改與前端 weekly.html 的 pctOf 完全一致：
      score>max 時視為百分比（≤100 才採計），否則 score/max*100 夾 0–100。
 
+   ★ v3.5 學號正規化：ct-practice／Moodle 匯入路徑把 sid 存成全碼（B11556002、11556002），
+     與契約「sid＝學號後4碼」不符，學生身分 6002 永遠對不到。meNormSid_() 對 5 碼以上、
+     尾端為 4 位數字者取「後 4 碼」；仍以 canonical 班級桶界定範圍（同末四碼跨年級如
+     B11556046／B11356046 因班級桶不同不會互見）。班級正規化同步放寬：未寫年級的
+     「資管／資管系／資訊管理(系)／資一A／四資管一A」歸大一資管；凡明示二/三/四(2/3/4)年級者一律原樣分開。
+
    detail 僅節錄前 400 字元；AI 協作紀錄（detail.action="ai"）只回旗標 ai:1，
    不回提示語內容。cls=LOADTEST 一律拒絕。緩衝區未落地的最新紀錄
    最多延遲約 1 分鐘（flushBuffer 節奏），前端已註明。
@@ -43,7 +49,7 @@ function meAction_(e) {
   var p = (e && e.parameter) || {};
   var sid = String(p.sid || '').trim();
   var cls = String(p.cls || '').trim();
-  if (!/^[0-9A-Za-z]{2,8}$/.test(sid)) return meJson_({ ok: false, error: 'bad sid' });
+  if (!/^[0-9A-Za-z]{2,12}$/.test(sid)) return meJson_({ ok: false, error: 'bad sid' });
   if (!cls) return meJson_({ ok: false, error: 'need cls' });
   if (cls.toUpperCase() === 'LOADTEST') return meJson_({ ok: false, error: 'bad cls' });
 
@@ -136,9 +142,12 @@ function mePct_(score, max) {
   if (s > m) return s <= 100 ? s : null;
   return Math.max(0, Math.min(100, s / m * 100));
 }
-function meNormSid_(v) { // 試算表把 0615 存成數字時補回前導零（與前端 cloud.js normRec 一致）
+function meNormSid_(v) { // 試算表把 0615 存成數字時補回前導零（與前端 cloud.js normRec 一致）；v3.5：全碼 → 後 4 碼
   var s = String(v == null ? '' : v).trim();
+  if (/\.0+$/.test(s)) s = s.replace(/\.0+$/, '');            // 數值欄位偶見 6101.0
   if (/^\d+$/.test(s) && s.length < 4) s = ('0000' + s).slice(-4);
+  var m = s.length >= 5 ? s.match(/(\d{4})$/) : null;         // B11556002 / 11556002 → 6002
+  if (m) s = m[1];
   return s.toUpperCase();
 }
 /* 舊版逐字比對（保留備用；正式比對已改用 meCanonCls_） */
@@ -152,15 +161,16 @@ function meCanonCls_(v) {
   if (!raw) return '';
   // 去半形/全形空白、統一大寫；ㄧ(注音一)→一
   var s = raw.toUpperCase().replace(/[\s　]+/g, '').replace(/ㄧ/g, '一');
-  // ── 資管一A（計算機概論）：MIS / IM / 資管一A / 資管1A / 資訊管理(系)一A / 含「計算機概論」──
-  if (s === 'MIS' || s === 'IM' ||
-      s.indexOf('計算機概論') >= 0 ||
-      /(資管|資訊管理)(系)?(一|1)A?/.test(s)) {
+  // 明示非一年級（二/三/四、2/3/4 後接 A/年級/班/結尾）→ 一律原樣分開，不併入大一
+  var otherYear = /(二|三|四|[234])(A|年級|班|$)/.test(s);
+  // ── 資管一A（計算機概論）：MIS / IM / 含「計算機概論」/ 資管(系)[一|1][A] / 資訊管理(系)… / 資一A / 四資管一A（四技）──
+  if (!otherYear && (s === 'MIS' || s === 'IM' || s.indexOf('計算機概論') >= 0 ||
+      /(資管|資訊管理)/.test(s) || /^資(一|1)A$/.test(s))) {
     return 'MIS-1A';
   }
   // ── 車輛‧機械一A（數位科技與AI應用）：含 車輛 / 機械 / 機(一|1)A / 數位科技 ──
-  if (s.indexOf('車輛') >= 0 || s.indexOf('機械') >= 0 ||
-      s.indexOf('數位科技') >= 0 || /^機(一|1|-)?A?/.test(s)) {
+  if (!otherYear && (s.indexOf('車輛') >= 0 || s.indexOf('機械') >= 0 ||
+      s.indexOf('數位科技') >= 0 || /^機(一|1|-)?A?/.test(s))) {
     return 'VME-1A';
   }
   return s; // 其他班級：正規化後原樣（例：資管4A → 資管4A）
