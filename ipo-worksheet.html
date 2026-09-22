@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>心智圖IPO 練習單｜AI 賦能教學 Hub</title>
+<meta name="description" content="新生必學運算思維基礎能力練習單：填 IPO 架構表、自動檢查 O→I 串接與可量測性、AI 提示詞產生器與決策紀錄，完成後送出練習紀錄（不計分），亦可直接列印或存 PDF。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/ipo-worksheet.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="AI 賦能教學 Hub">
+<meta property="og:title" content="心智圖IPO 練習單｜新生必學運算思維基礎能力">
+<meta property="og:description" content="用心智圖拆問題、用 IPO 找規律：線上填寫、自動檢查串接、AI 決策紀錄，一鍵送出練習紀錄。">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script>window.__ytGuideLoaded=true;/* 練習頁不顯示 YT 浮動卡，避免遮到底部工具列 */</script>
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<style>
+.phead{background:linear-gradient(120deg,var(--ipo),#7C5CD6);color:#fff;border-radius:16px;padding:18px 22px;margin-top:14px}
+.phead .must{display:inline-flex;align-items:center;gap:6px;background:#FDE68A;color:#78350F;font-weight:900;font-size:12px;border-radius:20px;padding:4px 12px;margin-bottom:8px}
+.phead h1{font-size:21px;line-height:1.35}
+.phead p{font-size:12.5px;opacity:.93;margin-top:6px;line-height:1.7;max-width:78ch}
+.phead a{color:#fff;text-decoration:underline}
+.paper{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:13px}
+.paper span{display:inline-flex;align-items:baseline;gap:6px}
+.paper i{font-style:normal;font-weight:700}
+.paper .fld{display:inline-block;min-width:86px;border-bottom:1.5px solid rgba(255,255,255,.7);padding:0 6px 1px;font-weight:700}
+section.blk{margin-top:18px}
+.blk>h2{font-size:16px;color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hintline{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px}
+.topicrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.topicrow select{font-family:inherit;font-size:13.5px;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;background:#fff;max-width:100%}
+.topicline{flex:1;min-width:240px;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:700;background:#fff;min-height:20px}
+.topicline:empty::before{content:attr(data-ph);color:#94A3B8;font-weight:400}
+.topicline:focus{outline:2px solid var(--accent)}
+
+/* IPO 表 */
+.iporow{display:grid;grid-template-columns:88px 1fr 1fr 1fr;gap:8px;align-items:stretch;margin-top:8px}
+@media(max-width:680px){.iporow{grid-template-columns:1fr;gap:6px}.iporow .ipost{padding:8px}}
+.ipost{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:var(--primary);color:#fff;border-radius:10px;font-weight:800;font-size:13px;padding:8px 4px;text-align:center}
+.ipost small{font-weight:600;font-size:10px;opacity:.85}
+.cell{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:24px 11px 9px}
+.cell .lb{position:absolute;top:6px;left:11px;font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--muted)}
+.cell.o{background:#FFFBEB;border-color:#FCD34D}
+.cell.o .lb{color:#92400E}
+.cell .ed{min-height:56px;font-size:13px;line-height:1.65;outline:none;white-space:pre-wrap;word-break:break-word}
+.cell .ed:empty::before{content:attr(data-ph);color:#9CA3AF;font-size:12px}
+.cell .ed:focus{background:rgba(8,145,178,.04)}
+.cell .chk{position:absolute;top:4px;right:9px;font-size:10.5px;font-weight:800}
+.chk.ok{color:#059669}.chk.bad{color:#D97706}
+.chain{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:5px 4px 3px 0;font-size:11.5px;font-weight:700;color:var(--muted)}
+.chain b{font-size:14px;line-height:1}
+.chain.ok{color:#059669}.chain.bad{color:#D97706}
+
+/* AI 區 */
+pre.prompt{background:#0F172A;color:#E2E8F0;border-radius:10px;padding:13px 15px;font-size:12px;line-height:1.75;white-space:pre-wrap;word-break:break-word;font-family:var(--font);max-height:300px;overflow:auto}
+.airow{display:grid;grid-template-columns:26px 1fr 118px 1fr;gap:8px;margin-top:8px;align-items:stretch}
+@media(max-width:680px){.airow{grid-template-columns:26px 1fr}.airow .aisel,.airow .cell.why{grid-column:2}}
+.airow .no{display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--muted)}
+.aisel{font-family:inherit;font-size:12.5px;border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:6px}
+.aihead{display:grid;grid-template-columns:26px 1fr 118px 1fr;gap:8px;font-size:11px;font-weight:800;color:var(--muted);margin-top:10px}
+@media(max-width:680px){.aihead{display:none}}
+
+/* 自我檢核 */
+.selfck{display:grid;gap:8px;margin-top:4px}
+.sc{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:13px;line-height:1.6}
+.sc input{width:18px;height:18px;margin-top:2px;accent-color:var(--ipo)}
+.sc .auto{margin-left:auto;font-size:11px;font-weight:800;white-space:nowrap}
+.sc .auto.ok{color:#059669}.sc .auto.bad{color:#D97706}
+
+/* 底部工具列 */
+.dock{position:sticky;bottom:0;z-index:30;margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:14px 14px 0 0;box-shadow:0 -6px 24px rgba(15,23,42,.12);padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.meter{flex:1;min-width:170px}
+.meter .bar{height:10px;background:var(--soft);border-radius:6px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ipo),#7C5CD6);border-radius:6px;transition:.3s}
+.meter small{font-size:11px;color:var(--muted)}
+.dock .btn{white-space:nowrap}
+#doneMsg{font-size:12px;font-weight:700;color:#059669}
+
+@media print{
+  .dock,.noprint,.phead .must a{display:none!important}
+  body{background:#fff}
+  .phead{background:#fff!important;color:#111!important;border:2px solid #111;border-radius:0;padding:12px 16px}
+  .phead .must{background:#fff;color:#111;border:1.5px solid #111}
+  .phead a{color:#111;text-decoration:none}
+  .paper .fld{border-bottom-color:#111;min-width:110px}
+  .cell,.topicline,.aisel,.sc{border-color:#111!important;box-shadow:none!important;border-radius:4px}
+  .cell .ed{min-height:64px}
+  .cell.o{background:#f3f3f3!important}
+  .ipost{background:#fff!important;color:#111!important;border:2px solid #111;border-radius:4px}
+  section.blk{break-inside:avoid}
+  pre.prompt{background:#fff;color:#111;border:1.5px dashed #111;max-height:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav noprint" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="mindmap-ipo.html">單元教材</a>
+      <a href="assess.html">我的評量</a><a href="weekly.html">我的學習</a>
+      <a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap" style="max-width:960px;padding-bottom:8px">
+
+  <header class="phead">
+    <span class="must">🎓 新生必學 · 運算思維基礎能力</span>
+    <h1>✏️ 心智圖IPO 練習單｜用心智圖拆問題，用 IPO 找規律</h1>
+    <p>先看過<a href="mindmap-ipo.html">單元教材與 120 秒影片</a>再來填。順序照課堂步驟：定題目 → 逐列填 IPO（Output 要有數字）→ 把 O 抄進下一列 I → 請 AI 找遺漏 → 每條建議寫下採納與否的理由。<b>不計評分</b>，只用於教學診斷。</p>
+    <div class="paper">
+      <span><i>班級</i><span class="fld ed-meta" id="fCls" contenteditable="true"></span></span>
+      <span><i>學號後4碼</i><span class="fld ed-meta" id="fSid" contenteditable="true"></span></span>
+      <span><i>姓名</i><span class="fld ed-meta" id="fName" contenteditable="true"></span></span>
+      <span><i>組別</i><span class="fld ed-meta" id="fGrp" contenteditable="true"></span></span>
+    </div>
+    <div data-aeid class="noprint" style="margin-top:12px;max-width:620px"></div>
+  </header>
+
+  <!-- 題目 -->
+  <section class="blk">
+    <h2>① 我們要解的題目<span class="tag noprint" style="background:var(--accent-soft);color:var(--primary)">一句話描述現象，不寫解法</span></h2>
+    <div class="hintline">例如「學餐午餐排隊太久」是現象；「做一個訂餐 App」是解法，不要寫在這裡。</div>
+    <div class="topicrow">
+      <select id="topicSel" class="noprint" aria-label="選擇題目">
+        <option value="">📌 選一題，或自訂…</option>
+        <option>學餐午餐排隊太久（課堂示範）</option>
+        <option>圖書館自習座位被占用</option>
+        <option>宿舍洗衣機總是滿</option>
+        <option>社團報名與點名混亂</option>
+        <option>校園機車停車位難找</option>
+        <option value="__custom__">✍️ 自訂題目</option>
+      </select>
+      <div class="topicline ed" id="topic" contenteditable="true" data-ph="題目：＿＿＿＿＿（一句話描述現象）"></div>
+    </div>
+  </section>
+
+  <!-- IPO 架構表 -->
+  <section class="blk">
+    <h2>② IPO 架構表<span class="tag noprint" style="background:#FEF3C7;color:#92400E">黃底 Output＝交付物，要抄進下一列 Input</span></h2>
+    <div class="hintline">每列 Output 必須<b>含數字或具體物</b>；右上角會即時提示 <b style="color:#059669">✓</b>／<b style="color:#D97706">△</b>。</div>
+
+    <div class="iporow">
+      <div class="ipost">問題定義<small>DEFINE</small></div>
+      <div class="cell"><span class="lb">INPUT</span><div class="ed" id="i-d" contenteditable="true" data-ph="例：同學抱怨、尖峰現場計時"></div></div>
+      <div class="cell"><span class="lb">PROCESS</span><div class="ed" id="p-d" contenteditable="true" data-ph="例：5W1H＋魚骨圖找根因"></div></div>
+      <div class="cell o"><span class="lb">OUTPUT ★含數字</span><span class="chk" id="n-d"></span><div class="ed" id="o-d" contenteditable="true" data-ph="例：尖峰平均排隊 18 分鐘"></div></div>
+    </div>
+    <div class="chain" id="c-1"><span>O → 下一列 I 串接檢查</span><b>⤵</b></div>
+    <div class="iporow">
+      <div class="ipost">需求分析<small>NEEDS</small></div>
+      <div class="cell"><span class="lb">INPUT ←上列 O</span><div class="ed" id="i-r" contenteditable="true" data-ph="把上一列的 Output 抄過來，再加問卷等"></div></div>
+      <div class="cell"><span class="lb">PROCESS</span><div class="ed" id="p-r" contenteditable="true" data-ph="例：利害關係人分析、MoSCoW 排序"></div></div>
+      <div class="cell o"><span class="lb">OUTPUT ★含數字</span><span class="chk" id="n-r"></span><div class="ed" id="o-r" contenteditable="true" data-ph="例：需求清單 3 項：預點、取餐時段、完成通知"></div></div>
+    </div>
+    <div class="chain" id="c-2"><span>O → 下一列 I 串接檢查</span><b>⤵</b></div>
+    <div class="iporow">
+      <div class="ipost">系統設計<small>DESIGN</small></div>
+      <div class="cell"><span class="lb">INPUT ←上列 O</span><div class="ed" id="i-s" contenteditable="true" data-ph="需求清單＋預算、既有工具（如 LINE）"></div></div>
+      <div class="cell"><span class="lb">PROCESS</span><div class="ed" id="p-s" contenteditable="true" data-ph="例：流程圖、資料表、介面草圖"></div></div>
+      <div class="cell o"><span class="lb">OUTPUT ★含數字</span><span class="chk" id="n-s"></span><div class="ed" id="o-s" contenteditable="true" data-ph="例：1 份架構圖＋可試用原型"></div></div>
+    </div>
+    <div class="chain" id="c-3"><span>O → 下一列 I 串接檢查</span><b>⤵</b></div>
+    <div class="iporow">
+      <div class="ipost">預期效益<small>BENEFIT</small></div>
+      <div class="cell"><span class="lb">INPUT ←上列 O</span><div class="ed" id="i-b" contenteditable="true" data-ph="原型＋問題定義的基準數據"></div></div>
+      <div class="cell"><span class="lb">PROCESS</span><div class="ed" id="p-b" contenteditable="true" data-ph="例：試辦兩週、前後對照"></div></div>
+      <div class="cell o"><span class="lb">OUTPUT ★回扣數字</span><span class="chk" id="n-b"></span><div class="ed" id="o-b" contenteditable="true" data-ph="例：排隊 18 分鐘 → 6 分鐘"></div></div>
+    </div>
+  </section>
+
+  <!-- AI 檢核 -->
+  <section class="blk" id="ai">
+    <h2>③ AI 協作檢核<span class="tag noprint" style="background:var(--accent-soft);color:var(--primary)">先自己填完上表，再來這一步</span></h2>
+    <div class="hintline">按下方按鈕，會把<b>你的表格</b>組成提示詞；貼給任何生成式 AI（或智慧專題創作平台的老師代管 AI）。AI 只找遺漏、不重寫——採納與否由你決定。</div>
+    <div class="noprint" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-primary" id="btnGen" type="button">🧾 產生我的 AI 提示詞</button>
+      <button class="btn btn-ghost" id="btnCopy" type="button">📋 複製提示詞</button>
+    </div>
+    <pre class="prompt" id="promptBox">（先填上方 IPO 表，再按「產生我的 AI 提示詞」）</pre>
+
+    <div class="aihead"><span></span><span>AI 建議（摘要抄下來）</span><span>採納？</span><span>理由（評量項目）</span></div>
+    <div class="airow"><div class="no">1</div>
+      <div class="cell"><span class="lb">AI 建議</span><div class="ed ai-s" id="a1s" contenteditable="true" data-ph="例：漏了『餐廳員工』這個利害關係人"></div></div>
+      <select class="aisel ai-a" id="a1a"><option value="">採納？</option><option>採納</option><option>不採納</option><option>部分採納</option></select>
+      <div class="cell why"><span class="lb">理由</span><div class="ed ai-w" id="a1w" contenteditable="true" data-ph="例：採納——出餐速度是他們決定的"></div></div>
+    </div>
+    <div class="airow"><div class="no">2</div>
+      <div class="cell"><span class="lb">AI 建議</span><div class="ed ai-s" id="a2s" contenteditable="true" data-ph=""></div></div>
+      <select class="aisel ai-a" id="a2a"><option value="">採納？</option><option>採納</option><option>不採納</option><option>部分採納</option></select>
+      <div class="cell why"><span class="lb">理由</span><div class="ed ai-w" id="a2w" contenteditable="true" data-ph=""></div></div>
+    </div>
+    <div class="airow"><div class="no">3</div>
+      <div class="cell"><span class="lb">AI 建議</span><div class="ed ai-s" id="a3s" contenteditable="true" data-ph=""></div></div>
+      <select class="aisel ai-a" id="a3a"><option value="">採納？</option><option>採納</option><option>不採納</option><option>部分採納</option></select>
+      <div class="cell why"><span class="lb">理由</span><div class="ed ai-w" id="a3w" contenteditable="true" data-ph=""></div></div>
+    </div>
+  </section>
+
+  <!-- 自我檢核 -->
+  <section class="blk">
+    <h2>④ 自我檢核</h2>
+    <div class="selfck">
+      <label class="sc"><input type="checkbox" id="k1"><span>四個階段<b>都有 I／P／O</b>，沒有留白。</span><span class="auto" id="k1a"></span></label>
+      <label class="sc"><input type="checkbox" id="k2"><span>每列 Output 都<b>含數字或具體物</b>，可以量測。</span><span class="auto" id="k2a"></span></label>
+      <label class="sc"><input type="checkbox" id="k3"><span>每列 Output 都<b>出現在下一列 Input</b>，三個箭頭都接得上。</span><span class="auto" id="k3a"></span></label>
+      <label class="sc"><input type="checkbox" id="k4"><span>預期效益<b>用到問題定義的數字</b>，形成閉環。</span><span class="auto" id="k4a"></span></label>
+    </div>
+  </section>
+
+  <!-- 底部工具列 -->
+  <div class="dock noprint">
+    <div class="meter">
+      <div class="bar"><i id="pctBar"></i></div>
+      <small>完成度 <b id="pctNum">0</b>%（自動暫存於這台裝置）</small>
+    </div>
+    <span id="doneMsg"></span>
+    <button class="btn btn-primary" id="btnSubmit" type="button">☁ 送出練習紀錄</button>
+    <button class="btn btn-ghost" id="btnPrint" type="button">🖨 列印／存 PDF</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">↺ 清空</button>
+  </div>
+
+  <footer class="footer" style="margin-top:0">
+    國立屏東科技大學 資訊管理系 · 郭博仁（Paul Kuo）｜心智圖 × IPO：新生必學運算思維基礎能力<br class="noprint">
+    <span class="noprint">送出的內容只用於課堂教學診斷，不列入學期成績；下一步請到 <a href="https://pjkuo.github.io/AI-empower-platform/">智慧專題創作平台</a> 實作。</span>
+  </footer>
+</main>
+
+<script src="assets/bridge.js" data-app="mindmap-ipo" data-quiet defer></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var BLANK=/[?&]blank=1/.test(location.search);
+var DKEY="ae.ipows.v1", SKEY="ae.ipows.submitted.v1";
+var CELLS=["i-d","p-d","o-d","i-r","p-r","o-r","i-s","p-s","o-s","i-b","p-b","o-b"];
+var STAGES=[["問題定義","d"],["需求分析","r"],["系統設計","s"],["預期效益","b"]];
+
+function txt(id){ var e=$(id); return e?e.textContent.replace(/ /g," ").trim():""; }
+function hasNum(s){ return /[0-9０-９]/.test(s); }
+function nums(s){ var m=String(s).replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-65248);}).match(/\d+(?:\.\d+)?/g); return m||[]; }
+function norm(s){ return String(s).replace(/[\s，。、；：,.;:！!？?（）()「」『』\-—～~]/g,""); }
+function lcsLen(a,b){ /* 最長共同子字串長度（短字串用） */
+  a=norm(a); b=norm(b);
+  if(!a||!b) return 0;
+  if(a.length>160) a=a.slice(0,160); if(b.length>160) b=b.slice(0,160);
+  var best=0, dp=new Array(b.length+1).fill(0);
+  for(var i=1;i<=a.length;i++){ var prev=0;
+    for(var j=1;j<=b.length;j++){ var tmp=dp[j];
+      dp[j]=(a[i-1]===b[j-1])?prev+1:0; if(dp[j]>best)best=dp[j]; prev=tmp; } }
+  return best;
+}
+function linked(o,i){
+  if(!o||!i) return null;
+  var shared=nums(o).some(function(n){ return i.indexOf(n)>=0 || norm(i).indexOf(n)>=0; });
+  return (shared || lcsLen(o,i)>=3);
+}
+
+function recalc(){
+  /* O 含數字 */
+  var numOK={};
+  STAGES.forEach(function(st){
+    var k=st[1], o=txt("o-"+k), el=$("n-"+k);
+    if(!o){ el.textContent=""; el.className="chk"; numOK[k]=false; return; }
+    numOK[k]=hasNum(o);
+    el.textContent=numOK[k]?"✓ 有數字":"△ 沒有數字";
+    el.className="chk "+(numOK[k]?"ok":"bad");
+  });
+  /* O→I 串接 */
+  var chainPairs=[["o-d","i-r","c-1"],["o-r","i-s","c-2"],["o-s","i-b","c-3"]], chainOK=[];
+  chainPairs.forEach(function(p){
+    var r=linked(txt(p[0]),txt(p[1])), el=$(p[2]);
+    chainOK.push(r===true);
+    el.className="chain "+(r===null?"":(r?"ok":"bad"));
+    el.firstElementChild.textContent = r===null ? "O → 下一列 I 串接檢查" : (r?"✓ 接上了：上列 O 出現在這列 I":"✗ 箭頭斷了：把上列 O 抄進這列 I");
+  });
+  /* 效益回扣問題定義數字 */
+  var loop = nums(txt("o-d")).length>0 && nums(txt("o-d")).some(function(n){ return txt("o-b").indexOf(n)>=0; });
+  /* 自我檢核旁的自動提示 */
+  var allFilled = CELLS.every(function(c){ return !!txt(c); });
+  function auto(id,ok,has){ var e=$(id); if(!has){e.textContent="";e.className="auto";return;} e.textContent=ok?"自動檢查 ✓":"自動檢查 △"; e.className="auto "+(ok?"ok":"bad"); }
+  auto("k1a", allFilled, CELLS.some(function(c){return !!txt(c);}));
+  auto("k2a", numOK.d&&numOK.r&&numOK.s&&numOK.b, !!(txt("o-d")||txt("o-r")||txt("o-s")||txt("o-b")));
+  auto("k3a", chainOK[0]&&chainOK[1]&&chainOK[2], !!(txt("i-r")||txt("i-s")||txt("i-b")));
+  auto("k4a", loop, !!txt("o-b"));
+  /* 完成度：題目6 + 12格×6=72 + AI 3列×4=12 + 自我檢核4×2.5=10 */
+  var pct=0;
+  if(txt("topic")) pct+=6;
+  CELLS.forEach(function(c){ if(txt(c)) pct+=6; });
+  [1,2,3].forEach(function(n){
+    var s=txt("a"+n+"s"), a=$("a"+n+"a").value, w=txt("a"+n+"w");
+    if(s&&a&&w) pct+=4; else if(s||a||w) pct+=2;
+  });
+  ["k1","k2","k3","k4"].forEach(function(k){ if($(k).checked) pct+=2.5; });
+  pct=Math.min(100,Math.round(pct));
+  $("pctBar").style.width=pct+"%"; $("pctNum").textContent=pct;
+  return {pct:pct,numOK:numOK,chainOK:chainOK,loop:loop};
+}
+
+/* ---------- 草稿 ---------- */
+function collect(){
+  var o={topic:txt("topic"),cells:{},ai:[],ck:{},meta:{}};
+  CELLS.forEach(function(c){o.cells[c]=txt(c);});
+  [1,2,3].forEach(function(n){o.ai.push({s:txt("a"+n+"s"),a:$("a"+n+"a").value,w:txt("a"+n+"w")});});
+  ["k1","k2","k3","k4"].forEach(function(k){o.ck[k]=$(k).checked;});
+  ["fCls","fSid","fName","fGrp"].forEach(function(f){o.meta[f]=txt(f);});
+  return o;
+}
+function restore(o){
+  if(!o) return;
+  try{
+    if(o.topic) $("topic").textContent=o.topic;
+    CELLS.forEach(function(c){ if(o.cells&&o.cells[c]) $(c).textContent=o.cells[c]; });
+    (o.ai||[]).forEach(function(r,i){ var n=i+1;
+      if(r.s)$("a"+n+"s").textContent=r.s; if(r.a)$("a"+n+"a").value=r.a; if(r.w)$("a"+n+"w").textContent=r.w; });
+    for(var k in (o.ck||{})){ if($(k)) $(k).checked=!!o.ck[k]; }
+    for(var f in (o.meta||{})){ if($(f)) $(f).textContent=o.meta[f]; }
+  }catch(e){}
+}
+var saveTimer=null;
+function save(){ if(BLANK) return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){ try{ localStorage.setItem(DKEY,JSON.stringify(collect())); }catch(e){} },400);
+}
+
+/* ---------- AI 提示詞 ---------- */
+function buildPrompt(){
+  var t=txt("topic")||"（題目未填）";
+  var lines=["以下是我們小組對「"+t+"」的 IPO 架構表。請不要改寫表格，只列出：","(1) 遺漏的利害關係人；","(2) 沒有數字、無法量測的 Output；","(3) 上一列 O 沒有出現在下一列 I 的地方。","每點最多 3 條，並說明原因。","","| 階段 | Input | Process | Output |","|---|---|---|---|"];
+  STAGES.forEach(function(st){
+    var k=st[1];
+    lines.push("| "+st[0]+" | "+(txt("i-"+k)||"（空）")+" | "+(txt("p-"+k)||"（空）")+" | "+(txt("o-"+k)||"（空）")+" |");
+  });
+  return lines.join("\n");
+}
+
+/* ---------- 送出 ---------- */
+function submit(){
+  var st=recalc(), id=(window.AEId&&AEId.get())||null;
+  var sidPaper=txt("fSid").replace(/\D/g,"").slice(-4);
+  if(!id&&sidPaper){ AEId.set({sid:sidPaper,cls:txt("fCls")}); id=AEId.get(); }
+  if(!id||!id.sid){ alert("請先在上方「我是誰」小卡填學號後 4 碼，練習紀錄才記得到你名下。"); try{document.querySelector("[data-aeid]").scrollIntoView({behavior:"smooth",block:"center"});}catch(e){} return; }
+  if(st.pct<30 && !confirm("完成度只有 "+st.pct+"%，確定要先送出嗎？（之後可再送，會以新紀錄補上）")) return;
+  var d=collect(), clip=function(s){return String(s||"").slice(0,400);};
+  var stages={};
+  STAGES.forEach(function(s){ var k=s[1]; stages[k]={i:clip(d.cells["i-"+k]),p:clip(d.cells["p-"+k]),o:clip(d.cells["o-"+k])}; });
+  var rec={
+    kind:"ipopractice", score:st.pct, max:100,
+    name:clip(txt("fName")),
+    unit:"心智圖IPO", graded:false, completion:st.pct,
+    topic:clip(d.topic), stages:stages,
+    chain:st.chainOK, numsOK:st.numOK, loop:st.loop,
+    ai:d.ai.map(function(r){return {s:clip(r.s),a:r.a,w:clip(r.w)};}),
+    selfCheck:[$("k1").checked,$("k2").checked,$("k3").checked,$("k4").checked],
+    grp:clip(txt("fGrp")),
+    chars:CELLS.reduce(function(a,c){return a+txt(c).length;},0)
+  };
+  var btn=$("btnSubmit"); btn.disabled=true; btn.textContent="送出中…";
+  function done(okMsg){
+    btn.textContent="✅ 已送出"; $("doneMsg").textContent=okMsg;
+    try{ localStorage.setItem(SKEY,JSON.stringify({ts:new Date().toISOString(),pct:st.pct})); }catch(e){}
+    setTimeout(function(){ btn.disabled=false; btn.textContent="☁ 再次送出（更新）"; },1800);
+  }
+  if(window.AEBridge){
+    AEBridge.push(rec).then(function(j){
+      done(j&&j.queued?"目前離線，已排入佇列，連線後自動補送":"練習紀錄已送出（不計分）");
+    }).catch(function(){ done("已排入佇列，連線後自動補送"); });
+  }else{ done("已暫存於裝置，連線後開啟本頁會自動補送"); }
+}
+
+/* ---------- 綁定 ---------- */
+document.addEventListener("input",function(e){
+  if(e.target.closest&&(e.target.closest(".ed")||e.target.classList.contains("aisel"))){ recalc(); save(); }
+});
+document.addEventListener("change",function(e){
+  if(e.target.classList&&(e.target.classList.contains("aisel")||e.target.type==="checkbox")){ recalc(); save(); }
+});
+$("topicSel").addEventListener("change",function(){
+  var v=this.value;
+  if(!v) return;
+  if(v==="__custom__"){ $("topic").textContent=""; $("topic").focus(); }
+  else { $("topic").textContent=v.replace("（課堂示範）",""); }
+  recalc(); save();
+});
+$("btnGen").addEventListener("click",function(){ $("promptBox").textContent=buildPrompt(); recalc(); });
+$("btnCopy").addEventListener("click",function(){
+  var t=$("promptBox").textContent.indexOf("（先填")===0?buildPrompt():$("promptBox").textContent;
+  $("promptBox").textContent=t;
+  var self=this;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){ self.textContent="✅ 已複製"; setTimeout(function(){self.textContent="📋 複製提示詞";},2000); })
+  .catch(function(){ var ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); self.textContent="✅ 已複製"; }catch(e){ self.textContent="請手動選取複製"; }
+    ta.remove(); setTimeout(function(){self.textContent="📋 複製提示詞";},2000); });
+});
+$("btnPrint").addEventListener("click",function(){ window.print(); });
+$("btnSubmit").addEventListener("click",submit);
+$("btnReset").addEventListener("click",function(){
+  if(!confirm("清空整張練習單？（已送出的紀錄不受影響）")) return;
+  CELLS.concat(["topic","a1s","a1w","a2s","a2w","a3s","a3w"]).forEach(function(c){ $(c).textContent=""; });
+  ["a1a","a2a","a3a"].forEach(function(s){ $(s).value=""; });
+  ["k1","k2","k3","k4"].forEach(function(k){ $(k).checked=false; });
+  try{ localStorage.removeItem(DKEY); }catch(e){}
+  recalc();
+});
+/* 身分同步：AEId → 紙本欄 */
+function syncId(){
+  var id=(window.AEId&&AEId.get())||null; if(!id) return;
+  if(!txt("fSid")) $("fSid").textContent=id.sid;
+  if(!txt("fCls")&&id.cls) $("fCls").textContent=id.cls;
+}
+document.addEventListener("ae:identity",function(){ syncId(); save(); });
+
+/* ---------- 初始化 ---------- */
+if(!BLANK){
+  try{ restore(JSON.parse(localStorage.getItem(DKEY)||"null")); }catch(e){}
+  try{ var sub=JSON.parse(localStorage.getItem(SKEY)||"null");
+    if(sub&&sub.ts){ $("doneMsg").textContent="上次已送出："+String(sub.ts).slice(0,10)+"（"+sub.pct+"%）"; $("btnSubmit").textContent="☁ 再次送出（更新）"; } }catch(e){}
+}else{
+  document.querySelectorAll(".ed").forEach(function(e){ e.setAttribute("data-ph",""); });
+}
+window.addEventListener("DOMContentLoaded",function(){ syncId(); recalc(); });
+recalc();
+})();
+</script>
+</body>
+</html>
