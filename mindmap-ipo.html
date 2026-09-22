@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>心智圖 × IPO 基礎單元｜AI 賦能教學 Hub</title>
+<meta name="description" content="新生必學運算思維基礎能力：用心智圖拆問題、用 IPO 找規律。120 秒教學影片＋30 分鐘課堂單元＋線上練習單，AI 協作採先思考後驗證（HITL），學會之後直接銜接智慧專題創作平台。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/mindmap-ipo.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="AI 賦能教學 Hub">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:title" content="心智圖 × IPO 基礎單元｜新生必學運算思維基礎能力">
+<meta property="og:description" content="用心智圖拆問題、用 IPO 找規律：120 秒影片＋30 分鐘課堂＋線上練習單，專題創作前先學會。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<style>
+.hero{background:linear-gradient(135deg,var(--primary),var(--primary-2) 60%,#5B6FE0);color:#fff;border-radius:var(--radius);padding:24px 26px;margin-top:16px}
+.hero .must{display:inline-flex;align-items:center;gap:6px;background:#FDE68A;color:#78350F;font-weight:900;font-size:13px;border-radius:20px;padding:6px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.hero h1{font-size:26px;line-height:1.35;margin-bottom:8px}
+.hero h1 small{display:block;font-size:14px;font-weight:600;opacity:.9;margin-top:4px}
+.hero p{font-size:13.5px;opacity:.93;line-height:1.75;max-width:76ch}
+.hero .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.hero .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700}
+.hero .cta{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hero .cta a{background:#fff;color:var(--primary);font-weight:800;font-size:13.5px;padding:10px 18px;border-radius:9px;text-decoration:none;transition:.16s}
+.hero .cta a.gold{background:#F59E0B;color:#fff}
+.hero .cta a:hover{transform:translateY(-1px)}
+
+section.blk{margin-top:22px}
+.blk>h2{font-size:17px;color:var(--primary);margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.blk>h2 .tag{background:var(--accent-soft);color:var(--primary)}
+
+/* 影片 */
+.vwrap{position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#0f172a;box-shadow:var(--shadow)}
+.vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.timeline td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--primary);font-weight:700}
+
+/* 學習目標 */
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--gap)}
+.goal{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 17px;border-top:4px solid var(--ipo)}
+.goal b{display:block;font-size:15px;color:var(--primary)}
+.goal span{font-size:12.5px;color:var(--muted);line-height:1.7;display:block;margin-top:6px}
+.goal .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ipo);color:#fff;font-size:13px;font-weight:800;margin-bottom:6px}
+
+/* CT 四要素 */
+.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--gap)}
+.sk{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 17px;border-top:4px solid var(--c)}
+.sk .n{font-family:var(--mono,ui-monospace);font-size:10.5px;font-weight:700;color:var(--c);letter-spacing:2px}
+.sk h3{font-size:18px;color:var(--ink);margin:3px 0 1px}
+.sk .en{font-size:10px;letter-spacing:1.4px;color:var(--muted)}
+.sk p{font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:8px}
+
+/* IPO 串接圖 */
+.ipoflow{margin-top:6px}
+.iporow{display:grid;grid-template-columns:96px 1fr 1fr 1fr;gap:8px;align-items:stretch}
+@media(max-width:640px){.iporow{grid-template-columns:76px 1fr 1fr 1fr;gap:5px}}
+.ipost{display:flex;align-items:center;justify-content:center;background:var(--primary);color:#fff;border-radius:10px;font-weight:800;font-size:13px;padding:10px 4px;text-align:center}
+.ipoc{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:12px;line-height:1.6}
+.ipoc b{display:block;font-size:10.5px;letter-spacing:1px;color:var(--muted);margin-bottom:2px}
+.ipoc.o{background:#FEF3C7;border-color:#FCD34D}
+.ipoc.o b{color:#92400E}
+.ipolink{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:4px 6px 4px 0;font-size:11.5px;font-weight:700;color:#B45309}
+.ipolink .arr{font-size:16px;line-height:1;transform:translateY(1px)}
+.closure{margin-top:12px;background:var(--ok-bg);border-radius:10px;padding:11px 14px;font-size:13px;color:#065F46;line-height:1.7}
+.closure b{font-size:16px}
+
+/* 範例表 */
+table.ex{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+table.ex th{background:var(--primary);color:#fff;padding:8px 9px;text-align:left;font-size:12px}
+table.ex td{border:1px solid var(--line);padding:8px 9px;line-height:1.6;vertical-align:top}
+table.ex td.o{background:#FEF3C7}
+table.ex td.stg{font-weight:800;color:var(--primary);white-space:nowrap}
+
+/* 流程帶 */
+.flowband{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}
+@media(max-width:760px){.flowband{grid-template-columns:repeat(3,1fr)}}
+.fb{border-radius:10px;padding:9px 10px;color:#fff;min-height:74px}
+.fb b{display:block;font-size:13px}
+.fb i{font-style:normal;font-size:10.5px;opacity:.85;display:block}
+.fb span{font-size:11px;opacity:.92;display:block;margin-top:3px;line-height:1.5}
+
+/* 步驟 */
+.stepcards{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+@media(max-width:860px){.stepcards{grid-template-columns:1fr}}
+.stepcards ol{margin:8px 0 0;padding-left:0;list-style:none;counter-reset:s}
+.stepcards li{counter-increment:s;position:relative;padding:7px 0 7px 36px;font-size:12.5px;line-height:1.65;border-bottom:1px dashed var(--line)}
+.stepcards li:last-child{border-bottom:0}
+.stepcards li::before{content:counter(s,decimal);position:absolute;left:0;top:8px;width:24px;height:24px;border-radius:50%;background:var(--ipo);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center}
+.stepcards .c2 li::before{content:counter(s + 5)}
+.stepcards li b{color:var(--ink)}
+
+/* AI 檢核 */
+.aiflow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+@media(max-width:700px){.aiflow{grid-template-columns:repeat(2,1fr)}}
+.aif{background:var(--soft);border-radius:10px;padding:10px 12px;text-align:center}
+.aif b{display:block;font-size:13px;color:var(--primary)}
+.aif span{font-size:11.5px;color:var(--muted);display:block;margin-top:3px;line-height:1.5}
+pre.prompt{background:#0F172A;color:#E2E8F0;border-radius:10px;padding:14px 16px;font-size:12.5px;line-height:1.8;white-space:pre-wrap;word-break:break-word;margin-top:10px;font-family:var(--font)}
+
+/* 規準 */
+table.rub{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+table.rub th{background:var(--ipo);color:#fff;padding:8px;text-align:left;font-size:12px}
+table.rub td{border:1px solid var(--line);padding:8px;line-height:1.6;vertical-align:top}
+table.rub td:first-child{font-weight:800;color:var(--primary);white-space:nowrap}
+
+/* 作業 */
+.hw{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.hw span{background:var(--ipo-bg);color:var(--ipo);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:700}
+
+/* 入口與下載 */
+.entries{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+@media(max-width:860px){.entries{grid-template-columns:1fr}}
+.mirror{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:560px){.mirror{grid-template-columns:1fr}}
+.mirror a{display:block;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-decoration:none}
+.mirror a:hover{border-color:var(--accent)}
+.mirror b{display:block;font-size:13px;color:var(--primary)}
+.mirror span{font-size:11px;color:var(--muted);word-break:break-all}
+.mirror .badge{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:2px 8px;margin-bottom:4px}
+.note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:8px}
+.next{background:linear-gradient(120deg,var(--ipo),#7C5CD6);color:#fff;border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+.next h2{font-size:18px}
+.next p{font-size:13px;opacity:.94;line-height:1.75;margin-top:6px;max-width:76ch}
+.next .cta{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.next .cta a{background:#fff;color:var(--ipo);font-weight:800;font-size:13.5px;padding:10px 18px;border-radius:9px;text-decoration:none}
+.next .cta a.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.hide{display:none !important}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="ioc.html">IOC 課程</a>
+      <a href="assess.html">我的評量</a><a href="weekly.html">我的學習</a>
+      <a href="console.html">教師工作台</a><a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap" style="padding-bottom:44px">
+
+  <header class="hero">
+    <span class="must">🎓 新生必學 · 運算思維基礎能力</span>
+    <h1>用心智圖拆問題，用 IPO 找規律<small>計算機概論｜運算思維與 AI 賦能單元｜問題拆解與模式辨識</small></h1>
+    <p>「學餐排隊太久」這種模糊的抱怨，30 分鐘內變成一張看得懂、做得動的解題藍圖：<b>心智圖</b>把問題拆成四個階段，<b>IPO 模板</b>描述每一階段，AI 只負責找遺漏——判斷永遠由你來做。這是之後每一個專題的骨架，先學會，專題就有起點。</p>
+    <div class="pills">
+      <span class="pill">⏱ 30 分鐘課堂單元</span>
+      <span class="pill">👥 每組 3–4 人</span>
+      <span class="pill">★ 練習不計評分</span>
+      <span class="pill">🎨 專題創作先修</span>
+      <span class="pill">🤖 AI 素養：先思考，後驗證</span>
+    </div>
+    <div class="cta">
+      <a class="gold" href="#video">▶ 先看 120 秒影片</a>
+      <a href="ipo-worksheet.html">✏️ 開啟線上練習單</a>
+    </div>
+    <div data-aeid style="margin-top:14px;max-width:620px"></div>
+  </header>
+
+  <!-- 影片 -->
+  <section class="blk" id="video">
+    <h2>🎬 120 秒教學影片<span class="tag" style="background:var(--warn-bg);color:#92400E">課前預習・課堂 0–3 分播放</span></h2>
+    <div class="card">
+      <div class="vwrap">
+        <iframe src="https://www.youtube-nocookie.com/embed/RgvnGZE6dMY" title="心智圖IPO 教學影片（120 秒）" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+      <details id="vFallback" style="margin-top:10px">
+        <summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:var(--primary)">📼 YouTube 開不了？改播站內備援影片（1080p，含旁白與字幕）</summary>
+        <video controls preload="none" style="width:100%;border-radius:10px;margin-top:8px;box-shadow:var(--shadow)">
+          <source src="assets/video/mindmap-ipo-120s.mp4" type="video/mp4">
+          您的瀏覽器不支援影片播放，請<a href="assets/video/mindmap-ipo-120s.mp4">下載觀看</a>。
+        </video>
+      </details>
+      <div style="overflow:auto;margin-top:12px">
+        <table class="ex timeline">
+          <tr><th style="width:110px">時間</th><th style="width:120px">畫面</th><th>旁白重點</th></tr>
+          <tr><td>0:00–0:13</td><td>封面</td><td>兩分鐘學會用心智圖拆解、用 IPO 找規律</td></tr>
+          <tr><td>0:13–0:28</td><td>引起動機</td><td>尖峰排隊 18 分鐘，占午休三分之一以上</td></tr>
+          <tr><td>0:28–0:43</td><td>CT 四要素</td><td>拆解、模式辨識、抽象化、演算法與工具對應</td></tr>
+          <tr><td>0:43–1:01</td><td>心智圖</td><td>第一步：中心寫題目、畫四支、接 IPO</td></tr>
+          <tr><td>1:01–1:17</td><td>IPO 串接</td><td>第二步：逐列填寫，O 即下一列的 I</td></tr>
+          <tr><td>1:17–1:34</td><td>範例表</td><td>18 分鐘從問題定義一路傳到預期效益</td></tr>
+          <tr><td>1:34–1:48</td><td>AI 檢核</td><td>第三步：先自己做，再請 AI 找遺漏，由你決定</td></tr>
+          <tr><td>1:48–2:00</td><td>課後作業</td><td>換題練習，先思考後驗證</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 學習目標 -->
+  <section class="blk">
+    <h2>🎯 三個學習目標</h2>
+    <div class="goals">
+      <div class="goal"><span class="n">1</span><b>拆解</b><span>能用心智圖把校園問題拆成「問題定義、需求分析、系統設計、預期效益」四個階段。</span></div>
+      <div class="goal"><span class="n">2</span><b>模式辨識</b><span>能用 IPO 模板描述每一階段，並找出「上一階段 Output＝下一階段 Input」的規律。</span></div>
+      <div class="goal"><span class="n">3</span><b>AI 協作</b><span>能運用 AI 檢核遺漏，並對每條建議寫下採納與否的理由——AI 是檢查員，不是代筆者。</span></div>
+    </div>
+  </section>
+
+  <!-- CT 四要素 -->
+  <section class="blk">
+    <h2>🧩 運算思維四要素 ↔ 本單元工具</h2>
+    <div class="skills">
+      <div class="sk" style="--c:#2E5496"><div class="n">CT 01</div><h3>拆解</h3><div class="en">DECOMPOSITION</div><p>心智圖把題目分成四個階段——大問題變成一口一口做得完的小事。</p></div>
+      <div class="sk" style="--c:#0F7A76"><div class="n">CT 02</div><h3>模式辨識</h3><div class="en">PATTERN RECOGNITION</div><p>四個階段長得一樣：都能用 IPO 描述。這是本堂課的核心發現。</p></div>
+      <div class="sk" style="--c:#6B4D9E"><div class="n">CT 03</div><h3>抽象化</h3><div class="en">ABSTRACTION</div><p>IPO 是可重複使用的模板——換一題，同一套格子照樣能裝。</p></div>
+      <div class="sk" style="--c:#B0821E"><div class="n">CT 04</div><h3>演算法</h3><div class="en">ALGORITHM</div><p>依序完成四個階段，就是一條誰照做都會得到結果的解題流程。</p></div>
+    </div>
+  </section>
+
+  <!-- IPO 串接規律 -->
+  <section class="blk">
+    <h2>🔗 IPO 模板與串接規律<span class="tag" style="background:#FEF3C7;color:#92400E">黃色＝交付物，往下一列傳遞</span></h2>
+    <div class="card">
+      <div class="ipoflow">
+        <div class="iporow"><div class="ipost">問題定義</div><div class="ipoc"><b>INPUT</b>抱怨、現場觀察</div><div class="ipoc"><b>PROCESS</b>5W1H、找根因</div><div class="ipoc o"><b>OUTPUT</b>可量測的問題陳述</div></div>
+        <div class="ipolink">Output 傳遞為下一階段的 Input <span class="arr">⤵</span></div>
+        <div class="iporow"><div class="ipost">需求分析</div><div class="ipoc"><b>INPUT</b>問題陳述</div><div class="ipoc"><b>PROCESS</b>利害關係人、排序</div><div class="ipoc o"><b>OUTPUT</b>需求清單</div></div>
+        <div class="ipolink">Output 傳遞為下一階段的 Input <span class="arr">⤵</span></div>
+        <div class="iporow"><div class="ipost">系統設計</div><div class="ipoc"><b>INPUT</b>需求清單</div><div class="ipoc"><b>PROCESS</b>流程圖、介面草圖</div><div class="ipoc o"><b>OUTPUT</b>可試用原型</div></div>
+        <div class="ipolink">Output 傳遞為下一階段的 Input <span class="arr">⤵</span></div>
+        <div class="iporow"><div class="ipost">預期效益</div><div class="ipoc"><b>INPUT</b>原型＋基準數據</div><div class="ipoc"><b>PROCESS</b>試辦、前後對照</div><div class="ipoc o"><b>OUTPUT</b>效益報告（回扣原始數字）</div></div>
+      </div>
+      <p class="note">寫不出某一列的 Input，代表<b>上一階段還沒做完</b>——這就是你的自我檢查工具；預期效益的指標必須回扣問題定義的數字，形成閉環。</p>
+    </div>
+  </section>
+
+  <!-- 範例 -->
+  <section class="blk">
+    <h2>🍜 教師示範：學餐排隊範例</h2>
+    <div class="card">
+      <div style="overflow:auto">
+        <table class="ex">
+          <tr><th style="width:92px">階段</th><th>Input</th><th>Process</th><th>Output（黃底＝傳給下一列）</th></tr>
+          <tr><td class="stg">問題定義</td><td>同學抱怨、尖峰現場計時</td><td>5W1H＋魚骨圖找根因</td><td class="o">尖峰平均排隊 <b>18 分鐘</b></td></tr>
+          <tr><td class="stg">需求分析</td><td>問題陳述、問卷、下課時間表</td><td>利害關係人分析、MoSCoW 排序</td><td class="o">需求清單：預點、取餐時段、完成通知</td></tr>
+          <tr><td class="stg">系統設計</td><td>需求清單、預算、既有 LINE 帳號</td><td>流程圖、訂單資料表、介面草圖</td><td class="o">架構圖與可試用原型</td></tr>
+          <tr><td class="stg">預期效益</td><td>原型＋基準數據 18 分鐘</td><td>試辦兩週、前後對照</td><td class="o">效益報告：排隊降至 <b>6 分鐘</b></td></tr>
+        </table>
+      </div>
+      <div class="closure"><b>18 → 6</b>　問題定義的 18 分鐘，在最後一階段被回頭驗證——沒有回扣原始數字，就無法證明問題真的被解決。（示範數據，實作請換成你們自己觀察到的數字）</div>
+    </div>
+  </section>
+
+  <!-- 30 分鐘流程 -->
+  <section class="blk">
+    <h2>⏱ 30 分鐘課程流程<span class="tag" style="background:var(--eco-bg);color:var(--eco)">學生實作占三分之一，是本堂課的核心</span></h2>
+    <div class="flowband">
+      <div class="fb" style="background:#2E5496"><b>引起動機</b><i>0–3 分</i><span>120 秒影片＋排隊情境</span></div>
+      <div class="fb" style="background:#0F7A76"><b>概念講解</b><i>3–8 分</i><span>CT 四要素與 IPO 規律</span></div>
+      <div class="fb" style="background:#6B4D9E"><b>教師示範</b><i>8–13 分</i><span>完整示範「問題定義」一列</span></div>
+      <div class="fb" style="background:#B45309"><b>學生實作</b><i>13–23 分</i><span>心智圖＋IPO 表（步驟 1–7）</span></div>
+      <div class="fb" style="background:#0E7490"><b>AI 檢核</b><i>23–27 分</i><span>先思考後驗證（步驟 8–9）</span></div>
+      <div class="fb" style="background:#1E3A8A"><b>發表總結</b><i>27–30 分</i><span>1 分鐘發表＋互評＋作業</span></div>
+    </div>
+  </section>
+
+  <!-- 操作步驟 -->
+  <section class="blk">
+    <h2>🛠 學生操作步驟 1–10</h2>
+    <p class="note" style="margin:0 0 10px">分工建議：一人畫圖、一人填表、一人計時、一人操作 AI。步驟 1–7 於 13–23 分完成，步驟 8–10 於 23–30 分完成。</p>
+    <div class="stepcards">
+      <div class="card">
+        <h3 style="font-size:14.5px;color:var(--primary)">拆解與填表（13–23 分）</h3>
+        <ol>
+          <li><b>在 A3 紙中心寫下題目</b>：一句話描述現象，不寫解法，例如「學餐午餐排隊太久」。</li>
+          <li><b>畫出四個階段分支</b>：依順時針畫問題定義、需求分析、系統設計、預期效益。</li>
+          <li><b>每個分支接上 I／P／O</b>：每支三行，先留白。</li>
+          <li><b>先完成「問題定義」的 Output</b>：必須含數字，例如「尖峰平均排隊 18 分鐘」；沒有數字就回去補觀察。</li>
+          <li><b>把 Output 抄到下一列 Input</b>：這一步即在驗證串接規律。</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3 style="font-size:14.5px;color:var(--primary)">串接與 AI 檢核（23–30 分）</h3>
+        <ol class="c2">
+          <li><b>依序填完其餘 Process 與 Output</b>：需求分析 → 系統設計 → 預期效益。</li>
+          <li><b>用黃筆標出每列 Output，畫箭頭連到下一列 Input</b>：箭頭斷掉處就是缺口，小組討論補齊。</li>
+          <li><b>把表格拍照或打字貼給 AI</b>：使用下方提示詞範本，只請 AI 找遺漏，不要求重寫。</li>
+          <li><b>逐條判斷 AI 建議</b>：在決策欄寫「採納／不採納＋理由」。</li>
+          <li><b>上傳成果並準備 1 分鐘發表</b>：說明一處因檢核而修改的地方。</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI 協作檢核 -->
+  <section class="blk">
+    <h2>🤖 AI 協作檢核：先思考，後驗證<span class="tag" style="background:var(--accent-soft);color:var(--primary)">HITL：人負責決策，AI 負責找遺漏</span></h2>
+    <div class="card">
+      <div class="aiflow">
+        <div class="aif"><b>① 學生先完成</b><span>自己的 IPO 表</span></div>
+        <div class="aif"><b>② AI 找遺漏</b><span>只指出、不重寫</span></div>
+        <div class="aif"><b>③ 學生判斷</b><span>採納或不採納</span></div>
+        <div class="aif"><b>④ 寫下理由</b><span>形成決策紀錄</span></div>
+      </div>
+      <pre class="prompt" id="aiPrompt">以下是我們小組對「＿＿＿＿」的 IPO 架構表。請不要改寫表格，只列出：
+(1) 遺漏的利害關係人；
+(2) 沒有數字、無法量測的 Output；
+(3) 上一列 O 沒有出現在下一列 I 的地方。
+每點最多 3 條，並說明原因。</pre>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn btn-primary" id="btnCopyPrompt" type="button">📋 複製提示詞範本</button>
+        <a class="btn btn-ghost" href="ipo-worksheet.html#ai">✏️ 到練習單填 AI 決策紀錄</a>
+      </div>
+      <p class="note">一定要先自己做完再問 AI。AI 的建議不是答案——每一條都要寫「採納／不採納＋理由」，這是評量項目之一。</p>
+    </div>
+  </section>
+
+  <!-- 評量規準 -->
+  <section class="blk">
+    <h2>📏 評量規準<span class="tag" style="background:var(--warn-bg);color:#92400E">發表時由他組依此互評，每項 1–3 分</span></h2>
+    <div class="card" style="overflow:auto">
+      <table class="rub">
+        <tr><th style="width:120px">評量項目</th><th>3 分</th><th>2 分</th><th>1 分</th></tr>
+        <tr><td>心智圖拆解</td><td>四階段完整且各有 IPO</td><td>四階段完整，IPO 缺一</td><td>階段不完整</td></tr>
+        <tr><td>Output 可量測</td><td>四個 O 都含數字或具體物</td><td>二至三個 O 可量測</td><td>僅一個或皆不可量測</td></tr>
+        <tr><td>O→I 串接</td><td>三個箭頭全部接得上</td><td>斷一處</td><td>斷兩處以上</td></tr>
+        <tr><td>AI 決策紀錄</td><td>每條建議都有判斷與理由</td><td>部分有理由</td><td>僅照抄 AI 建議</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 課後作業 -->
+  <section class="blk">
+    <h2>🏠 課後作業與延伸</h2>
+    <div class="card">
+      <p style="font-size:13px;line-height:1.7">任選一題，完成<b>心智圖、IPO 表與 AI 決策紀錄</b>，下週上傳。同一套方法，換題一樣適用——先思考，後驗證。</p>
+      <div class="hw">
+        <span>📚 圖書館自習座位被占用</span>
+        <span>🧺 宿舍洗衣機總是滿</span>
+        <span>🎪 社團報名與點名混亂</span>
+        <span>🛵 校園機車停車位難找</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 練習單與教材 -->
+  <section class="blk" id="materials">
+    <h2>✏️ 練習單與教材下載</h2>
+    <div class="entries">
+      <div class="card">
+        <h3 style="font-size:15px;color:var(--primary)">🟢 線上互動練習單・主要<span class="tag" style="background:var(--ok-bg);color:#065F46;margin-left:8px">自動檢查串接</span></h3>
+        <p style="font-size:12.5px;color:var(--muted);line-height:1.7;margin-top:6px">直接在網頁上填 IPO 架構表：自動檢查「O 是否含數字」與「O→I 是否接上」、內建 AI 提示詞產生器與決策紀錄表，完成後一鍵送出練習紀錄（不計分），也能直接列印或存 PDF。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <a class="btn btn-primary" href="ipo-worksheet.html">開始練習 →</a>
+          <a class="btn btn-ghost" href="ipo-worksheet.html?blank=1" target="_blank" rel="noopener">🖨 列印空白練習單</a>
+        </div>
+        <p class="note">送出的內容只用於課堂教學診斷，<b>不列入學期成績</b>。</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:15px;color:var(--primary)">🟡 教材下載・備援<span class="tag" style="background:var(--warn-bg);color:#92400E;margin-left:8px">教案／簡報／影片</span></h3>
+        <p style="font-size:12.5px;color:var(--muted);line-height:1.7;margin-top:6px">網路不穩、要離線備課或現場發紙本時使用，內容與本頁一致。</p>
+        <div class="mirror" id="docs">
+          <a href="assets/doc/mindmap-ipo-lesson-plan.docx" download data-chk>
+            <span class="badge" style="background:var(--accent-soft);color:var(--primary)">教師備課</span>
+            <b>⬇ 教案 DOCX</b><span>30 分鐘完整教學流程與評量規準</span></a>
+          <a href="assets/doc/mindmap-ipo-slides-30min.pptx" download data-chk>
+            <span class="badge" style="background:var(--accent-soft);color:var(--primary)">課堂投影</span>
+            <b>⬇ 簡報 PPTX（14 頁）</b><span>含教師講述備忘稿</span></a>
+          <a href="assets/video/mindmap-ipo-120s.mp4" download data-chk>
+            <span class="badge" style="background:var(--soft);color:var(--muted)">離線播放</span>
+            <b>⬇ 教學影片 MP4</b><span>120 秒・1080p・含旁白字幕</span></a>
+          <a href="https://youtu.be/RgvnGZE6dMY" target="_blank" rel="noopener">
+            <span class="badge" style="background:#FEE2E2;color:#B91C1C">線上觀看</span>
+            <b>▶ YouTube 影片</b><span>youtu.be/RgvnGZE6dMY</span></a>
+        </div>
+        <h3 style="font-size:14px;color:var(--primary);margin-top:16px">🌐 平台入口（兩站內容一致）</h3>
+        <div class="mirror">
+          <a href="https://ai-empower-hub.pages.dev/mindmap-ipo.html">
+            <span class="badge" style="background:var(--ok-bg);color:#065F46">主要平台</span>
+            <b>AI 賦能教學 Hub 正式站</b><span>ai-empower-hub.pages.dev</span></a>
+          <a href="https://pjkuo.github.io/ai-empower/mindmap-ipo.html">
+            <span class="badge" style="background:var(--warn-bg);color:#92400E">備援平台</span>
+            <b>GitHub Pages 備援站</b><span>pjkuo.github.io/ai-empower</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 下一步 -->
+  <section class="blk">
+    <div class="next">
+      <h2>🎨 學會了？把同一套方法帶進你的專題</h2>
+      <p>智慧專題創作平台的步驟 ①②，就是你剛剛在紙上做過的事：🪄 一鍵生成心智圖、✨ IPO 自動補充說明——AI 幫你起草，但每一格都由你檢查、你決定。接著往 Python、簡報、影音一路做完，一個專題就成形了。</p>
+      <div class="cta">
+        <a href="https://pjkuo.github.io/AI-empower-platform/">🚀 進入智慧專題創作平台 →</a>
+        <a class="ghost" href="https://pjkuo.github.io/IPO_Spliter/">IPO 拆解器（構想 → 架構）</a>
+        <a class="ghost" href="https://pjkuo.github.io/mind2IPO2python_AI/">心智圖 → Python 工作台</a>
+      </div>
+    </div>
+    <p class="note" style="text-align:right">教師端：練習紀錄以 <code>kind=ipopractice</code> 進入評量資料庫，可於 <a href="console.html">教師工作台</a> 查閱；本單元教材原始檔見上方下載區。</p>
+  </section>
+
+  <footer class="footer">
+    國立屏東科技大學 資訊管理系 · 郭博仁（Paul Kuo）<br>
+    新生必學運算思維基礎能力單元：心智圖 × IPO。練習紀錄僅用於教學診斷，不列入學期成績。
+  </footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+/* 教材備援下載：檔案不存在（HEAD ≥ 400）就自動隱藏該磁貼 */
+Array.prototype.forEach.call(document.querySelectorAll('#docs a[data-chk]'),function(a){
+  fetch(a.getAttribute('href'),{method:'HEAD',cache:'no-store'}).then(function(r){
+    if(!r.ok){ a.classList.add('hide'); }
+  }).catch(function(){ /* 離線時保留連結 */ });
+});
+/* 站內備援影片：不存在就隱藏整個 fallback 區塊 */
+fetch('assets/video/mindmap-ipo-120s.mp4',{method:'HEAD',cache:'no-store'}).then(function(r){
+  if(!r.ok){ var f=document.getElementById('vFallback'); if(f) f.classList.add('hide'); }
+}).catch(function(){});
+/* 複製提示詞 */
+var btn=document.getElementById('btnCopyPrompt');
+if(btn) btn.addEventListener('click',function(){
+  var t=document.getElementById('aiPrompt').textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){
+    btn.textContent='✅ 已複製，貼給你的 AI 吧'; setTimeout(function(){btn.textContent='📋 複製提示詞範本';},2200);
+  }).catch(function(){
+    var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); btn.textContent='✅ 已複製'; }catch(e){ btn.textContent='請手動選取複製'; }
+    ta.remove(); setTimeout(function(){btn.textContent='📋 複製提示詞範本';},2200);
+  });
+});
+})();
+</script>
+</body>
+</html>
