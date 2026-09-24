@@ -117,7 +117,7 @@ section.blk{margin-top:var(--gap)}
     <p class="sub">第一次使用？照著做：</p>
     <table class="data">
       <tr><th style="width:56px">步驟</th><th>做什麼</th></tr>
-      <tr><td>1</td><td>在上方「我是誰」小卡填<b>學號後 4 碼</b>與<b>班級</b>（跟你作答評量時用的同一組）。</td></tr>
+      <tr><td>1</td><td>在上方「我是誰」小卡填<b>學號後 4 碼</b>與<b>班級</b>（兩者都必填，跟你作答評量時用的同一組）。班級依學院分組下拉；找不到就選「其他系（自行輸入）」打關鍵字，例如「資管」「車輛」「環工一A」。</td></tr>
       <tr><td>2</td><td>按「🔍 查詢我的學習」。</td></tr>
       <tr><td>3</td><td>看每週趨勢與建議，弱的單元點「去練習」直接補強。</td></tr>
     </table>
@@ -231,10 +231,20 @@ var DATA=null, IS_DEMO=false, IS_STALE=false;
 function setMsg(t){ $("#qMsg").textContent=t||""; }
 function showErr(t){ var e=$("#vErr"); e.textContent=t; e.classList.add("show"); }
 function clearErr(){ var e=$("#vErr"); e.textContent=""; e.classList.remove("show"); }
+/* 2026-09-24：查詢前先在本機檢查學號＋班級；缺任一項直接提示補填，不呼叫 me API
+   （以前缺班級會打到後端回 need cls，被顯示成「暫時連不上雲端」，學生誤以為斷線）。 */
+function needIdentity(id){
+  var what=(!id||!id.sid)?"學號後 4 碼與班級":"班級";
+  var msg="還缺"+what+"——請在上方「我是誰」小卡補填（跟作答評量時同一組），再按查詢。";
+  setMsg("↑ 請先補填"+what);
+  showErr(msg);
+  $("#vLoad").classList.remove("on"); $("#vMain").hidden=true; $("#vEmpty").hidden=false;
+  try{ if(window.AEId&&AEId.prompt) AEId.prompt(msg); }catch(e){}
+}
 function query(){
   clearErr();
   var id=identity();
-  if(!id){ setMsg("↑ 請先在小卡填學號後 4 碼與班級"); return; }
+  if(!id||!id.sid||!String(id.cls||"").trim()){ needIdentity(id); return; }
   var u=gasUrl();
   if(!u){ showErr("尚未設定雲端網址（cc-cloud-url）。"); return; }
   $("#vEmpty").hidden=true; $("#vMain").hidden=true; $("#vLoad").classList.add("on"); setMsg("");
@@ -248,7 +258,8 @@ function query(){
       if(!j||!j.ok){
         var er=String((j&&j.error)||"讀取失敗");
         if(/unknown action|bad action/i.test(er)) throw new Error("__NOME__");
-        throw new Error(er);
+        if(/^(need|bad) (sid|cls)$/i.test(er)) throw new Error("__INPUT__:"+er);   /* 參數問題：伺服器有正常回應，不是斷線 */
+        throw new Error("__API__:"+er);                                             /* 後端其他錯誤（no records sheet / bad header…） */
       }
       IS_DEMO=false; IS_STALE=false; DATA=j;
       try{ localStorage.setItem(CACHE_KEY,JSON.stringify({sid:id.sid,cls:id.cls||"",at:new Date().toISOString(),data:j})); }catch(e){}
@@ -259,13 +270,28 @@ function query(){
       $("#vLoad").classList.remove("on");
       var cached=null;
       try{ var c=JSON.parse(localStorage.getItem(CACHE_KEY)||"null"); if(c&&c.sid===id.sid) cached=c; }catch(e2){}
-      if(String(e&&e.message)==="__NOME__"){
+      var em=String(e&&e.message||e);
+      if(em==="__NOME__"){
         showErr("後端尚未啟用「me」查詢（請老師依 gas/me-patch.gs 更新 Apps Script 後重新部署）。你可以先開示範模式看畫面。");
         $("#vEmpty").hidden=false; return;
       }
+      if(em.indexOf("__INPUT__:")===0){   /* 學號／班級沒送到或格式不符 → 資料未填完整，不是斷線 */
+        var code=em.slice(10).toLowerCase();
+        var what=/cls/.test(code)?"班級":"學號後 4 碼";
+        var msg="資料未填完整："+what+(/^bad/.test(code)?"格式不符":"沒有送出")+"（伺服器回應 "+esc(code)+"）。請在上方「我是誰」小卡補填後再查詢。";
+        showErr(msg); setMsg("↑ 請補填"+what);
+        $("#vEmpty").hidden=false;
+        try{ if(window.AEId&&AEId.prompt) AEId.prompt(msg); }catch(e3){}
+        return;
+      }
+      if(em.indexOf("__API__:")===0){
+        showErr("後端回報錯誤（"+esc(em.slice(8))+"），請截圖告知老師。"); $("#vEmpty").hidden=false; return;
+      }
       if(cached){ IS_STALE=true; IS_DEMO=false; DATA=cached.data; render();
         $("#staleNote").innerHTML='<span class="stale">⚠ 目前離線／連線失敗，顯示 '+esc(fmtDT(new Date(cached.at)))+' 的快取資料。</span>'; return; }
-      showErr("暫時連不上雲端（"+esc(String(e&&e.message||e))+"），請稍後再試。");
+      /* 只有網路／逾時／HTTP 5xx／非 JSON 回應才算「連不上雲端」 */
+      var why=(e&&e.name==="AbortError")?"逾時 15 秒":em;
+      showErr("暫時連不上雲端（"+esc(why)+"），請確認網路後稍後再試。");
       $("#vEmpty").hidden=false;
     });
 }
