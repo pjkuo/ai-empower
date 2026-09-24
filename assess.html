@@ -133,18 +133,22 @@ function load(){
   }
   render(null); /* 先渲染清單，不等雲端 */
   var id=(window.AEId&&AEId.get())||null;
-  if(!id||!id.sid){ $("asNote").textContent="填上方身分後，完成狀態會自動顯示。"; return; }
+  if(!id||!id.sid){ $("asNote").textContent="填上方身分（學號後 4 碼＋班級）後，完成狀態會自動顯示。"; return; }
+  /* 2026-09-24：缺班級不打 me API（後端會回 need cls），直接提示補填 */
+  if(!String(id.cls||"").trim()){ $("asNote").textContent="↑ 還缺班級——請在上方身分小卡補填，完成狀態才查得到。"; return; }
   var m=document.querySelector('meta[name="cc-cloud-url"]');
   var u=m?m.getAttribute("content"):"";
   if(!/^https?:/.test(u)) return;
   $("asNote").textContent="完成狀態查詢中…";
   fetch(u+"?action=me&sid="+encodeURIComponent(id.sid)+"&cls="+encodeURIComponent(id.cls||""))
-    .then(function(r){return r.json();})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json();})
     .then(function(j){
-      if(j&&j.ok&&j.records){ render(statusFromRecords(j.records)); $("asNote").textContent="完成狀態依你的雲端紀錄自動更新。"; }
-      else $("asNote").textContent="";
+      if(j&&j.ok&&j.records){ render(statusFromRecords(j.records)); $("asNote").textContent="完成狀態依你的雲端紀錄自動更新。"; return; }
+      var er=String((j&&j.error)||"");
+      if(/^(need|bad) (sid|cls)$/i.test(er)){ $("asNote").textContent="身分未填完整（"+(/cls/i.test(er)?"班級":"學號")+"），請在上方身分小卡按「修改」補填。"; return; }
+      $("asNote").textContent=er?"後端回報錯誤（"+er+"），僅顯示清單。":"";
     })
-    .catch(function(){ $("asNote").textContent="（目前離線，僅顯示清單）"; });
+    .catch(function(){ $("asNote").textContent="（暫時連不上雲端，僅顯示清單）"; });
 }
 document.addEventListener("ae:identity",load);
 window.addEventListener("DOMContentLoaded",load);
