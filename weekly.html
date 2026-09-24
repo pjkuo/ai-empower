@@ -117,7 +117,7 @@ section.blk{margin-top:var(--gap)}
     <p class="sub">第一次使用？照著做：</p>
     <table class="data">
       <tr><th style="width:56px">步驟</th><th>做什麼</th></tr>
-      <tr><td>1</td><td>在上方「我是誰」小卡填<b>學號後 4 碼</b>與<b>班級</b>（兩者都必填，跟你作答評量時用的同一組）。班級依學院分組下拉；找不到就選「其他系（自行輸入）」打關鍵字，例如「資管」「車輛」「環工一A」。</td></tr>
+      <tr><td>1</td><td>在上方「我是誰」小卡填<b>學號後 4 碼</b>（跟你作答評量時用的同一組）與班級。班級選錯也沒關係——查詢時會依學號自動對到你作答的班級，對不上時才會請你指定。</td></tr>
       <tr><td>2</td><td>按「🔍 查詢我的學習」。</td></tr>
       <tr><td>3</td><td>看每週趨勢與建議，弱的單元點「去練習」直接補強。</td></tr>
     </table>
@@ -163,7 +163,7 @@ section.blk{margin-top:var(--gap)}
 
   <footer class="footer">
     國立屏東科技大學 資訊管理系 · 郭博仁（Paul Kuo）<br>
-    本頁只查詢「你自己」的評量紀錄與全班去識別化統計；查詢需要學號後 4 碼＋班級，未儲存任何密碼。
+    本頁只查詢「你自己」的評量紀錄與全班去識別化統計；查詢以學號後 4 碼為主、班級為輔，未儲存任何密碼。
   </footer>
 </main>
 
@@ -225,32 +225,41 @@ function weekTick(i){ /* 圖表刻度：開學前的週以該週週一日期呈�
 }
 
 /* ================= 狀態 ================= */
-var DATA=null, IS_DEMO=false, IS_STALE=false;
+var DATA=null, IS_DEMO=false, IS_STALE=false, QCLS="";   /* QCLS＝本次實際送出的班級（可能為空） */
 
 /* ================= 查詢 ================= */
 function setMsg(t){ $("#qMsg").textContent=t||""; }
 function showErr(t){ var e=$("#vErr"); e.textContent=t; e.classList.add("show"); }
 function clearErr(){ var e=$("#vErr"); e.textContent=""; e.classList.remove("show"); }
-/* 2026-09-24：查詢前先在本機檢查學號＋班級；缺任一項直接提示補填，不呼叫 me API
-   （以前缺班級會打到後端回 need cls，被顯示成「暫時連不上雲端」，學生誤以為斷線）。 */
+/* 2026-09-24（v3.6 學號為主、班級為輔）：查詢只需要學號；班級交給後端依學號自動對班
+   （後端 me API v3.6：cls 選填——對不上就依學號找出作答班級；後 4 碼撞號時回 ambiguous 請學生指定）。
+   仍相容舊後端：舊版回 need cls 時提示補填班級，不會被誤判成斷線。 */
+var TEST_CLS=/^(test|測試|示範|demo)$/i;   /* 這些班級名在教師週報會被當測試資料排除，查詢時順帶提醒 */
 function needIdentity(id){
-  var what=(!id||!id.sid)?"學號後 4 碼與班級":"班級";
-  var msg="還缺"+what+"——請在上方「我是誰」小卡補填（跟作答評量時同一組），再按查詢。";
-  setMsg("↑ 請先補填"+what);
+  var msg="還缺學號後 4 碼——請在上方「我是誰」小卡填入（跟作答評量時同一組），再按查詢。";
+  setMsg("↑ 請先填學號後 4 碼");
   showErr(msg);
   $("#vLoad").classList.remove("on"); $("#vMain").hidden=true; $("#vEmpty").hidden=false;
   try{ if(window.AEId&&AEId.prompt) AEId.prompt(msg); }catch(e){}
 }
-function query(){
+/* 把後端對到的班級寫回身分小卡（AEId 會觸發 ae:identity → 自動重查） */
+function adoptClass(cls){
+  var id=identity(); if(!id||!cls) return;
+  var col=""; try{ var mc=window.AEId&&AEId.matchClass?AEId.matchClass(cls):null; if(mc){ cls=mc.name; col=mc.college; } }catch(e){}
+  if(window.AEId&&AEId.set){ AEId.set({sid:id.sid,cls:cls,col:col}); }
+  else{ try{ localStorage.setItem("ae.identity.v1",JSON.stringify({sid:id.sid,cls:cls,ts:new Date().toISOString()})); }catch(e2){} query(cls); }
+}
+function query(clsOverride){
   clearErr();
   var id=identity();
-  if(!id||!id.sid||!String(id.cls||"").trim()){ needIdentity(id); return; }
+  if(!id||!id.sid){ needIdentity(id); return; }
+  var cls=(typeof clsOverride==="string")?clsOverride:String(id.cls||"").trim();
   var u=gasUrl();
   if(!u){ showErr("尚未設定雲端網址（cc-cloud-url）。"); return; }
   $("#vEmpty").hidden=true; $("#vMain").hidden=true; $("#vLoad").classList.add("on"); setMsg("");
   var ctl=("AbortController" in window)?new AbortController():null;
   var tm=ctl?setTimeout(function(){ctl.abort();},15000):0;
-  fetch(u+(u.indexOf("?")>0?"&":"?")+"action=me&sid="+encodeURIComponent(id.sid)+"&cls="+encodeURIComponent(id.cls||""),
+  fetch(u+(u.indexOf("?")>0?"&":"?")+"action=me&sid="+encodeURIComponent(id.sid)+"&cls="+encodeURIComponent(cls),
         ctl?{signal:ctl.signal}:{})
     .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
     .then(function(j){
@@ -261,8 +270,9 @@ function query(){
         if(/^(need|bad) (sid|cls)$/i.test(er)) throw new Error("__INPUT__:"+er);   /* 參數問題：伺服器有正常回應，不是斷線 */
         throw new Error("__API__:"+er);                                             /* 後端其他錯誤（no records sheet / bad header…） */
       }
-      IS_DEMO=false; IS_STALE=false; DATA=j;
-      try{ localStorage.setItem(CACHE_KEY,JSON.stringify({sid:id.sid,cls:id.cls||"",at:new Date().toISOString(),data:j})); }catch(e){}
+      IS_DEMO=false; IS_STALE=false; DATA=j; QCLS=cls;
+      if(j.ambiguous){ $("#vLoad").classList.remove("on"); renderAmbiguous(j,id); return; }
+      try{ localStorage.setItem(CACHE_KEY,JSON.stringify({sid:id.sid,cls:cls,at:new Date().toISOString(),data:j})); }catch(e){}
       render();
     })
     .catch(function(e){
@@ -279,6 +289,7 @@ function query(){
         var code=em.slice(10).toLowerCase();
         var what=/cls/.test(code)?"班級":"學號後 4 碼";
         var msg="資料未填完整："+what+(/^bad/.test(code)?"格式不符":"沒有送出")+"（伺服器回應 "+esc(code)+"）。請在上方「我是誰」小卡補填後再查詢。";
+        if(code==="need cls") msg="後端仍是舊版（需要班級才能查）：請在小卡選你作答時的班級後再查詢；老師更新 gas/me-patch.gs v3.6 後即可只憑學號查詢。";
         showErr(msg); setMsg("↑ 請補填"+what);
         $("#vEmpty").hidden=false;
         try{ if(window.AEId&&AEId.prompt) AEId.prompt(msg); }catch(e3){}
@@ -408,23 +419,59 @@ function render(){
   $("#recentTbl").innerHTML=rrows;
   $("#metaLine").textContent=(IS_DEMO?"【示範資料】":"")+"共 "+recs.length+" 筆紀錄｜資料時間 "+(j.at?fmtDT(new Date(j.at)):fmtDT(new Date()))+"｜新作答約 1 分鐘後入庫";
 
-  /* --- 查無紀錄時的診斷提示（把「靜默 0 筆」變成可行動的說明） --- */
+  /* --- 查無紀錄／自動對班的診斷提示（把「靜默 0 筆」變成可行動的說明） --- */
+  var qid=identity()||{};
   if(IS_STALE){ /* 離線快取：保留 catch 內已寫入的 staleNote */ }
   else if(!IS_DEMO && recs.length===0){
-    var qid=identity()||{};
-    $("#staleNote").innerHTML=
-      '<div class="stale" style="display:block;line-height:1.7">'+
-      '查無「<b>'+esc(qid.sid||"?")+'</b>／<b>'+esc(qid.cls||"未填班級")+'</b>」的紀錄。可能原因：'+
-      '① 班級名稱與作答時不一致（請用小卡「修改」重選你上課的班級）；'+
-      '② 學號後 4 碼輸入錯誤；'+
-      '③ 剛作答完，資料約 1 分鐘後入庫，可按「⟳ 更新」再試。'+
-      '</div>';
+    var html;
+    if(j.reason==="no-sid"){   /* v3.6 後端：整個資料庫（所有班級）都沒有這個學號 → 問題在學號，不在班級 */
+      html='整個資料庫（<b>所有班級</b>）都沒有學號「<b>'+esc(qid.sid||"?")+'</b>」的紀錄——這不是班級填錯。可能原因：'+
+        '① 作答時用的學號不是這組：<b>IOC 模擬平台有自己的學號欄位</b>，請到那裡確認你填的後 4 碼；'+
+        '② 學號後 4 碼打錯（請用小卡「修改」重填）；'+
+        '③ 剛作答完，資料約 1 分鐘後入庫，可按「⟳ 更新」再試。';
+    } else {
+      html='查無「<b>'+esc(qid.sid||"?")+'</b>／<b>'+esc(QCLS||qid.cls||"未填班級")+'</b>」的紀錄。可能原因：'+
+        '① 學號後 4 碼輸入錯誤；'+
+        '② 班級名稱與作答時不一致（v3.6 後端會依學號自動對班；若仍看到這則訊息，代表後端尚未更新，請用小卡「修改」重選作答時的班級）；'+
+        '③ 剛作答完，資料約 1 分鐘後入庫，可按「⟳ 更新」再試。';
+    }
+    $("#staleNote").innerHTML='<div class="stale" style="display:block;line-height:1.7">'+html+'</div>';
+  }
+  else if(!IS_DEMO && (j.resolvedBy==="sid"||j.resolvedBy==="sid-fallback") && j.clsHint){
+    /* v3.6：班級沒填或填錯，後端已依學號對到作答班級 → 提示並可一鍵回填小卡 */
+    var was=String(qid.cls||"").trim();
+    var same=was && was.replace(/[\s　]+/g,"").toUpperCase()===String(j.clsHint).replace(/[\s　]+/g,"").toUpperCase();
+    var note=(was?'你小卡填的班級「<b>'+esc(was)+'</b>」'+(TEST_CLS.test(was)?'是測試用名稱、':'')+'與作答紀錄不符':'你的小卡還沒填班級')+
+      '，已依學號自動對到「<b>'+esc(j.clsHint)+'</b>」'+(j.reason==="unclassed"?'（作答時未填班級，故無全班對照）':'')+'。';
+    $("#staleNote").innerHTML=same?"":'<div class="stale" style="display:block;line-height:1.7">'+note+
+      ' <button type="button" id="btnAdopt" class="btn" style="font-size:11.5px;padding:3px 10px;margin-left:6px">把小卡班級改成這個</button></div>';
+    var ba=$("#btnAdopt"); if(ba) ba.addEventListener("click",function(){ adoptClass(j.clsHint); });
   }
   else { $("#staleNote").innerHTML=""; }
   $("#vLoad").classList.remove("on");
+  Array.prototype.forEach.call(document.querySelectorAll("#vMain section.blk"),function(s){ s.hidden=false; });
   $("#vEmpty").hidden=true;
   $("#vMain").hidden=false;
   setMsg((IS_DEMO?"示範模式":"查詢完成")+"（"+fmtDT(new Date())+"）");
+}
+
+/* --- v3.6：學號後 4 碼在多個班級都有紀錄（跨年級撞號）→ 只列班名與筆數，請學生指定 --- */
+function renderAmbiguous(j,id){
+  var list=(j.classes||[]).map(function(c){
+    return '<button type="button" class="btn" data-cls="'+esc(c.cls)+'" style="font-size:12px;padding:5px 12px;margin:4px 6px 0 0">'+
+      esc(c.cls)+' <small style="opacity:.75">('+esc(c.n)+' 筆)</small></button>';
+  }).join("");
+  $("#staleNote").innerHTML='<div class="stale" style="display:block;line-height:1.7">'+
+    '學號「<b>'+esc(id.sid)+'</b>」在 <b>'+(j.classes||[]).length+'</b> 個班級都有紀錄（不同年級的後 4 碼可能相同）。'+
+    (String(id.cls||"").trim()?'你小卡填的「'+esc(id.cls)+'」不在其中，':'')+'請點你上課的班級：<br>'+list+'</div>';
+  Array.prototype.forEach.call($("#staleNote").querySelectorAll("button[data-cls]"),function(b){
+    b.addEventListener("click",function(){ adoptClass(b.getAttribute("data-cls")); });
+  });
+  $("#kpis").innerHTML=""; $("#wkChart").innerHTML=""; $("#kindTbl").innerHTML=""; $("#tips").innerHTML=""; $("#recentTbl").innerHTML="";
+  $("#metaLine").textContent="";
+  Array.prototype.forEach.call(document.querySelectorAll("#vMain section.blk"),function(s){ s.hidden=true; });   /* 指定班級前先不顯示空區塊 */
+  $("#vEmpty").hidden=true; $("#vMain").hidden=false;
+  setMsg("請先指定班級（"+fmtDT(new Date())+"）");
 }
 
 /* --- 每週趨勢 SVG（零相依） --- */

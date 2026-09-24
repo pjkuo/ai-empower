@@ -1,6 +1,7 @@
 /* ============================================================
-   ai-empower 後端 v3.5 追加：學生自查 API「action=me」（me-patch）
+   ai-empower 後端 v3.6 追加：學生自查 API「action=me」（me-patch）
    2026-09-07 首版 · 2026-09-21 v3.3 班級正規化 · v3.4 得分率對齊 pctOf · v3.5 學號全碼→後4碼、無年級資管寫法歸大一
+   · 2026-09-24 v3.6 學號為主、班級為輔（cls 改選填；自動對班／多班時要求指定）
 
    ── 安裝（一次，約 2 分鐘）──────────────────────────────
    1. 開啟 Apps Script 專案（試算表「ai-empower 評量資料庫」→ 擴充功能 → Apps Script）。
@@ -14,12 +15,26 @@
    5. 驗證：瀏覽器開
         <exec 網址>?action=me&sid=6010&cls=MIS
       應回 {"ok":true,...}。前端 weekly.html 即可查詢。
+      v3.6 另可驗：<exec 網址>?action=me&sid=6010（不帶 cls）→ 應回 resolvedBy:"sid" 且 records 非空。
 
    ── 行為 ────────────────────────────────────────────────
-   GET ?action=me&sid=<學號後4碼>&cls=<班級>
+   GET ?action=me&sid=<學號後4碼>[&cls=<班級>]
    只回傳「該 sid＋該班」自己的紀錄（讀 records 長表；60 秒快取），
    外加同班各 kind 的去識別化統計（人數、中位數、平均得分率），
    以及 cfg 工作表的 semStart（若有設，格式 YYYY-MM-DD，週次基準）。
+
+   ★ v3.6 學號為主、班級為輔：班級名並非密碼，也驗不了身分——它唯一的功能是「命名空間」：
+     學號後 4 碼會跨年級重複（實測 6015/6045/6046/6052 同時出現在資管一A 與資管三A）。
+     因此 cls 改為「選填」，比對順序：
+       ① 有帶 cls 且該班桶有此學號的紀錄 → 照舊（resolvedBy:"cls"）。
+       ② 沒帶 cls，或帶了但該班桶查無此學號 → 以學號掃全表，統計此學號出現在哪些班桶：
+          ・只有 1 個班桶 → 直接用該班（resolvedBy:"sid"／"sid-fallback"），回 clsHint＝該班最常見的原始寫法，
+            前端可提示學生把小卡班級改正；
+          ・≥2 個班桶（後 4 碼撞號）→ 回 ambiguous:true＋classes:[{cls,n,last}]（只有班名與筆數，無任何明細），
+            前端請學生指定班級後再查；
+          ・0 個班桶 → records:[]＋reason:"no-sid"（整個資料庫沒有這個學號），前端可給出與「班級不符」不同的說明。
+     未填班級（cls 為空）的紀錄不算一個班桶，但一律併入本人 records（不進全班統計）。
+     隱私邊界不變：任何情況下都只回「該 sid」自己的明細；班級統計仍是去識別化。
 
    ★ v3.3 班級正規化：各子平台寫入的班級字串不一致（IOC 寫「資管一A 計算機概論」、
      專題 studio 寫「MIS」/「IM」、課前評量寫全名），導致同一位學生的紀錄散在不同 cls，
@@ -50,10 +65,10 @@ function meAction_(e) {
   var sid = String(p.sid || '').trim();
   var cls = String(p.cls || '').trim();
   if (!/^[0-9A-Za-z]{2,12}$/.test(sid)) return meJson_({ ok: false, error: 'bad sid' });
-  if (!cls) return meJson_({ ok: false, error: 'need cls' });
+  // v3.6：cls 改為選填（不再回 need cls）；LOADTEST 仍拒絕
   if (cls.toUpperCase() === 'LOADTEST') return meJson_({ ok: false, error: 'bad cls' });
 
-  var ck = 'me:' + meCanonCls_(cls) + ':' + meNormSid_(sid);  // 快取鍵改用 canonical，避免同班不同寫法各存一份
+  var ck = 'me:' + meCanonCls_(cls) + ':' + meNormSid_(sid);  // 快取鍵改用 canonical，避免同班不同寫法各存一份（cls 空＝'me::sid'）
   try {
     var hit = CacheService.getScriptCache().get(ck);
     if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -73,18 +88,48 @@ function meAction_(e) {
   if (col.sid < 0 || col.kind < 0) return meJson_({ ok: false, error: 'bad header' });
 
   var qSid = meNormSid_(sid), qCls = meCanonCls_(cls);
+
+  /* ★ v3.6 對班：先掃「此學號出現在哪些班桶」（只讀 sid／cls 兩欄，不碰明細） */
+  var buckets = meBuckets_(vals, col, qSid);           // {canon: {n, last, raw:{原始寫法:次數}}}
+  var resolvedBy = 'cls', reason = '';
+  if (!qCls || !buckets[qCls]) {
+    var keys = Object.keys(buckets).filter(function (k) { return k !== ''; });   // 未填班級的紀錄不算一個班桶
+    if (keys.length === 1) {                            // 唯一班桶 → 直接採用
+      qCls = keys[0]; resolvedBy = cls ? 'sid-fallback' : 'sid';
+    } else if (keys.length >= 2) {                      // 後 4 碼撞號 → 請學生指定（只回班名與筆數）
+      var out2 = meEmpty_(sid, cls, ss);
+      out2.ambiguous = true; out2.reason = 'ambiguous'; out2.resolvedBy = 'none';
+      out2.classes = keys.map(function (k) {
+        return { cls: meRawName_(buckets[k]), n: buckets[k].n, last: buckets[k].last };
+      }).sort(function (a, b) { return b.n - a.n; });
+      var b2 = JSON.stringify(out2);
+      try { CacheService.getScriptCache().put(ck, b2, 60); } catch (eP2) {}
+      return ContentService.createTextOutput(b2).setMimeType(ContentService.MimeType.JSON);
+    } else if (buckets['']) {                           // 只有「未填班級」的紀錄 → 仍回本人明細，無班級統計
+      qCls = ''; resolvedBy = 'sid'; reason = 'unclassed';
+    } else {                                            // 整個資料庫沒有這個學號
+      var out0 = meEmpty_(sid, cls, ss);
+      out0.reason = 'no-sid'; out0.resolvedBy = 'none';
+      var b0 = JSON.stringify(out0);
+      try { CacheService.getScriptCache().put(ck, b0, 60); } catch (eP0) {}
+      return ContentService.createTextOutput(b0).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  var clsHint = buckets[qCls] ? meRawName_(buckets[qCls]) : cls;
+
   var mine = [], agg = {}; // agg[kind] = {by:{sid:[..]}, all:[]}
   for (var i = 1; i < vals.length; i++) {
     var row = vals[i];
     var rCls = meCanonCls_(row[col.cls]);
-    if (rCls !== qCls) continue;
     var rSid = meNormSid_(row[col.sid]);
+    var unclassedMine = (rCls === '' && rSid === qSid);   // v3.6：本人「未填班級」的紀錄一律併入（不進全班統計）
+    if (rCls !== qCls && !unclassedMine) continue;
     var kind = String(row[col.kind] || 'misc');
     var det = col.detail >= 0 ? String(row[col.detail] || '') : '';
     var isAI = det.indexOf('"action":"ai"') >= 0;
     var score = row[col.score], max = row[col.max];
 
-    if (!isAI) { // 全班去識別化統計（僅計分紀錄）
+    if (!isAI && rCls === qCls && qCls !== '') { // 全班去識別化統計（僅計分紀錄；未填班級者不計）
       var pct = mePct_(score, max);            // v3.4：與前端 pctOf 同一套規則
       if (pct !== null) {
         var a = agg[kind] || (agg[kind] = { by: {}, all: [] });
@@ -119,6 +164,7 @@ function meAction_(e) {
 
   var out = {
     ok: true, sid: sid, cls: cls, records: mine, 'class': classStats,
+    resolvedBy: resolvedBy, clsHint: clsHint, reason: reason,   // v3.6：對班結果（cls 仍原樣回傳，舊前端不受影響）
     cfg: { semStart: meCfg_(ss, 'semStart') }, at: new Date().toISOString()
   };
   var body = JSON.stringify(out);
@@ -132,6 +178,29 @@ function meJson_(o) {
 }
 function meEmpty_(sid, cls, ss) {
   return { ok: true, sid: sid, cls: cls, records: [], 'class': {}, cfg: { semStart: meCfg_(ss, 'semStart') }, at: new Date().toISOString() };
+}
+/* ★ v3.6：此學號出現在哪些班桶（canonical）；每桶記筆數、最近時間、各原始寫法次數 */
+function meBuckets_(vals, col, qSid) {
+  var b = {};
+  for (var i = 1; i < vals.length; i++) {
+    var row = vals[i];
+    if (meNormSid_(row[col.sid]) !== qSid) continue;
+    var rawCls = String(row[col.cls] == null ? '' : row[col.cls]).trim();
+    var k = meCanonCls_(rawCls);
+    if (k.toUpperCase() === 'LOADTEST') continue;
+    var e = b[k] || (b[k] = { n: 0, last: '', raw: {} });
+    e.n++;
+    var ts = col.ts >= 0 ? meISO_(row[col.ts]) : '';
+    if (ts > e.last) e.last = ts;
+    e.raw[rawCls] = (e.raw[rawCls] || 0) + 1;
+  }
+  return b;
+}
+/* 班桶最常見的原始寫法（給前端顯示／回填小卡用） */
+function meRawName_(bucket) {
+  var best = '', n = -1;
+  Object.keys(bucket.raw).forEach(function (r) { if (bucket.raw[r] > n) { n = bucket.raw[r]; best = r; } });
+  return best;
 }
 /* ★ v3.4 得分率（與 weekly.html 的 pctOf 逐字對齊）：
    score>max → 視為「百分比格式」（IOC warm/subquiz/live/xr/vidq：score＝%、max＝題數），≤100 才採計；
