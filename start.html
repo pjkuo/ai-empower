@@ -170,9 +170,11 @@ function fromCloud(sid,cls){
   var u=m?m.getAttribute("content"):"";
   if(!/^https?:/.test(u)) return Promise.resolve(null);
   return fetch(u+"?action=me&sid="+encodeURIComponent(sid)+"&cls="+encodeURIComponent(cls||""))
-    .then(function(r){return r.json();})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json();})
     .then(function(j){
-      if(!j||!j.ok||!j.records) return null;
+      /* 2026-09-24：區分「參數未填完整」與「連不上雲端」 */
+      if(!j||!j.ok){ var er=String((j&&j.error)||""); return {err:/^(need|bad) (sid|cls)$/i.test(er)?"input":"api",msg:er}; }
+      if(!j.records) return null;
       var ps=j.records.filter(function(r){return r.kind==="presurvey";});
       if(!ps.length) return null;
       var last=ps[ps.length-1], dims=null;
@@ -180,7 +182,7 @@ function fromCloud(sid,cls){
       var R=parseFloat(last.score); if(!isFinite(R)) R=null;
       return {R:R,dims:dims,src:"來源：雲端紀錄（"+String(last.ts||"").slice(0,10)+"）"};
     })
-    .catch(function(){return null;});
+    .catch(function(e){return {err:"net",msg:String(e&&e.message||e)};});
 }
 function go(){
   if(DEMO){
@@ -188,11 +190,19 @@ function go(){
     render(sc.R,sc.dims,"示範資料（?demo=1）"); return;
   }
   var id=(window.AEId&&AEId.get())||null;
-  if(!id||!id.sid){ showEmpty("先在上方填學號後 4 碼＋班級。"); return; }
+  if(!id||!id.sid){ showEmpty("先在上方填學號後 4 碼＋班級。"); try{ if(window.AEId&&AEId.prompt) AEId.prompt(); }catch(e){} return; }
   var loc=fromLocal(id.sid);
   if(loc){ render(loc.R,loc.dims,loc.src); return; }
+  /* 2026-09-24：查雲端需要班級；缺班級直接提示補填，不打 me API */
+  if(!String(id.cls||"").trim()){
+    var m="還缺班級——請在上方身分小卡補填（跟作答時同一組），再按「看我的起點」。";
+    showEmpty(m); try{ if(window.AEId&&AEId.prompt) AEId.prompt(m); }catch(e2){} return;
+  }
   $("stMsg").textContent="查詢雲端中…";
   fromCloud(id.sid,id.cls).then(function(c){
+    if(c&&c.err==="input"){ var m2="身分未填完整（"+(/cls/i.test(c.msg)?"班級":"學號")+"），請在上方補填後再查。"; showEmpty(m2); try{ AEId.prompt(m2); }catch(e3){} return; }
+    if(c&&c.err==="net"){ showEmpty("暫時連不上雲端（"+c.msg+"），請稍後再試。"); return; }
+    if(c&&c.err==="api"){ showEmpty("後端回報錯誤（"+c.msg+"），請告知老師。"); return; }
     if(c) render(c.R,c.dims,c.src);
     else showEmpty("雲端沒有你的課前評量紀錄。");
   });
