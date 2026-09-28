@@ -4,17 +4,21 @@
   command = ""
 
 # 不對外提供 repo 內的維護檔案（Apps Script 補丁、同步腳本）
+# force = true：檔案實際存在時 Netlify 預設會直接回傳檔案、忽略 redirect，必須強制
 [[redirects]]
   from = "/gas/*"
   to = "/404.html"
   status = 404
+  force = true
 
 [[redirects]]
   from = "/tools/*"
   to = "/404.html"
   status = 404
+  force = true
 
 [[redirects]]
   from = "/README.md"
   to = "/404.html"
   status = 404
+  force = true
