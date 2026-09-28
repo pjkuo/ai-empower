@@ -43,6 +43,8 @@
   opacity:0;pointer-events:none;transition:.25s}
 .topbtn.show{opacity:1;pointer-events:auto}
 @media print{.mtoc,.topbtn,.topnav,video,#video,#video+p,#video~h3{display:none}.mlayout{grid-template-columns:1fr}.mbody{box-shadow:none}}
+.mbody tr[id^="faq-"]{scroll-margin-top:70px}
+.mbody tr[id^="faq-"]:target td{background:#FEF9C3;transition:background .6s}
 </style>
 </head>
 <body>
@@ -76,12 +78,13 @@
       <a class="sub" href="#s32">3.2 教師總覽（全平台）</a>
       <a href="#s4">4　論文生成（HOTL）</a>
       <a href="#s5">5　常見問題</a>
+      <a class="sub" href="#s51">5.1 學生提問 FAQ</a>
       <a style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px" href="javascript:window.print()">🖨 列印 / 存 PDF</a>
     </nav>
 
     <article class="mbody">
       <h1>平台操作教學手冊</h1>
-      <p style="color:var(--muted);font-size:12.5px">學生操作 × 教師研究者應用（網頁版）　·　v1.2　·　國立屏東科技大學 資訊管理系</p>
+      <p style="color:var(--muted);font-size:12.5px">學生操作 × 教師研究者應用（網頁版）　·　v1.3　·　國立屏東科技大學 資訊管理系</p>
 
       <h2 id="video">🎬 教學影片</h2>
       <p>三分鐘看完四大功能實際操作。中文旁白版與英文旁白（中文字幕）版內容相同，擇一觀看即可。</p>
@@ -223,6 +226,37 @@
         <tr><td>生成段落可直接投稿？</td><td>不建議——數字可信，文字須逐句確認潤飾，這正是 HOTL 流程的意義。文責在人。</td></tr>
         <tr><td>前後測配對 0 人？</td><td>檢查兩階段學號是否一致、stage 是否為「前測／後測」，且至少 2 人完成前後測；結果卡的未配對名單可幫你追人。</td></tr>
       </table>
+      <!-- FAQ-SYNC:START -->
+      <h3 id="s51">5.1　學生常見問題（課堂／Moodle 提問整理）</h3>
+      <p style="color:var(--muted);font-size:12px">由老師從課堂與 Moodle 提問整理，每週批次更新　·　最後同步 2026-09-28　·　共 6 題</p>
+      <p style="margin:14px 0 4px;font-weight:700;color:var(--primary)">🔐 登入/帳號</p>
+      <table>
+      <tr><th style="width:32%">問題</th><th>解答</th></tr>
+      <tr id="faq-5"><td><b>Q5.</b> 在電腦教室公用電腦使用平台要注意什麼？</td><td>離開前務必登出並關閉瀏覽器，不要讓瀏覽器記住帳號或班級碼。</td></tr>
+      </table>
+      <p style="margin:14px 0 4px;font-weight:700;color:var(--primary)">🤖 AI代理/班級碼</p>
+      <table>
+      <tr><th style="width:32%">問題</th><th>解答</th></tr>
+      <tr id="faq-1"><td><b>Q1.</b> AI 功能要我輸入「班級碼」，要填什麼？</td><td>輸入老師公布的班級碼 MIS2026（大寫）。AI 由老師代管，不需自備金鑰。</td></tr>
+      <tr id="faq-2"><td><b>Q2.</b> AI 回覆「今日次數已用完」怎麼辦？</td><td>每人每日上限 60 次，隔日自動重置。先整理好心智圖與 IPO 再一次提問，可節省次數。</td></tr>
+      </table>
+      <p style="margin:14px 0 4px;font-weight:700;color:var(--primary)">🐍 Python/Pyodide</p>
+      <table>
+      <tr><th style="width:32%">問題</th><th>解答</th></tr>
+      <tr id="faq-4"><td><b>Q4.</b> Python 執行按下去很久才有反應？</td><td>首次執行需在瀏覽器載入 Python 環境（Pyodide），約需數秒至數十秒；之後同一頁面執行會變快。建議使用 Chrome/Edge 最新版。</td></tr>
+      </table>
+      <p style="margin:14px 0 4px;font-weight:700;color:var(--primary)">🎬 影片/字幕</p>
+      <table>
+      <tr><th style="width:32%">問題</th><th>解答</th></tr>
+      <tr id="faq-7"><td><b>Q7.</b> 教學影片在哪裡看？</td><td>平台導覽列「▶ 影音」或短網址 <a href="https://pjkuo.github.io/yt" style="color:var(--accent)">pjkuo.github.io/yt</a>（YouTube @paulkuo4106），中文版附字幕。</td></tr>
+      </table>
+      <p style="margin:14px 0 4px;font-weight:700;color:var(--primary)">📤 作業繳交</p>
+      <table>
+      <tr><th style="width:32%">問題</th><th>解答</th></tr>
+      <tr id="faq-6"><td><b>Q6.</b> 平時成績的桌面截圖要交到哪裡？</td><td>上傳至該課程 Moodle 對應週次的作業區。</td></tr>
+      </table>
+      <div class="tip">💡 找不到你的問題？在課堂上直接問、或到 Moodle 討論區發問，老師整理後會加到這裡。</div>
+      <!-- FAQ-SYNC:END -->
       <p style="color:var(--muted);font-size:12px;margin-top:20px">Word 版手冊與教學影片請洽課程公告；平台原始碼見 GitHub（pjkuo）。</p>
     </article>
   </div>
