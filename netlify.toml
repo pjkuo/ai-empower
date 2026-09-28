@@ -1,0 +1,20 @@
+# Netlify 連動 GitHub（pjkuo/ai-empower）：純靜態站，無建置步驟，每次 push 到 main 自動部署
+[build]
+  publish = "."
+  command = ""
+
+# 不對外提供 repo 內的維護檔案（Apps Script 補丁、同步腳本）
+[[redirects]]
+  from = "/gas/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/tools/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
