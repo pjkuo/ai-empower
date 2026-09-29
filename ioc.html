@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IOC 課程模擬｜AI 賦能教學 Hub</title>
-<meta name="description" content="計算機概論模擬平台：硬體・軟體・網路三軸互動模擬、3C 拆解、虛擬組裝、即時評量與期末考，12 個模組一鍵直達。">
+<meta name="description" content="計算機概論模擬平台：硬體・軟體・網路三軸互動模擬、3C 拆解、虛擬組裝、即時評量、期中評量與期末評量，12 個模組一鍵直達。">
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/ioc.html">
 <meta name="theme-color" content="#1E3A8A">
 <meta property="og:type" content="website">
@@ -64,6 +64,19 @@ body{display:flex;flex-direction:column;min-height:100vh}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.loader .spin{animation:none}}
 .stage{position:relative}
+/* 期末評量：依公告開放（正式評量未上線前，晶片顯示提示卡、不進入任何測驗畫面） */
+.stage.final-on iframe{display:none}
+.finalbox{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:28px 16px 40px}
+.finalbox[hidden]{display:none}
+.finalbox .card{max-width:640px;width:100%;padding:22px 24px 20px}
+.finalbox .fb-tag{display:inline-block;font-size:11.5px;font-weight:800;color:#7a5b12;background:#fbf3dc;
+  border:1px solid #e0b44a;border-radius:20px;padding:3px 10px;margin-bottom:8px}
+.finalbox h2{font-size:18px;margin-bottom:8px}
+.finalbox .st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--warn);
+  background:var(--warn-bg);border-radius:8px;padding:6px 10px;margin:4px 0 12px}
+.finalbox p{font-size:13.5px;line-height:1.75;color:var(--ink);margin-bottom:10px}
+.finalbox ul{margin:0 0 14px 18px;font-size:13px;line-height:1.8;color:var(--ink)}
+.finalbox .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 </style>
 </head>
 <body>
@@ -109,6 +122,23 @@ body{display:flex;flex-direction:column;min-height:100vh}
   <iframe id="sim" title="計算機概論模擬平台（學生版）"
           src="https://pjkuo.github.io/IOC-platform/student.html"
           allow="fullscreen"></iframe>
+  <section class="finalbox" id="finalbox" hidden aria-labelledby="finalTitle">
+    <div class="card">
+      <span class="fb-tag">🏁 期末評量</span>
+      <h2 id="finalTitle">期末評量・依公告開放</h2>
+      <div class="st">⏳ 目前尚未開放</div>
+      <p>期末評量的<b>開放時間、範圍與作答方式</b>，以 Moodle 課程公告為準；開放後由此進入測驗。</p>
+      <ul>
+        <li>開放前，請依進度完成「每週單元評量」（暖身 → 互動模擬 → 講義小測）與「期中評量」。</li>
+        <li>各單元的「課後評量系統」可隨時複習錯題，作為期末準備。</li>
+      </ul>
+      <div class="acts">
+        <button type="button" class="btn btn-primary" id="finalBackBtn">← 回課程總覽</button>
+        <button type="button" class="btn btn-ghost" id="finalMidBtn">期中評量</button>
+        <a class="btn btn-ghost" href="assess.html">📋 評量中心・查看時程</a>
+      </div>
+    </div>
+  </section>
 </div>
 <div class="fallback card" id="fb">
   <h2>模擬平台載入中…</h2>
@@ -119,13 +149,20 @@ body{display:flex;flex-direction:column;min-height:100vh}
 <script>
 (function(){
   "use strict";
+  // 2026-09-29：期中→「期中評量」（內嵌 #midterm 線上期中評量）；期末考→「期末評量」（key=final）。
+  // 內嵌平台（IOC-platform student.html）沒有期末畫面，其 #exam 是「課後評量系統」——
+  // 舊版把期末考晶片指到 #exam 才會點期末看到期中；現改為顯示「依公告開放」提示卡。
   var MODULES=[
     ["overview","總覽"],["hardware","硬體"],["software","軟體"],["network","網路"],
     ["packetflow","封包流"],["repair","3C 拆解"],["lab-hub","實作中心"],["pcbuild","虛擬組裝"],
-    ["assess","即時評量"],["midterm","期中"],["exam","期末考"],["aicollab","AI 協作"]
+    ["assess","即時評量"],["midterm","期中評量"],["final","期末評量"],["aicollab","AI 協作"]
   ];
   var BASE="https://pjkuo.github.io/IOC-platform/student.html";
+  // 正式期末評量上線後，填入其網址（例 "https://pjkuo.github.io/IOC-platform/final.html"）即接上：
+  // 期末評量晶片會改為在下方載入該頁；留空＝顯示「依公告開放」提示卡。後端資料庫不需變動。
+  var FINAL_URL="";
   var box=document.getElementById("chips"), iframe=document.getElementById("sim");
+  var stage=document.querySelector(".stage"), finalbox=document.getElementById("finalbox");
   var current=(location.hash||"").replace(/^#/,"")||null;
 
   MODULES.forEach(function(m){
@@ -143,9 +180,25 @@ body{display:flex;flex-direction:column;min-height:100vh}
       if(on&&c.scrollIntoView) try{ c.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}); }catch(e){}
     });
   }
+  function hideLoader(){
+    var l=document.getElementById("loader");
+    if(l){ l.classList.add("hide"); setTimeout(function(){ if(l.parentNode) l.remove(); },450); }
+  }
+  function showFinal(on){
+    stage.classList.toggle("final-on",on);
+    finalbox.hidden=!on;
+    if(on) hideLoader();
+  }
   function go(key){
     mark(key);
     try{ history.replaceState(null,"","#"+key); }catch(e){}
+    if(key==="final"){
+      if(FINAL_URL){ showFinal(false); if(iframe.src!==FINAL_URL) iframe.src=FINAL_URL; }
+      else showFinal(true);
+      return;
+    }
+    showFinal(false);
+    if(iframe.src.indexOf(BASE)!==0){ iframe.src=BASE+"#"+key; return; }  // 曾載入期末頁 → 換回模擬平台
     // 同源（都在 pjkuo.github.io）時直接改 iframe 的 hash，不重載整頁；
     // 跨域或本機測試時退回重設 src。
     try{ iframe.contentWindow.location.hash=key; }
@@ -155,21 +208,16 @@ body{display:flex;flex-direction:column;min-height:100vh}
     var k=(location.hash||"").replace(/^#/,"");
     if(k) go(k);
   });
-  if(current) iframe.src=BASE+"#"+current;
+  document.getElementById("finalBackBtn").addEventListener("click",function(){ go("overview"); });
+  document.getElementById("finalMidBtn").addEventListener("click",function(){ go("midterm"); });
+  if(current==="final") go("final");
+  else if(current) iframe.src=BASE+"#"+current;
 
   // 載入逾時提示
   var loaded=false;
-  iframe.addEventListener("load",function(){
-    loaded=true;
-    var l=document.getElementById("loader");
-    if(l){ l.classList.add("hide"); setTimeout(function(){ l.remove(); },450); }
-  });
+  iframe.addEventListener("load",function(){ loaded=true; hideLoader(); });
   setTimeout(function(){
-    if(!loaded){
-      document.getElementById("fb").style.display="block";
-      var l=document.getElementById("loader");
-      if(l){ l.classList.add("hide"); setTimeout(function(){ l.remove(); },450); }
-    }
+    if(!loaded){ document.getElementById("fb").style.display="block"; hideLoader(); }
   },8000);
 })();
 </script>
