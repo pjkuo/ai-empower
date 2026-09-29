@@ -188,7 +188,7 @@ table.data td.sm{font-size:11px;color:var(--muted)}
 
         <div class="card" id="crossCard" style="display:none">
           <h2>跨評量對照 <span class="en">同一學號在雲端的其他評量</span></h2>
-          <p class="sub">課前準備度與後續 4C 評量、即時測驗、期末考的平均得分率並列；只顯示雲端有資料的項目。</p>
+          <p class="sub">課前準備度與後續 4C 評量、即時測驗、課後評量的平均得分率並列；只顯示雲端有資料的項目。</p>
           <div style="overflow-x:auto"><table class="data" id="crossTable"></table></div>
           <p class="hint" id="crossHint"></p>
         </div>
@@ -391,7 +391,7 @@ function renderCross(s){
   var ks=Object.keys(kinds).sort();
   if(!ks.length){ $("crossCard").style.display="none"; return; }
   $("crossCard").style.display="block";
-  var KN={assess4c:"4C 評量",quiz:"即時測驗",exam:"期末考",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"問卷",progress:"進度"};
+  var KN={assess4c:"4C 評量",quiz:"即時測驗",exam:"課後評量",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"問卷",progress:"進度"};
   var h='<thead><tr><th>學號</th><th>班級</th><th class="num">課前 R</th><th>分群</th>'+ks.map(function(k){return '<th class="num">'+(KN[k]||k)+'<br><small>平均得分率（筆數）</small></th>';}).join("")+'</tr></thead><tbody>';
   var rows=0, pairs=[];
   s.scored.forEach(function(x){ var o=cloudOthers[x.rec.sid]; if(!o) return; rows++;

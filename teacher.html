@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>教師總覽：即時與統計報表｜AI 賦能教學 Hub</title>
-<meta name="description" content="所有平台評量（課前評量、4C、即時測驗、期中期末、3C 拆解、虛擬組裝、專題、問卷）集中一頁：即時動態、各平台 KPI、跨平台逐人矩陣、前後測統計、預測力與需關注名單。">
+<meta name="description" content="所有平台評量（課前評量、4C、即時測驗、課後評量、期中評量、3C 拆解、虛擬組裝、專題、問卷）集中一頁：即時動態、各平台 KPI、跨平台逐人矩陣、前後測統計、預測力與需關注名單。">
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/teacher.html">
 <meta name="theme-color" content="#1E3A8A">
 <meta name="robots" content="noindex">
@@ -167,7 +167,7 @@ table.data td.sm{font-size:11px;color:var(--muted);white-space:nowrap}
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var all=[], timer=null, sortKey="presurvey", sortDir=-1;
-var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中考",exam:"期末考",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度"};
+var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中評量",exam:"課後評量",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度"};
 var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",exam:"#1E3A8A",repair:"#D97706",build:"#D97706",project:"#7C3AED",survey:"#DB2777",consensus:"#6B7280",progress:"#6B7280"};
 var kname=function(k){return KN[k]||k;};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -321,7 +321,7 @@ function integration(kinds,students){
   var items=[];
   items.push({ok:has("presurvey"),text:"<b>課前評量</b>"+(has("presurvey")?"已寫入雲端（kind=presurvey）。":"尚無資料：請學生從入口「課前評量」作答，送出即自動入庫。")});
   items.push({ok:has("assess4c"),text:"<b>4C 學習成效評量</b>（AICT-assess-platform）"+(has("assess4c")?"已接上。":"尚未接上：該站把 <code>COLLECT_URL</code> 改成本 Hub 的 /exec 網址，送出格式改為統一記錄 <code>{kind:\"assess4c\", sid, cls, score, max, detail:{stage:\"前測|後測\", scores:[16], se}}</code>，這一頁就會自動出現前後測 paired t。")});
-  items.push({ok:has("quiz")||has("exam")||has("midterm"),text:"<b>IOC 模擬平台</b>（即時測驗／期中／期末）"+((has("quiz")||has("exam"))?"已接上。":"尚未接上：<code>student.html</code> 的 <code>qadd()</code>／<code>addRecord()</code> 改呼叫 <code>AECloud.push({kind:\"quiz\"|\"midterm\"|\"exam\", sid, cls, score, max, detail:{scope, level, cat, items}})</code>；記得帶學號（整合案 P1-2）。")});
+  items.push({ok:has("quiz")||has("exam")||has("midterm"),text:"<b>IOC 模擬平台</b>（即時測驗／課後評量／期中評量）"+((has("quiz")||has("exam"))?"已接上。":"尚未接上：<code>student.html</code> 的 <code>qadd()</code>／<code>addRecord()</code> 改呼叫 <code>AECloud.push({kind:\"quiz\"|\"midterm\"|\"exam\", sid, cls, score, max, detail:{scope, level, cat, items}})</code>；記得帶學號（整合案 P1-2）。")});
   items.push({ok:has("repair")||has("build"),text:"<b>3C 拆解／虛擬組裝</b>"+((has("repair")||has("build"))?"已接上。":"尚未接上：完成一次拆解或組裝時以 <code>kind:\"repair\"|\"build\"</code> 記錄 <code>score/max</code>（步驟正確數）與耗時 <code>detail.durationSec</code>。")});
   items.push({ok:has("project"),text:"<b>AI 賦能學習平台（專題五步）</b>"+(has("project")?"已接上。":"尚未接上：每完成一步送 <code>kind:\"project\", score:步數, max:5, detail:{step, title}</code>，這一頁就能看到專題進度。")});
   items.push({ok:has("survey"),text:"<b>40 題學習後測問卷</b>"+(has("survey")?"已接上。":"尚未接上：送 <code>kind:\"survey\", detail:{scores:[40]}</code>，可與課前 A 向度（AI 使用）做前後比較。")});

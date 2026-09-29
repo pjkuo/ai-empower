@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>單元評量分析｜AI 賦能教學 Hub</title>
-<meta name="description" content="IOC 課程各單元評量（暖身、隨堂、講義小測、拆裝、組裝、期中期末）集中分析：單元 × 評量得分率、週次趨勢、難點與教學建議、學生 × 單元矩陣。">
+<meta name="description" content="IOC 課程各單元評量（暖身、隨堂、講義小測、拆裝、組裝、課後評量、期中線上評量）集中分析：單元 × 評量得分率、週次趨勢、難點與教學建議、學生 × 單元矩陣。">
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/unit-analysis.html">
 <meta name="theme-color" content="#1E3A8A">
 <meta name="robots" content="noindex">
@@ -68,7 +68,7 @@ table.data td.sm,span.sm{font-size:11px;color:var(--muted);white-space:nowrap}
     <div class="side">
       <div class="card noprint">
         <h2>📊 單元評量分析 <span class="en">Unit Assessment Analytics</span></h2>
-        <p class="sub">IOC 課程的單元評量（暖身、隨堂、講義小測、拆裝、組裝、期中期末）集中分析：哪個單元卡住、何時卡住、誰卡住。</p>
+        <p class="sub">IOC 課程的單元評量（暖身、隨堂、講義小測、拆裝、組裝、課後評量、期中線上評量）集中分析：哪個單元卡住、何時卡住、誰卡住。</p>
         <label class="fld" for="tcode" style="margin-top:0">教師碼</label>
         <input type="password" id="tcode" placeholder="教師碼（已從工作台登入者可留空）" autocomplete="off">
         <div class="toolbar">
@@ -176,7 +176,7 @@ var KC={warm:"#0D9488",quiz:"#3B82F6",subquiz:"#6366F1",lab:"#0EA5E9",netflow:"#
         xr:"#7C3AED",repair:"#D97706",build:"#B45309",midterm:"#1E3A8A",exam:"#1E3A8A",posttest:"#059669"};
 var UNIT_NAME={all:"綜合（全範圍）",overview:"總覽",hardware:"硬體",software:"軟體",network:"網路",
         packetflow:"封包流",repair:"3C 拆解","lab-hub":"實作中心",pcbuild:"虛擬組裝",assess:"即時評量",
-        midterm:"期中",exam:"期末考",aicollab:"AI 協作",retrieval:"提取練習",interleave:"交錯練習",spacing:"間隔練習"};
+        midterm:"期中評量",exam:"課後評量",aicollab:"AI 協作",retrieval:"提取練習",interleave:"交錯練習",spacing:"間隔練習"};
 var kname=function(k){return KN[k]||k;};
 var uname=function(u){return u?(UNIT_NAME[u]||u):"未標示單元";};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
