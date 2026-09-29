@@ -1,0 +1,86 @@
+name: relabel-tmp
+on:
+  push:
+    paths:
+      - ".github/workflows/relabel-tmp.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  relabel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply relabel (md5-gated)
+        run: |
+          python3 - <<'PYEOF'
+          import hashlib,sys
+          R={
+           "teacher.html":[
+            ('midterm:"期中考",exam:"期末考"','midterm:"期中評量",exam:"課後評量"'),
+            ('即時測驗、期中期末、3C 拆解','即時測驗、課後評量、期中評量、3C 拆解'),
+            ('（即時測驗／期中／期末）','（即時測驗／課後評量／期中評量）'),
+           ],
+           "presurvey-teacher.html":[
+            ('exam:"期末考"','exam:"課後評量"'),
+            ('即時測驗、期末考的平均得分率','即時測驗、課後評量的平均得分率'),
+           ],
+           "unit-analysis.html":[
+            ('midterm:"期中",exam:"期末考"','midterm:"期中評量",exam:"課後評量"'),
+            ('拆裝、組裝、期中期末）','拆裝、組裝、課後評量、期中線上評量）'),
+           ],
+           "index.html":[
+            ('即時評量與期末考，12 個模組一鍵直達','即時評量、期中評量與期末評量，12 個模組一鍵直達'),
+            ('即時測驗、期中期末、拆解組裝','即時測驗、課後評量、期中評量、拆解組裝'),
+           ],
+           "manual.html":[
+            ('即時評量、期中、期末考、AI 協作','即時評量、期中評量、期末評量、AI 協作'),
+            ('4C 評量、即時測驗、期末考（<code>assess4c</code>','4C 評量、即時測驗、課後評量（<code>assess4c</code>'),
+           ],
+           "README.md":[
+            ('／拆裝／組裝／期中期末）','／拆裝／組裝／課後評量／期中）'),
+           ],
+           "assess.html":[
+            ('graded:"計分",kinds:["midterm","exam"],','graded:"計分",kinds:["midterm"],'),
+           ],
+          }
+          MD5={
+           "README.md":("77164d9c2443e97d9683ed31df6a2178","f7db88564dbc94b21f8eac646105b1c1"),
+           "assess.html":("0841bb98a6ab346e09cc8b14d964f5dd","1c9896786ef7ea4dfdb6b3e8b5c14cbf"),
+           "index.html":("7d98be405659384117522350c90c7053","f3aa4e06f42b946e67d8acadd8b82346"),
+           "manual.html":("50211e982fadd779cdbc4545b0a9d1cf","7ad79941406663c796e89050999cc788"),
+           "presurvey-teacher.html":("2058137bac65eb0147f3dee3081a76fa","58701d0c91c51521c1e34d91bbcd6333"),
+           "teacher.html":("5cafb397867d9734751d437c6440b30e","b7bf962372d0baf5831eeb912d22e845"),
+           "unit-analysis.html":("3d7d4749403e2f20f3769768cf27a762","98cf99ff495f9efcfeb82d52f5398d3c"),
+          }
+          def md5(b): return hashlib.md5(b).hexdigest()
+          out={}
+          for f,reps in R.items():
+              b=open(f,"rb").read()
+              if md5(b)!=MD5[f][0]: sys.exit("BEFORE md5 mismatch: "+f+" "+md5(b))
+              s=b.decode("utf-8")
+              for a,c in reps:
+                  if s.count(a)<1: sys.exit("pattern not found in "+f+": "+a)
+                  s=s.replace(a,c)
+              nb=s.encode("utf-8")
+              if md5(nb)!=MD5[f][1]: sys.exit("AFTER md5 mismatch: "+f+" "+md5(nb))
+              out[f]=nb
+          for f,nb in out.items():
+              open(f,"wb").write(nb); print("OK",f,md5(nb))
+          PYEOF
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md assess.html index.html manual.html presurvey-teacher.html teacher.html unit-analysis.html
+          git commit -F - <<'MSG'
+          教師端標籤更正：kind exam＝「課後評量」、midterm＝「期中評量」（純前端文字，不動後端）
+
+          - teacher.html／presurvey-teacher.html／unit-analysis.html：exam「期末考」→「課後評量」、midterm「期中考／期中」→「期中評量」（資料庫 kind=exam 實為內嵌 IOC 平台的課後評量成績）
+          - index.html／manual.html／README／各頁 meta 文案同步；assess.html「期中／期末評量」完成狀態只認 kind=midterm
+          - 由暫時性 workflow relabel-tmp 於伺服器端套用（md5 閘門），套用後移除
+
+          Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+          Claude-Session: https://claude.ai/code/session_013A7C2Hy5aeYJ1RrGejqnvY
+          MSG
+          git push origin HEAD:main
