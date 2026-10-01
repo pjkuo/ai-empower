@@ -78,8 +78,12 @@ def main(argv):
     mc.sort(key=lambda q: (q["a"], q["i"]))
     es.sort(key=lambda q: (q["a"], q["i"]))
     out = {"v": 1, "built": datetime.date.today().isoformat(), "n": {"mc": len(mc), "es": len(es)}, "mc": mc, "es": es}
+    # 一題一行：檔案精簡、git diff 也看得出哪幾題變了
+    def lines(arr):
+        return ",\n".join(json.dumps(q, ensure_ascii=False, separators=(",", ":")) for q in arr)
+    head = json.dumps({"v": out["v"], "built": out["built"], "n": out["n"]}, ensure_ascii=False, separators=(",", ":"))[:-1]
     with open(dst, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+        f.write(head + ',"mc":[\n' + lines(mc) + '\n],"es":[\n' + lines(es) + '\n]}\n')
     axes = {}
     for q in mc:
         axes[q["a"]] = axes.get(q["a"], 0) + 1
