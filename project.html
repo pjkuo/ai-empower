@@ -13,8 +13,8 @@
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/project.html">
 <meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
 <!-- 老師公布後填入：學生學習計畫範本（Notion 公開範本連結）、專題 GitHub 範本 repo -->
-<meta name="ae-notion-template" content="">
-<meta name="ae-github-template" content="">
+<meta name="ae-notion-template" content="https://lead-airport-9f6.notion.site/3eca3751648481aeb54ecb0dad4a0337">
+<meta name="ae-github-template" content="https://github.com/pjkuo/ai-project-starter">
 <link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/ae.css">
 <link rel="stylesheet" href="assets/learn.css">
@@ -272,7 +272,7 @@ Array.prototype.forEach.call(document.querySelectorAll("[data-go]"),function(a){
 function meta(n){ var m=document.querySelector('meta[name="'+n+'"]'); var v=m?String(m.getAttribute("content")||"").trim():""; return /^https:\/\//.test(v)?v:""; }
 var NT=meta("ae-notion-template"), GT=meta("ae-github-template");
 $("ntTplBox").innerHTML=NT?'<a class="btn btn-primary" href="'+esc(NT)+'" target="_blank" rel="noopener">📒 複製「學生學習計畫範本」到我的 Notion</a>':'<span class="note" style="margin:0">📒 老師公布範本連結後，這裡會出現「一鍵複製」按鈕；在那之前可依下方 10 個區塊自己建一頁。</span>';
-if(GT) $("ghTpl").innerHTML='<a class="btn btn-primary" href="'+esc(GT)+'/generate" target="_blank" rel="noopener">💻 用專題範本建立我的 repo</a>';
+if(GT) $("ghTpl").innerHTML='<a class="btn btn-primary" href="'+esc(GT)+'/generate" target="_blank" rel="noopener">💻 用專題範本建立我的 repo</a> <a href="'+esc(GT)+'" target="_blank" rel="noopener">看範本內容</a>';
 
 function say(id,txt,kind){ var m=$(id); m.className="msg show "+(kind||"ok"); m.textContent=txt; }
 function needId(msgId){ var id=(window.AEId&&AEId.get())||null; if(id&&id.sid&&id.cls) return id; say(msgId,"請先在上方身分小卡填學號後 4 碼與班級（只用來核對小組，老師的追蹤表不記學號）。","warn"); if(window.AEId&&AEId.prompt)AEId.prompt("填好身分才能登記／打卡。"); return null; }
