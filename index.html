@@ -198,7 +198,7 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
     </div>
     <div data-aeid style="margin-top:14px;max-width:620px"></div>
     <div id="aeParity" style="margin-top:10px;max-width:620px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);border-radius:12px;padding:10px 14px;font-size:13px;color:#fff">
-      🚦 <b>學號分流</b>:單號 → 主站｜雙號 → 備援站
+      🚦 <b>學號分流</b>:單號 → 主站|雙號 → 備援站
       <button id="aeParityBtn" type="button" style="margin-left:10px;background:#fff;color:#4338ca;font-weight:700;border:0;border-radius:8px;padding:6px 14px;cursor:pointer">依我的學號分流 →</button>
       <span id="aeParityMsg" style="margin-left:8px;opacity:.95"></span>
     </div>
@@ -298,9 +298,18 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
   <!-- ===== 自學・回饋・作品（2026-10-01：學生端 GitHub，教師端 Notion）===== -->
   <section style="--gc:var(--ipo)">
     <div class="sec-head"><span class="bar"></span>
-      <div><h2>🧭 自學・回饋・作品</h2><p>自己練、自己看進步；你的聲音老師每週都會看</p></div>
+      <div><h2>🧭 自學・回饋・作品</h2><p>Notion 管「想什麼、為什麼、怎麼學」；GitHub 管「做什麼、改什麼、怎麼跑」——你是主角，老師是教練</p></div>
     </div>
     <div class="cards">
+      <article class="pc">
+        <h3>專題工作流 <span class="badge new">新</span></h3>
+        <span class="en">Think · Write · Build · Improve</span>
+        <p><b>🧠 想清楚 → 📝 寫下來</b>（Notion 學習計畫）<b>→ 💻 做出來 → 🔄 改進它</b>（GitHub 實作與 Pages）。四人分工、Issue → PR 流程、專題登記與每週進度打卡都在這裡。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <a class='go' href='project.html' style='background:var(--primary)'>看工作流 →</a>
+          <a class='go' href='project.html#ck' style='background:var(--eco)'>📌 每週打卡</a>
+        </div>
+      </article>
       <article class="pc">
         <h3>學習回饋站 <span class="badge new">新</span></h3>
         <span class="en">Feedback · Reflection · Questions</span>
