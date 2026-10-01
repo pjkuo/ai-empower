@@ -13,6 +13,12 @@
 | `ct-practice.html` | 運算思維四大技巧練習（學生＋教師雙模式）：以校園生活為例（演唱會搶票／排隊美食／揪團出遊／社團擺攤）各練拆解、找規律、抽象化、演算法一次，**不計評分**；主要入口＝線上 Google 表單（內嵌 QR＋短網址 da.gd/q0L2y），備援＝`ct-worksheet.html` 列印版與 `assets/doc/ct-practice-worksheet.docx`；`?embed=1`／`#teacher`（需經 console 驗證）進教師審閱：四技巧具體度、完成度分布、單選題分布、每日趨勢四張 inline SVG 圖，加自動生成的文字分析與教學建議、關鍵詞頻率、逐人明細與 CSV；`?demo=1` 示範模式 |
 | `ct-worksheet.html` | 練習單列印版（A4 直式一頁）：`@page A4` ＋ 縮放，按「列印」即出紙本；沒有 Word 也能用，為 `ct-practice.html` 的備援入口 |
 | `presurvey.html` | 課前評量（學生）：27 題六向度、回覆碼 `PS1.<base64>`、本機自存；`?stage=post` 為期末複測（T＋C 11 題） |
+| `project.html` | 專題工作流（2026-10-01）：四句口訣（🧠 Notion 想清楚、📝 Notion 寫下來、💻 GitHub 做出來、🔄 GitHub 改進它）、Notion vs GitHub 分工、作業鏈、AI×Notion×GitHub 三角、四人角色、Notion 學習計畫 10 區塊、GitHub 三步開工與 Issue→Branch→PR→Review→Merge；表單：專題登記（`kind=projreg`，小組＋Notion 計畫＋repo 連結）、每週進度打卡（`kind=checkin`，階段／完成／卡點／🟢🟡🔴／需協助）。`<meta name="ae-notion-template">`、`<meta name="ae-github-template">` 填入後自動出現一鍵複製按鈕 |
+| `reflect.html` | 學習回饋站（2026-10-01）：三分頁 ⏱ 一分鐘回饋（**匿名**，`kind=feedback`，`sid` 留空、只記班級＋週次；score＝理解度 1–5）、📝 每週反思（記名，`kind=reflection`，What／So what／Now what＋投入度＋AI 協作＋去識別化摘錄同意；下方以 `action=me` 顯示本人反思歷程）、❓ 我要提問（**匿名**，`kind=question`，可勾選收進 FAQ） |
+| `practice.html` | 題庫自主練習（2026-10-01）：讀 `assets/bank/practice.json`（只含 Notion 題庫「已審核」且用途非「考試保留」的題）；向度練習（即時回饋、選項每次重排）、錯題本（連對 2 次畢業）、模擬考（選擇站 30 題 × 2.5＝75 分，配額硬體 8／軟體 8／網路 7／物聯網 7；問答站 3 題 9／8／8＝25 分，依規準自評）、我的進步；結果 `kind=practice` 上傳（有身分才傳） |
+| `showcase.html` | 學生作品展示牆（2026-10-01）：讀 `assets/showcase.json`（週日由 Notion「作品投稿」已核准＋同意公開者產生，只含暱稱）；投稿表單 `kind=work`（需身分供老師核對作者，展出只顯示暱稱） |
+| `assets/learn.js`／`learn.css` | 上述自學頁共用：週次（W1＝2026-09-14）、分頁、送出包裝、`action=me` 查本人紀錄 |
+| `tools/bank_export.py` | Notion 題庫匯出 → `assets/bank/practice.json`（HITL：只收已審核） |
 | `weekly.html` | 我的學習週報（學生自查）：學號後 4 碼＋班級查自己的每週活動、成績趨勢、與全班中位數對照及建議；`?demo=1` 示範模式；需後端 v3.2 `action=me`（見 `gas/me-patch.gs`） |
 | `assets/identity.js` | 共同身分：入口頁「我是誰」小卡（`[data-aeid]` 容器），`ae.identity.v1`；外站連結自動附 `?sid=&cls=`；`AEId.get/set/clear` |
 | `assets/bridge.js` | 舊站一行接入：`<script src="…/assets/bridge.js" data-app="…">`，攔截 CCLOUD.push／qadd／addRecord／舊 Apps Script 送出 → 轉統一記錄鏡射到雲端；身分由 ?sid=&cls= 或小卡取得；`AEBridge.push()` |
@@ -73,3 +79,19 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 新增 `gas/ct-practice-patch.gs`：Google 表單 `onFormSubmit` → 統一記錄（`kind=ctpractice`，`score`＝填答完整度％、`detail.graded=false`）→ push 進「ai-empower 評量資料庫」；另有 `backfillAll()` 補推、`pingCloud()` 自測。
 - `console.html` 新增第 6 分頁「運算思維練習」（`#ct`）；`index.html` 於「問卷・評量・統計分析」區新增卡片與導覽連結。
 - 「具體度」定義見 `specificity()`：以「換別人照做，做得出來嗎」為判準（THEN 是否為可執行動作、等待時間是否寫得出數字、兩項「要留下的資訊」是否重複），**僅供教學診斷，不作為評分依據**。
+
+## 2026-10-01 更新（GitHub 自學實踐 × Notion 學習計畫追蹤）
+
+規劃核心：**以學生為主角、教師為輔助（教練）。**
+
+- **GitHub＝自學實踐（程式流）**：本站的練習、回饋、作品牆＋學生自己的專題 repo（Issue → PR → Pages）。口訣：💻 做出來、🔄 改進它。
+- **Notion＝學習計畫追蹤（知識流）**：學生在**自己的 Notion** 複製「學生學習計畫範本」維護計畫與反思；教師 Notion 只有小組層級的「專題計畫追蹤」與教學決策（評量選單、題庫審核、週報），**不放學號**、不發布 Notion Sites。口訣：🧠 想清楚、📝 寫下來。
+- Notion 留下「學習歷程」，GitHub 留下「技術歷程」；AI 管協作，學生管思考與決策。
+
+| 方向 | 流程 |
+|---|---|
+| 學生 → 老師 | `reflect／practice／showcase／project` → `AECloud.push`（kind＝feedback／reflection／question／practice／work／projreg／checkin）→ 試算表 → 週一週報排程彙整為**人數與統計**寫入 Notion 週頁「學生聲音」；提問進 FAQ「新進」；投稿進「作品投稿（私有）」收件匣（不帶學號）；專題登記與打卡進「專題計畫追蹤」（只記小組名稱與連結，🔴／需協助置頂） |
+| 老師 → 學生 | Notion 審核（題庫「已審核」、作品「已核准＋同意公開」、FAQ 已回覆）→ 週日同步排程：`tools/faq_sync.py` 更新手冊 FAQ、`tools/bank_export.py` 更新 `assets/bank/practice.json`、產生 `assets/showcase.json` → push 到 main 自動部署 |
+
+- 匿名 kind（feedback／question）`sid` 一律留空：`teacher.html` 不會把它算成學生；`assess.html` 對匿名項目只顯示「匿名・不記錄完成」。
+- 練習題答案在前端可見，只供自學；正式期中／期末走 Moodle（GIFT 匯入，伺服器端計分）。需要保密的考試題，在 Notion 題庫把「用途」設為「考試保留」即不會匯出。
