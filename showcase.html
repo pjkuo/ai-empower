@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>學生作品展示牆｜ai-empower</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學平台">
+<meta property="og:title" content="學生作品展示牆｜ai-empower">
+<meta property="og:description" content="老師精選的學生專題、心智圖、IPO 與程式作品；也可以從這裡投稿你的作品。">
+<meta name="description" content="老師精選的學生專題、心智圖、IPO 與程式作品；也可以從這裡投稿你的作品。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/showcase.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<link rel="stylesheet" href="assets/learn.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/cloud.js"></script>
+<script src="assets/learn.js"></script>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span><span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="ioc.html">IOC 課程</a><a href="assess.html">我的評量</a>
+      <a href="reflect.html">回饋站</a><a href="practice.html">題庫練習</a><a href="showcase.html" aria-current="page">作品牆</a><a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+<main class="wrap" style="max-width:1000px;padding-bottom:40px">
+  <header class="phead ipo">
+    <h1>🏆 學生作品展示牆<span class="en">Student Showcase</span></h1>
+    <p>同學的專題、心智圖、IPO 分析與程式作品，經老師審核、本人同意後在這裡展出。看看別人怎麼「先思考、後驗證」，也歡迎投稿你的作品。</p>
+    <div class="idrow" data-aeid></div>
+  </header>
+
+  <div class="tabs" role="tablist" style="max-width:1000px">
+    <button type="button" role="tab" data-tab="wall">🖼 作品牆</button>
+    <button type="button" role="tab" data-tab="sub">📤 我要投稿</button>
+  </div>
+
+  <section class="pane" id="wall">
+    <div class="filters">
+      <select id="fType" aria-label="作品類型"><option value="">全部類型</option></select>
+      <select id="fUnit" aria-label="單元"><option value="">全部單元</option></select>
+      <label class="consent" style="padding:6px 10px"><input type="checkbox" id="fPick"><span>只看老師精選 ⭐</span></label>
+    </div>
+    <div class="wall" id="wallList"></div>
+    <p class="note" id="wallNote"></p>
+  </section>
+
+  <section class="pane lw" id="sub">
+    <form class="fcard" id="wkForm" autocomplete="off">
+      <h2>📤 投稿作品 <span class="named">需填身分・展出只顯示暱稱</span></h2>
+      <p class="sub">老師審核後才會上牆（通常在週日更新）。作品頁上<b>只顯示你填的暱稱</b>，不會出現學號或真實姓名。</p>
+      <div class="row2">
+        <div class="fq"><label for="wkTitle">作品名稱</label><input type="text" id="wkTitle" maxlength="60" placeholder="例如：智慧澆花系統 IPO 設計"></div>
+        <div class="fq"><label for="wkNick">展示暱稱</label><input type="text" id="wkNick" maxlength="20" placeholder="例如：小農工程師"></div>
+      </div>
+      <div class="row2">
+        <div class="fq"><label for="wkType">作品類型</label>
+          <select id="wkType"><option>AI 賦能專題</option><option>心智圖</option><option>IPO 分析</option><option>Python 程式</option><option>簡報</option><option>影音</option><option>其他</option></select></div>
+        <div class="fq"><label for="wkWeek">完成週次</label><select id="wkWeek"></select></div>
+      </div>
+      <div class="fq"><label for="wkLink">作品連結<span class="hint">雲端硬碟／Canva／GitHub／YouTube 等，請設成「知道連結的人可檢視」</span></label><input type="url" id="wkLink" maxlength="400" placeholder="https://"></div>
+      <div class="fq"><label for="wkDesc">一句話介紹：解決了什麼問題？</label><textarea id="wkDesc" maxlength="300"></textarea></div>
+      <div class="fq"><label for="wkAI">我和 AI 怎麼分工？我怎麼驗證 AI 的產出？</label><textarea id="wkAI" maxlength="400" placeholder="例如：AI 幫我列感測器選項，我查規格表確認電壓，再自己畫 IPO。"></textarea></div>
+      <label class="consent"><input type="checkbox" id="wkOK"><span>我確認這是我（或我們小組）的作品，<b>同意以暱稱公開展示</b>於本展示牆；老師可去識別化引用作為教學案例。我可以隨時請老師下架。</span></label>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出投稿</button></div>
+      <div class="msg" id="wkMsg"></div>
+    </form>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var L=window.AELearn, $=function(id){return document.getElementById(id);}, esc=L.esc;
+L.tabs(); L.weekSelect($("wkWeek"));
+var WORKS=[], ICON={"AI 賦能專題":"🎨","心智圖":"🧠","IPO 分析":"🔁","Python 程式":"🐍","簡報":"📊","影音":"🎬","其他":"✨"};
+function safeUrl(u){ u=String(u||""); return /^https:\/\//i.test(u)?u:""; }
+
+function render(){
+  var t=$("fType").value, u=$("fUnit").value, pk=$("fPick").checked;
+  var list=WORKS.filter(function(w){return (!t||w.type===t)&&(!u||w.unit===u)&&(!pk||w.pick);});
+  $("wallList").innerHTML=list.map(function(w){
+    var img=safeUrl(w.img), link=safeUrl(w.link);
+    return '<article class="wk"><div class="img"'+(img?' style="background-image:url(\''+esc(img)+'\')"':'')+'>'+(img?'':(ICON[w.type]||"✨"))+'</div><div class="bd">'+
+      '<h3>'+(w.pick?"⭐ ":"")+esc(w.title)+'</h3><div class="by">'+esc(w.nick||"匿名")+'・'+esc(w.type||"")+(w.week?'・W'+(w.week<10?"0":"")+w.week:'')+(w.cls?'・'+esc(w.cls):'')+'</div>'+
+      '<p>'+esc(w.desc||"")+'</p>'+(w.note?'<p style="color:var(--ipo);font-weight:700">👩‍🏫 '+esc(w.note)+'</p>':'')+
+      ((w.tags&&w.tags.length)?'<div class="tg">'+w.tags.map(function(x){return '<span>'+esc(x)+'</span>';}).join("")+'</div>':'')+
+      (link?'<a class="go" href="'+esc(link)+'" target="_blank" rel="noopener">看作品 →</a>':'')+'</div></article>';
+  }).join("");
+  if(!WORKS.length){ $("wallList").innerHTML=""; $("wallNote").innerHTML='<div class="empty">🌱 第一批作品審核中。<br>你的作品可能就是第一件——到「我要投稿」送出吧！</div>'; }
+  else $("wallNote").textContent=list.length?("共 "+list.length+" 件作品"):"沒有符合篩選的作品。";
+}
+function fillFilters(){
+  var types={}, units={};
+  WORKS.forEach(function(w){ if(w.type)types[w.type]=1; if(w.unit)units[w.unit]=1; });
+  Object.keys(types).forEach(function(x){ $("fType").insertAdjacentHTML("beforeend",'<option>'+esc(x)+'</option>'); });
+  Object.keys(units).forEach(function(x){ $("fUnit").insertAdjacentHTML("beforeend",'<option>'+esc(x)+'</option>'); });
+}
+["fType","fUnit","fPick"].forEach(function(id){ $(id).addEventListener("change",render); });
+fetch("assets/showcase.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():{works:[]};})
+  .then(function(j){ WORKS=(j.works||[]).filter(function(w){return w&&w.title;}); WORKS.sort(function(a,b){return (b.pick?1:0)-(a.pick?1:0)||(b.week||0)-(a.week||0);}); fillFilters(); render(); })
+  .catch(function(){ WORKS=[]; render(); });
+
+/* 投稿 */
+function say(txt,kind){ var m=$("wkMsg"); m.className="msg show "+(kind||"ok"); m.textContent=txt; }
+$("wkForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var id=(window.AEId&&AEId.get())||null;
+  if(!id||!id.sid||!id.cls){ say("請先在上方身分小卡填學號後 4 碼與班級（只給老師核對作者，不會公開）。","warn"); if(window.AEId&&AEId.prompt)AEId.prompt("投稿需要身分，展出只顯示暱稱。"); return; }
+  var title=$("wkTitle").value.trim(), nick=$("wkNick").value.trim(), link=$("wkLink").value.trim();
+  if(!title||!nick){ say("作品名稱與展示暱稱都要填。","warn"); return; }
+  if(!/^https:\/\//i.test(link)){ say("作品連結請貼 https:// 開頭的網址。","warn"); return; }
+  if(!$("wkOK").checked){ say("需要勾選同意公開展示，老師才能上牆。","warn"); return; }
+  var rec={app:"ai-empower",kind:"work",sid:id.sid,cls:id.cls,score:"",max:"",
+    detail:{title:title,nick:nick,type:$("wkType").value,week:Number($("wkWeek").value),link:link,desc:$("wkDesc").value.trim(),ai:$("wkAI").value.trim(),consent:1}};
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send(rec).then(function(r){
+    say("✅ 投稿已送出！老師審核後會出現在作品牆（通常週日更新）。"+(r.queued?" "+r.msg:""),r.queued?"warn":"ok");
+    f.reset(); L.weekSelect($("wkWeek"));
+  }).then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+})();
+</script>
+</body>
+</html>
