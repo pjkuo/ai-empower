@@ -198,7 +198,7 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
     </div>
     <div data-aeid style="margin-top:14px;max-width:620px"></div>
     <div id="aeParity" style="margin-top:10px;max-width:620px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);border-radius:12px;padding:10px 14px;font-size:13px;color:#fff">
-      🚦 <b>學號分流</b>:單號 → 主站|雙號 → 備援站
+      🚦 <b>學號分流</b>:單號 → 主站｜雙號 → 備援站
       <button id="aeParityBtn" type="button" style="margin-left:10px;background:#fff;color:#4338ca;font-weight:700;border:0;border-radius:8px;padding:6px 14px;cursor:pointer">依我的學號分流 →</button>
       <span id="aeParityMsg" style="margin-left:8px;opacity:.95"></span>
     </div>
@@ -291,6 +291,36 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
         <span class="en">My Weekly Learning</span>
         <p>學生自查：學號後 4 碼＋班級，看自己每週的學習活動、成績趨勢、與全班中位數對照及下一步建議——只查得到自己的紀錄，別人看不到你的。</p>
         <a class='go' href='weekly.html' style='background:var(--eco)'>查我的學習 →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== 自學・回饋・作品（2026-10-01：學生端 GitHub，教師端 Notion）===== -->
+  <section style="--gc:var(--ipo)">
+    <div class="sec-head"><span class="bar"></span>
+      <div><h2>🧭 自學・回饋・作品</h2><p>自己練、自己看進步；你的聲音老師每週都會看</p></div>
+    </div>
+    <div class="cards">
+      <article class="pc">
+        <h3>學習回饋站 <span class="badge new">新</span></h3>
+        <span class="en">Feedback · Reflection · Questions</span>
+        <p>下課前<b>一分鐘匿名回饋</b>（哪裡懂、哪裡卡）、每週三問反思存成學習歷程、不好意思當面問的問題匿名提問——老師週日彙整，下週課堂回應。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <a class='go' href='reflect.html#fb' style='background:var(--ipo)'>一分鐘回饋 →</a>
+          <a class='go' href='reflect.html#rf' style='background:var(--eco)'>寫反思</a>
+        </div>
+      </article>
+      <article class="pc">
+        <h3>題庫自主練習＋模擬考 <span class="badge new">新</span></h3>
+        <span class="en">Self-paced Practice</span>
+        <p>硬體・軟體・網路・物聯網四向度老師審核題：向度練習即時回饋、錯題本自動收集、<b>模擬考 30 選擇 75 分＋3 問答 25 分</b>，看自己哪個向度最需要補。</p>
+        <a class='go' href='practice.html' style='background:var(--eco)'>開始練習 →</a>
+      </article>
+      <article class="pc">
+        <h3>學生作品展示牆 <span class="badge new">新</span></h3>
+        <span class="en">Student Showcase</span>
+        <p>老師精選、本人同意後以暱稱展出的專題與作品；看同學怎麼和 AI 分工、怎麼驗證，也可以投稿你的作品。</p>
+        <a class='go' href='showcase.html' style='background:var(--ipo)'>看作品牆 →</a>
       </article>
     </div>
   </section>

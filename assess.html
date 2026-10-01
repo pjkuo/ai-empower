@@ -7,8 +7,8 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="AI 賦能教學平台">
 <meta property="og:title" content="我的評量中心｜ai-empower">
-<meta property="og:description" content="這學期所有要作答的項目都在這一頁：時機、時長、計不計分一目了然，完成的自動打勾。">
-<meta name="description" content="這學期所有要作答的項目都在這一頁：時機、時長、計不計分一目了然，完成的自動打勾。">
+<meta property="og:description" content="這學期所有要作答與自學的項目都在這一頁：時機、時長、計不計分一目了然，完成的自動打勾。">
+<meta name="description" content="這學期所有要作答與自學的項目都在這一頁：時機、時長、計不計分一目了然，完成的自動打勾。">
 <meta name="theme-color" content="#1E3A8A">
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/assess.html">
 <meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
@@ -58,6 +58,8 @@
     <h2>📊 作答完想看成果？</h2>
     <a href="start.html">📍 我的起點報告</a>
     <a href="weekly.html">📈 我的學習週報</a>
+    <a href="practice.html#me">🎯 我的練習進步</a>
+    <a href="reflect.html#rf">📚 我的反思歷程</a>
   </div>
   <p class="note" id="asNote"></p>
 </main>
@@ -88,14 +90,27 @@ var ITEMS=[
  {ic:"🎯",name:"4C 學習成效評量",when:"前測第 2–4 週・後測期末",mins:"約 10 分鐘",graded:"不計分",kinds:["assess4c"],
   desc:"12 題核心素養＋4 題教學效能，學號自動配對前後測。（40 題學習後測問卷在 AI 賦能學習平台側欄）",
   btns:[["開始作答","https://pjkuo.github.io/AICT-assess-platform/",""]]},
+ {ic:"⏱",name:"課後一分鐘回饋",when:"每次下課前",mins:"1 分鐘",graded:"不計分",kinds:[],anon:true,
+  desc:"匿名：理解度 1–5、最清楚／最模糊的一點、今天怎麼用 AI。老師每週日彙整，下週上課先回應全班最卡的地方。",
+  btns:[["填回饋","reflect.html#fb",""]]},
+ {ic:"📝",name:"每週學習反思",when:"每週一次（週末前）",mins:"約 5 分鐘",graded:"不計分",kinds:["reflection"],ongoing:true,
+  desc:"What → So what → Now what 三問整理一週，存成你自己的學習歷程，期末回頭看成長軌跡。",
+  btns:[["寫反思","reflect.html#rf",""],["❓ 我要提問","reflect.html#qa","ghost"]]},
+ {ic:"🎯",name:"題庫自主練習＋模擬考",when:"隨時（考前兩週加強）",mins:"10–50 分鐘",graded:"不計分",kinds:["practice"],ongoing:true,
+  desc:"四向度老師審核題：向度練習、錯題本、模擬考（選擇站 30 題 75 分＋問答站 3 題 25 分）。",
+  btns:[["開始練習","practice.html",""],["🏁 模擬考","practice.html#mk","ghost"]]},
+ {ic:"🏆",name:"作品投稿",when:"專題完成後",mins:"約 3 分鐘",graded:"不計分",kinds:["work"],
+  desc:"把專題、心智圖、IPO 或程式作品投稿到展示牆；老師審核、你同意後以暱稱展出。",
+  btns:[["投稿","showcase.html#sub",""],["🖼 作品牆","showcase.html","ghost"]]},
  {ic:"🏁",name:"期中／期末評量",when:"依課程公告",mins:"—",graded:"計分",kinds:["midterm"],
-  desc:"於課程模擬平台內進行，時間與範圍以 Moodle 公告為準。",
-  btns:[["前往課程平台","ioc.html","ghost"]]}
+  desc:"正式評量：選擇站 30 題 75 分＋問答站 3 題 25 分，時間、地點與方式以 Moodle 公告為準。考前用「題庫自主練習」的模擬考暖身。",
+  btns:[["🏁 模擬考暖身","practice.html#mk",""],["前往課程平台","ioc.html","ghost"]]}
 ];
 
 function badge(st){
   if(st.done) return '<span class="badge-done">✓ 已完成 '+st.date+'</span>';
   if(st.count) return '<span class="badge-run">進行中 · 已記錄 '+st.count+' 筆</span>';
+  if(st.anon) return '<span class="badge-run">匿名・不記錄完成</span>';
   if(st.unknown) return '';
   return '<span class="badge-todo">○ 未完成</span>';
 }
@@ -103,7 +118,8 @@ function render(statusByKind){
   var h="";
   ITEMS.forEach(function(it){
     var st={unknown:!statusByKind};
-    if(statusByKind){
+    if(it.anon){ st={anon:true}; }
+    else if(statusByKind){
       var recs=[]; it.kinds.forEach(function(k){ (statusByKind[k]||[]).forEach(function(r){recs.push(r);}); });
       if(it.ongoing){ st={count:recs.length}; }
       else if(recs.length){ recs.sort(function(a,b){return String(a.ts)<String(b.ts)?-1:1;}); st={done:true,date:String(recs[recs.length-1].ts||"").slice(5,10).replace("-","/")} ; }
