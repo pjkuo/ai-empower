@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>專題工作流｜ai-empower</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學平台">
+<meta property="og:title" content="專題工作流｜ai-empower">
+<meta property="og:description" content="Notion 管想什麼、為什麼、怎麼學；GitHub 管做什麼、改什麼、怎麼跑。想清楚 → 寫下來 → 做出來 → 改進它。">
+<meta name="description" content="Notion 管想什麼、為什麼、怎麼學；GitHub 管做什麼、改什麼、怎麼跑。想清楚 → 寫下來 → 做出來 → 改進它。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/project.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<!-- 老師公布後填入：學生學習計畫範本（Notion 公開範本連結）、專題 GitHub 範本 repo -->
+<meta name="ae-notion-template" content="">
+<meta name="ae-github-template" content="">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<link rel="stylesheet" href="assets/learn.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/cloud.js"></script>
+<script src="assets/learn.js"></script>
+<style>
+.mn{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:4px 0 6px}
+@media(max-width:700px){.mn{grid-template-columns:repeat(2,1fr)}}
+.mn div{border-radius:14px;padding:14px;color:#fff;font-weight:800;font-size:15px;line-height:1.4}
+.mn div small{display:block;font-weight:600;font-size:12px;opacity:.92;margin-top:4px}
+.mn .n1{background:#334155}.mn .n2{background:#475569}.mn .n3{background:#1E3A8A}.mn .n4{background:#3457C5}
+.motto{text-align:center;font-weight:800;color:var(--primary);font-size:14.5px;margin:10px 0 2px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:8px 8px;text-align:left;vertical-align:top}
+.tbl th{background:var(--soft);font-size:12.5px}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.chain a,.chain span.s{display:inline-flex;flex-direction:column;border:1.5px solid var(--line);border-radius:12px;padding:8px 11px;background:#fff;font-size:13px;font-weight:800;color:var(--ink);line-height:1.3}
+.chain a small,.chain span.s small{font-weight:600;color:var(--muted);font-size:11px}
+.chain a.nt{border-color:#94A3B8}.chain a.gh{border-color:var(--accent)}.chain a.ai{border-color:var(--ipo)}
+.chain .ar{color:var(--dim);font-weight:900}
+.tri{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+@media(max-width:700px){.tri{grid-template-columns:repeat(2,1fr)}}
+.tri div{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.6}
+.tri div>b:first-child{display:block;font-size:14px;color:var(--primary)}
+.flowpr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:800;font-size:13.5px;margin:8px 0}
+.flowpr span{background:var(--accent-soft);color:var(--primary);border-radius:999px;padding:5px 12px}
+pre.code{background:#0F172A;color:#E2E8F0;border-radius:12px;padding:12px 14px;font:12.5px/1.6 var(--mono);overflow:auto;margin-top:8px;white-space:pre}
+.ok-list{list-style:none;display:grid;gap:6px;margin-top:6px}
+.ok-list li{font-size:13.5px;line-height:1.6;padding-left:26px;position:relative}
+.ok-list li::before{content:"☐";position:absolute;left:4px;color:var(--primary);font-weight:900}
+.coach{background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.7;margin-top:10px}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span><span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="project.html" aria-current="page">專題工作流</a><a href="assess.html">我的評量</a>
+      <a href="reflect.html">回饋站</a><a href="practice.html">題庫練習</a><a href="showcase.html">作品牆</a><a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+<main class="wrap" style="max-width:980px;padding-bottom:40px">
+  <header class="phead">
+    <h1>🧭 專題工作流<span class="en">Think · Write · Build · Improve</span></h1>
+    <p><b>Notion 管「想什麼、為什麼、怎麼學」；GitHub 管「做什麼、改什麼、怎麼跑」。</b>你是專題的主角——自己規劃、自己實作、自己追蹤進度；老師是教練，看你的打卡、在你卡關時出手。</p>
+    <div class="idrow" data-aeid></div>
+  </header>
+
+  <div class="tabs" role="tablist" style="max-width:980px">
+    <button type="button" role="tab" data-tab="flow">🧭 工作流</button>
+    <button type="button" role="tab" data-tab="team">👥 小組分工</button>
+    <button type="button" role="tab" data-tab="nt">📒 Notion 計畫</button>
+    <button type="button" role="tab" data-tab="gh">💻 GitHub 實作</button>
+    <button type="button" role="tab" data-tab="ck">📌 登記與打卡</button>
+  </div>
+
+  <!-- ===== 工作流 ===== -->
+  <section class="pane" id="flow">
+    <div class="fcard">
+      <h2>四句口訣</h2>
+      <div class="mn">
+        <div class="n1">🧠 Notion：想清楚<small>問題是什麼？為什麼值得做？</small></div>
+        <div class="n2">📝 Notion：寫下來<small>IPO、心智圖、分工、AI 紀錄</small></div>
+        <div class="n3">💻 GitHub：做出來<small>程式、網頁、資料，進版本</small></div>
+        <div class="n4">🔄 GitHub：改進它<small>Issue 找問題、PR 改版本</small></div>
+      </div>
+      <p class="motto">Notion 留下「學習歷程」，GitHub 留下「技術歷程」。</p>
+    </div>
+    <div class="fcard">
+      <h2>兩個平台怎麼分工（不搶工作）</h2>
+      <table class="tbl">
+        <thead><tr><th style="width:22%">面向</th><th>📒 Notion｜知識流</th><th>💻 GitHub｜程式流</th></tr></thead>
+        <tbody>
+          <tr><td>核心角色</td><td>學習計畫與知識工作空間</td><td>程式與專案的自學實踐場</td></tr>
+          <tr><td>放什麼</td><td>問題定義、需求、IPO、心智圖、AI Prompt 紀錄、分工、每週進度、反思</td><td>README、程式碼、網頁、資料、圖片、文件</td></tr>
+          <tr><td>怎麼追蹤</td><td>計畫頁的每週進度與卡點</td><td>Issue（任務／Bug）、Commit 歷史、Pull Request</td></tr>
+          <tr><td>怎麼被檢查</td><td>老師看你的計畫與反思</td><td>同學與老師 Review 你的 PR</td></tr>
+          <tr><td>怎麼展示</td><td>學習歷程（作品集的「為什麼」）</td><td>GitHub Pages（作品集的「做出來了」）</td></tr>
+          <tr><td>入門門檻</td><td>低：會打字就能用</td><td>中：跟著本頁「GitHub 實作」一步步來</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="fcard">
+      <h2>專題作業鏈（點下去就是對應工具）</h2>
+      <div class="chain">
+        <span class="s">❓ 問題<small>生活中的痛點</small></span><span class="ar">→</span>
+        <a class="nt" href="mindmap-ipo.html">🗺 心智圖＋IPO<small>拆解、找規律</small></a><span class="ar">→</span>
+        <a class="nt" href="#nt" data-go="nt">📒 Notion<small>整理想法</small></a><span class="ar">→</span>
+        <a class="ai" href="https://pjkuo.github.io/AI-empower-platform/">🤖 AI<small>協作與驗證</small></a><span class="ar">→</span>
+        <a class="gh" href="#gh" data-go="gh">💻 GitHub<small>實作＋版本</small></a><span class="ar">→</span>
+        <a class="gh" href="#gh" data-go="gh">🌐 Pages<small>公開展示</small></a><span class="ar">→</span>
+        <a class="nt" href="reflect.html#rf">🪞 反思<small>Notion＋回饋站</small></a><span class="ar">→</span>
+        <a href="showcase.html">🏆 作品集<small>投稿作品牆</small></a>
+      </div>
+    </div>
+    <div class="fcard">
+      <h2>AI × Notion × GitHub 三角</h2>
+      <div class="tri">
+        <div><b>🤖 AI 幫你想</b>發想、解釋、找 Bug；但<b>先自己想</b>，再請 AI 驗證。</div>
+        <div><b>📒 Notion 幫你整理</b>把 Prompt、AI 回覆與「你怎麼判斷它對不對」記在計畫頁。</div>
+        <div><b>💻 GitHub 幫你實作</b>每次可運作就 commit；AI 給的程式要有你的測試證據。</div>
+        <div><b>🪞 Notion 幫你反思</b>這週學到什麼、卡在哪、下週做什麼——回到第一步。</div>
+      </div>
+      <p class="motto" style="font-size:13.5px">Notion 管「知識」，GitHub 管「作品」；AI 管「協作」，你管「思考與決策」。</p>
+    </div>
+  </section>
+
+  <!-- ===== 小組分工 ===== -->
+  <section class="pane" id="team">
+    <div class="fcard">
+      <h2>👥 四人小組角色（每 3–4 週輪替一次，每個人都要碰到兩個平台）</h2>
+      <table class="tbl">
+        <thead><tr><th>角色</th><th>主要工作</th><th>主平台</th><th>每週要交出的東西</th></tr></thead>
+        <tbody>
+          <tr><td>🧠 A 企劃</td><td>問題定義、使用者需求、IPO</td><td>Notion</td><td>計畫頁「問題／需求／IPO」更新</td></tr>
+          <tr><td>🎨 B 設計</td><td>UI、流程、系統架構</td><td>Notion＋GitHub</td><td>架構圖、畫面草稿（放 <code>docs/</code>）</td></tr>
+          <tr><td>💻 C 開發</td><td>Python／Web／IoT 程式</td><td>GitHub</td><td>可執行的 commit、PR</td></tr>
+          <tr><td>🧪 D 測試</td><td>測試、找 Bug、驗證 AI 產出</td><td>GitHub Issue</td><td>至少 2 則 Issue（重現步驟＋預期結果）</td></tr>
+          <tr><td>👩‍🏫 老師</td><td>教練：看打卡、回 Issue、Review PR、評量</td><td>兩者</td><td>每週一回覆「需協助」的小組</td></tr>
+        </tbody>
+      </table>
+      <div class="coach">🧑‍🏫 <b>老師怎麼幫你</b>：每週一看全班的進度打卡，🔴 或勾選「需要老師協助」的小組優先處理（課堂 5 分鐘諮詢或在你的 Issue 留言）。老師不會替你做，但會問你對的問題。</div>
+    </div>
+  </section>
+
+  <!-- ===== Notion 計畫 ===== -->
+  <section class="pane" id="nt">
+    <div class="fcard">
+      <h2>📒 在你自己的 Notion 建學習計畫</h2>
+      <p class="sub">計畫頁是<b>你們小組的</b>，放在你們自己的 Notion（學生用學校信箱可申請免費教育方案）。老師只需要一個「可檢視」的連結。</p>
+      <div class="actions" id="ntTplBox"></div>
+      <h2 style="font-size:15px;margin-top:14px">計畫頁 10 個區塊（範本已排好）</h2>
+      <ul class="ok-list">
+        <li><b>專題名稱</b>＋一句話：要幫誰解決什麼問題</li>
+        <li><b>1. 問題定義</b>：現況、痛點、為什麼值得做</li>
+        <li><b>2. 使用者需求</b>：誰會用？他最在意什麼？</li>
+        <li><b>3. 系統架構</b>：感知 → 傳輸 → 分析 → 行動（或前端／後端）</li>
+        <li><b>4. IPO</b>：每個功能的輸入、處理、輸出</li>
+        <li><b>5. 心智圖</b>：貼圖或連結（<a href="mindmap-ipo.html" style="color:var(--primary);font-weight:700">心智圖×IPO 單元</a>）</li>
+        <li><b>6. AI Prompt 紀錄</b>：Prompt → AI 回覆重點 → 我怎麼驗證 → 採用／修改／不採用</li>
+        <li><b>7. 小組分工</b>：本輪 A／B／C／D 是誰</li>
+        <li><b>8. 每週進度</b>：W 週次｜完成｜卡點｜下週目標（和「登記與打卡」同步填）</li>
+        <li><b>9. 遇到的問題</b>：問題 → 試過什麼 → 怎麼解決</li>
+        <li><b>10. 學習反思</b>：期中、期末各一次</li>
+      </ul>
+      <h2 style="font-size:15px;margin-top:14px">分享給老師（10 秒）</h2>
+      <p class="sub">計畫頁右上角「分享」→「發布／複製連結」設為<b>知道連結者可檢視</b> → 貼到「登記與打卡 → 專題登記」。</p>
+    </div>
+  </section>
+
+  <!-- ===== GitHub 實作 ===== -->
+  <section class="pane" id="gh">
+    <div class="fcard">
+      <h2>💻 GitHub 自學實踐：三步開工</h2>
+      <ul class="ok-list">
+        <li>建 repo：<span id="ghTpl">用老師的專題範本（公布後此處會出現按鈕）或自己新建一個 <b>Public</b> repo</span></li>
+        <li>寫 <code>README.md</code>：專題名稱、要解決的問題、如何執行、AI 協作聲明、組員角色</li>
+        <li>開 GitHub Pages：Settings → Pages → Branch 選 <code>main</code> → 幾分鐘後得到 <code>https://帳號.github.io/repo名/</code></li>
+      </ul>
+      <h2 style="font-size:15px;margin-top:14px">建議的資料夾結構</h2>
+<pre class="code">smart-irrigation/
+├── README.md        ← 專題說明（給人看的首頁）
+├── index.html       ← GitHub Pages 首頁
+├── css/  js/        ← 網頁樣式與程式
+├── python/          ← Python／IoT 程式
+├── images/  data/   ← 圖片、資料集
+└── docs/            ← 架構圖、測試紀錄</pre>
+    </div>
+    <div class="fcard">
+      <h2>🔄 改進它：Issue → Branch → Pull Request → Review → Merge</h2>
+      <div class="flowpr"><span>🐞 Issue</span>→<span>🌿 Branch</span>→<span>📬 Pull Request</span>→<span>👀 Review</span>→<span>✅ Merge</span></div>
+      <p class="sub">測試者（D）開 Issue，開發者（C）開分支修正、發 PR，另一位組員或老師 Review 後合併。這就是真正的軟體工程流程。</p>
+<pre class="code">標題：Bug 01：按下「開始」按鈕沒有反應
+重現方式：
+  1. 開啟首頁
+  2. 按 Start
+  3. 畫面沒有更新
+預期結果：顯示目前土壤濕度
+實際結果：畫面不變，Console 出現 TypeError
+環境：Chrome 129／手機 Safari</pre>
+      <h2 style="font-size:15px;margin-top:14px">好的 commit 訊息</h2>
+<pre class="code">feat: 新增濕度低於 30% 自動澆水
+fix: 修正 Start 按鈕沒有綁定事件（closes #1）
+docs: README 補上執行步驟與 AI 協作聲明</pre>
+      <div class="coach">🤖 <b>AI 協作規則</b>：AI 產生的程式可以用，但 PR 說明要寫「哪段是 AI 給的、我怎麼測過」。沒有測試證據的 AI 程式，Review 時會被要求補上。</div>
+    </div>
+  </section>
+
+  <!-- ===== 登記與打卡 ===== -->
+  <section class="pane lw" id="ck">
+    <form class="fcard" id="pjForm" autocomplete="off">
+      <h2>📌 專題登記 <span class="named">每組一次・組長填</span></h2>
+      <p class="sub">登記後老師的追蹤表只記<b>小組名稱與連結</b>，不記學號；你的身分只用來核對是哪一組。</p>
+      <div class="row2">
+        <div class="fq"><label for="pjGroup">小組名稱</label><input type="text" id="pjGroup" maxlength="30" placeholder="例如：資管一A 第 3 組 綠手指"></div>
+        <div class="fq"><label for="pjSize">組員人數</label><select id="pjSize"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></div>
+      </div>
+      <div class="fq"><label for="pjTitle">專題名稱</label><input type="text" id="pjTitle" maxlength="60" placeholder="例如：AI 智慧植物澆灌系統"></div>
+      <div class="fq"><label for="pjNotion">Notion 學習計畫連結<span class="hint">知道連結者可檢視</span></label><input type="url" id="pjNotion" maxlength="400" placeholder="https://"></div>
+      <div class="row2">
+        <div class="fq"><label for="pjRepo">GitHub Repo<span class="hint">可之後再補</span></label><input type="url" id="pjRepo" maxlength="300" placeholder="https://github.com/…"></div>
+        <div class="fq"><label for="pjPages">GitHub Pages<span class="hint">選填</span></label><input type="url" id="pjPages" maxlength="300" placeholder="https://….github.io/…"></div>
+      </div>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出登記</button><span class="note" style="margin:0">連結有變動，重新送出即可（以最新一筆為準）。</span></div>
+      <div class="msg" id="pjMsg"></div>
+    </form>
+
+    <form class="fcard" id="ckForm" autocomplete="off">
+      <h2>✅ 每週進度打卡 <span class="named">每組每週一次・誰填都可以</span></h2>
+      <p class="sub">內容和 Notion 計畫頁「8. 每週進度」一致即可。老師每週一看全班打卡，🔴 和「需要協助」優先回覆。</p>
+      <div class="row2">
+        <div class="fq"><label for="ckGroup">小組名稱</label><input type="text" id="ckGroup" maxlength="30"></div>
+        <div class="fq"><label for="ckWeek">週次</label><select id="ckWeek"></select></div>
+      </div>
+      <div class="fq"><span class="lb">目前階段</span>
+        <div class="chips" id="ckStage">
+          <label><input type="radio" name="stage" value="問題定義">❓ 問題定義</label>
+          <label><input type="radio" name="stage" value="IPO 規劃">🗺 IPO 規劃</label>
+          <label><input type="radio" name="stage" value="設計">🎨 設計</label>
+          <label><input type="radio" name="stage" value="實作">💻 實作</label>
+          <label><input type="radio" name="stage" value="測試">🧪 測試</label>
+          <label><input type="radio" name="stage" value="發布">🌐 發布</label>
+          <label><input type="radio" name="stage" value="反思">🪞 反思</label>
+        </div>
+      </div>
+      <div class="fq"><label for="ckDone">本週完成</label><textarea id="ckDone" maxlength="400" placeholder="例如：完成 IPO 表、Arduino 讀到濕度值、開了 2 個 Issue"></textarea></div>
+      <div class="fq"><label for="ckBlock">卡點<span class="hint">沒有就寫「無」</span></label><input type="text" id="ckBlock" maxlength="200"></div>
+      <div class="fq"><label for="ckNext">下週目標</label><input type="text" id="ckNext" maxlength="200"></div>
+      <div class="fq"><span class="lb">整體狀態</span>
+        <div class="chips" id="ckState">
+          <label><input type="radio" name="state" value="green">🟢 順利</label>
+          <label><input type="radio" name="state" value="yellow">🟡 有卡關，自己能處理</label>
+          <label><input type="radio" name="state" value="red">🔴 卡住了</label>
+        </div>
+      </div>
+      <label class="consent"><input type="checkbox" id="ckHelp"><span>我們需要老師協助（老師會在週一優先聯絡）</span></label>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出打卡</button></div>
+      <div class="msg" id="ckMsg"></div>
+    </form>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var L=window.AELearn, $=function(id){return document.getElementById(id);}, esc=L.esc;
+var show=L.tabs(); L.weekSelect($("ckWeek"));
+Array.prototype.forEach.call(document.querySelectorAll("[data-go]"),function(a){ a.addEventListener("click",function(e){ e.preventDefault(); show(a.getAttribute("data-go")); window.scrollTo(0,0); }); });
+
+/* 範本連結（老師公布後填 meta） */
+function meta(n){ var m=document.querySelector('meta[name="'+n+'"]'); var v=m?String(m.getAttribute("content")||"").trim():""; return /^https:\/\//.test(v)?v:""; }
+var NT=meta("ae-notion-template"), GT=meta("ae-github-template");
+$("ntTplBox").innerHTML=NT?'<a class="btn btn-primary" href="'+esc(NT)+'" target="_blank" rel="noopener">📒 複製「學生學習計畫範本」到我的 Notion</a>':'<span class="note" style="margin:0">📒 老師公布範本連結後，這裡會出現「一鍵複製」按鈕；在那之前可依下方 10 個區塊自己建一頁。</span>';
+if(GT) $("ghTpl").innerHTML='<a class="btn btn-primary" href="'+esc(GT)+'/generate" target="_blank" rel="noopener">💻 用專題範本建立我的 repo</a>';
+
+function say(id,txt,kind){ var m=$(id); m.className="msg show "+(kind||"ok"); m.textContent=txt; }
+function needId(msgId){ var id=(window.AEId&&AEId.get())||null; if(id&&id.sid&&id.cls) return id; say(msgId,"請先在上方身分小卡填學號後 4 碼與班級（只用來核對小組，老師的追蹤表不記學號）。","warn"); if(window.AEId&&AEId.prompt)AEId.prompt("填好身分才能登記／打卡。"); return null; }
+function https(v){ return !v||/^https:\/\//i.test(v); }
+var GKEY="ae.project.group";
+var g0=L.local(GKEY); if(g0){ $("pjGroup").value=g0; $("ckGroup").value=g0; }
+
+/* 專題登記 */
+$("pjForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var id=needId("pjMsg"); if(!id) return;
+  var g=$("pjGroup").value.trim(), t=$("pjTitle").value.trim(), n=$("pjNotion").value.trim(), r=$("pjRepo").value.trim(), p=$("pjPages").value.trim();
+  if(!g||!t){ say("pjMsg","小組名稱與專題名稱都要填。","warn"); return; }
+  if(!n||!https(n)){ say("pjMsg","請貼 Notion 學習計畫的 https 連結（記得設成知道連結者可檢視）。","warn"); return; }
+  if(!https(r)||!https(p)){ say("pjMsg","GitHub 連結請用 https:// 開頭。","warn"); return; }
+  L.local(GKEY,g); $("ckGroup").value=g;
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send({app:"ai-empower",kind:"projreg",sid:id.sid,cls:id.cls,score:"",max:"",
+    detail:{group:g,size:Number($("pjSize").value),title:t,notion:n,repo:r,pages:p}})
+   .then(function(res){ say("pjMsg","✅ 已登記「"+g+"」。下一步：每週到下方打卡。"+(res.queued?" "+res.msg:""),res.queued?"warn":"ok"); })
+   .then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+
+/* 每週打卡 */
+function radio(n){ var x=document.querySelector('input[name="'+n+'"]:checked'); return x?x.value:""; }
+$("ckForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var id=needId("ckMsg"); if(!id) return;
+  var g=$("ckGroup").value.trim(), st=radio("stage"), s=radio("state"), done=$("ckDone").value.trim();
+  if(!g){ say("ckMsg","請填小組名稱（和登記時一樣）。","warn"); return; }
+  if(!st||!s){ say("ckMsg","請點選目前階段與整體狀態。","warn"); return; }
+  if(done.length<6){ say("ckMsg","「本週完成」寫具體一點（至少一句）。","warn"); return; }
+  L.local(GKEY,g);
+  var help=$("ckHelp").checked||s==="red";
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send({app:"ai-empower",kind:"checkin",sid:id.sid,cls:id.cls,score:"",max:"",
+    detail:{group:g,week:Number($("ckWeek").value),stage:st,done:done,block:$("ckBlock").value.trim(),next:$("ckNext").value.trim(),state:s,help:help?1:0}})
+   .then(function(res){ say("ckMsg","✅ 第 "+$("ckWeek").value+" 週打卡完成。"+(help?"老師週一會優先聯絡你們。":"記得同步更新 Notion 計畫頁的每週進度。")+(res.queued?" "+res.msg:""),res.queued?"warn":"ok"); })
+   .then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+})();
+</script>
+</body>
+</html>
