@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>題庫自主練習｜ai-empower</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學平台">
+<meta property="og:title" content="題庫自主練習｜ai-empower">
+<meta property="og:description" content="硬體・軟體・網路・物聯網四向度題庫：向度練習、錯題本、30 選擇＋3 問答模擬考，自己練、自己看進步。">
+<meta name="description" content="硬體・軟體・網路・物聯網四向度題庫：向度練習、錯題本、30 選擇＋3 問答模擬考，自己練、自己看進步。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/practice.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<link rel="stylesheet" href="assets/learn.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/cloud.js"></script>
+<script src="assets/learn.js"></script>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span><span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="ioc.html">IOC 課程</a><a href="assess.html">我的評量</a>
+      <a href="reflect.html">回饋站</a><a href="practice.html" aria-current="page">題庫練習</a><a href="showcase.html">作品牆</a><a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+<main class="wrap" style="max-width:920px;padding-bottom:40px">
+  <header class="phead eco">
+    <h1>🎯 題庫自主練習<span class="en">Self-paced Practice</span></h1>
+    <p>四個向度（硬體・軟體・網路・物聯網）的老師審核題。先挑弱的向度練，錯的題自動進錯題本；準備好了就挑戰<b>模擬考：選擇站 30 題 75 分＋問答站 3 題 25 分</b>。練習不計分，練多少次都可以。</p>
+    <div class="idrow" data-aeid></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="ax">🎯 向度練習</button>
+    <button type="button" role="tab" data-tab="wr">🔁 錯題本 <span id="wrN"></span></button>
+    <button type="button" role="tab" data-tab="mk">🏁 模擬考</button>
+    <button type="button" role="tab" data-tab="me">📊 我的進步</button>
+  </div>
+
+  <!-- 向度練習 -->
+  <section class="pane lw" id="ax">
+    <div class="fcard" id="axSetup">
+      <h2>🎯 向度練習</h2>
+      <p class="sub">每題點選後立刻告訴你對錯。建議從「我的進步」裡正確率最低的向度開始。</p>
+      <div class="fq"><span class="lb">向度</span>
+        <div class="chips" id="axPick">
+          <label><input type="radio" name="axis" value="" checked>全部</label>
+          <label><input type="radio" name="axis" value="硬體">🖥 硬體</label>
+          <label><input type="radio" name="axis" value="軟體">💾 軟體</label>
+          <label><input type="radio" name="axis" value="網路">🌐 網路</label>
+          <label><input type="radio" name="axis" value="物聯網">📡 物聯網</label>
+        </div>
+      </div>
+      <div class="fq"><span class="lb">題數</span>
+        <div class="chips" id="axCnt">
+          <label><input type="radio" name="cnt" value="10" checked>10 題</label>
+          <label><input type="radio" name="cnt" value="20">20 題</label>
+          <label><input type="radio" name="cnt" value="30">30 題</label>
+        </div>
+      </div>
+      <label class="consent" style="margin-top:6px"><input type="checkbox" id="axFresh" checked><span>優先出我還沒做過的題目</span></label>
+      <div class="actions"><button class="btn btn-primary" id="axGo" type="button">開始練習</button><span class="note" id="bankNote" style="margin:0">題庫載入中…</span></div>
+    </div>
+    <div id="axRun"></div>
+  </section>
+
+  <!-- 錯題本 -->
+  <section class="pane lw" id="wr">
+    <div class="fcard">
+      <h2>🔁 錯題本</h2>
+      <p class="sub">答錯的題目會自動收進來；在錯題重練裡<b>連續答對 2 次</b>就會畢業移出。</p>
+      <div id="wrSum" class="note"></div>
+      <div class="actions"><button class="btn btn-primary" id="wrGo" type="button">重練錯題</button><button class="btn btn-ghost" id="wrClear" type="button">清空錯題本</button></div>
+    </div>
+    <div id="wrRun"></div>
+  </section>
+
+  <!-- 模擬考 -->
+  <section class="pane lw" id="mk">
+    <div class="fcard" id="mkSetup">
+      <h2>🏁 模擬考（比照期中／期末結構）</h2>
+      <p class="sub">選擇站 30 題 × 2.5 分＝75 分（硬體 8・軟體 8・網路 7・物聯網 7）；問答站 3 題＝25 分（9／8／8），交卷後依評分規準<b>自評</b>。建議時間 50 分鐘，時間到會提醒但不強制交卷。</p>
+      <div class="note" id="mkEsNote"></div>
+      <div class="actions"><button class="btn btn-primary" id="mkGo" type="button">開始模擬考</button></div>
+      <p class="note">⚠ 模擬考只用來自我檢核，不計入成績；正式期中／期末依老師在 Moodle 的公告進行。</p>
+    </div>
+    <div id="mkRun"></div>
+  </section>
+
+  <!-- 我的進步 -->
+  <section class="pane lw" id="me">
+    <div class="fcard">
+      <h2>📊 我的進步（這台裝置）</h2>
+      <p class="sub">依你在這台裝置的作答統計。練習結果也會上傳到你的雲端紀錄（填了身分才會），在「我的學習週報」看得到。</p>
+      <div id="meAxis"></div>
+      <h2 style="margin-top:16px;font-size:15px">最近 10 次</h2>
+      <ul class="hist" id="meHist"></ul>
+      <div class="actions"><a class="btn btn-ghost" href="weekly.html">📈 我的學習週報</a></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var L=window.AELearn, $=function(id){return document.getElementById(id);}, esc=L.esc;
+var AXES=["硬體","軟體","網路","物聯網"], LET="ABCD";
+var BANK={mc:[],es:[]}, BYID={};
+var K_STAT="ae.practice.stat", K_WRONG="ae.practice.wrong", K_HIST="ae.practice.hist";
+var showTab=L.tabs();
+
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function stat(){ return L.local(K_STAT)||{}; }
+function wrong(){ return L.local(K_WRONG)||{}; }
+function radio(n){ var x=document.querySelector('input[name="'+n+'"]:checked'); return x?x.value:""; }
+function ident(){ return (window.AEId&&AEId.get())||{}; }
+
+/* 單題作答紀錄：stat[id]={n,ok,last}；錯題本 wrong[id]={miss,streak} */
+function mark(q,ok,inRetry){
+  var s=stat(), w=wrong(), r=s[q.i]||{n:0,ok:0}; r.n++; if(ok)r.ok++; r.last=Date.now(); s[q.i]=r; L.local(K_STAT,s);
+  if(!ok){ var x=w[q.i]||{miss:0,streak:0}; x.miss++; x.streak=0; w[q.i]=x; }
+  else if(w[q.i]){ if(inRetry){ w[q.i].streak=(w[q.i].streak||0)+1; if(w[q.i].streak>=2) delete w[q.i]; } }
+  L.local(K_WRONG,w); wrBadge();
+}
+function wrBadge(){ var n=Object.keys(wrong()).filter(function(k){return BYID[k];}).length; $("wrN").textContent=n?"("+n+")":""; return n; }
+
+/* 選項洗牌：題庫原始答案位置不固定可預測，顯示時一律重排 */
+function view(q){ var idx=shuffle([0,1,2,3]); return {q:q,ord:idx,ans:idx.indexOf(q.c)}; }
+
+function qHTML(v,n,total,withFb){
+  var q=v.q;
+  return '<div class="qcard" data-i="'+esc(q.i)+'"><div class="qhead"><span>第 '+n+' / '+total+' 題・'+esc(q.a)+(q.d&&q.d!=="未分級"?"・"+esc(q.d):"")+'</span><span>'+esc(q.i)+'</span></div>'+
+    '<div class="qstem">'+esc(q.s)+'</div><div class="opts">'+
+    v.ord.map(function(k,j){return '<button type="button" class="opt" data-j="'+j+'"><span class="L">'+LET[j]+'</span><span>'+esc(q.o[k])+'</span></button>';}).join("")+
+    '</div>'+(withFb?'<div class="fb"></div>':'')+'</div>';
+}
+
+/* ---------- 即時回饋模式（向度練習／錯題重練） ---------- */
+function runQuiz(box,list,mode,meta){
+  var views=list.map(view), done=0, right=0, wrongIds=[];
+  box.innerHTML='<div class="stick"><span id="'+mode+'Prog">進度 0 / '+views.length+'</span><span id="'+mode+'Ok">答對 0</span></div>'+
+    views.map(function(v,k){return qHTML(v,k+1,views.length,true);}).join("")+'<div id="'+mode+'End"></div>';
+  Array.prototype.forEach.call(box.querySelectorAll(".qcard"),function(card,k){
+    card.addEventListener("click",function(e){
+      var b=e.target.closest(".opt"); if(!b||card.dataset.done)return;
+      card.dataset.done=1; var v=views[k], j=Number(b.dataset.j), ok=j===v.ans;
+      var opts=card.querySelectorAll(".opt"); Array.prototype.forEach.call(opts,function(o){o.disabled=true;});
+      opts[v.ans].classList.add("right"); if(!ok)b.classList.add("wrong");
+      var fb=card.querySelector(".fb"); fb.className="fb "+(ok?"ok":"err"); fb.textContent=ok?"✔ 答對了！":"✘ 正確答案是 "+LET[v.ans]+"。想想看為什麼——不確定就問 AI，再回講義驗證。";
+      done++; if(ok)right++; else wrongIds.push(v.q.i);
+      mark(v.q,ok,mode==="wr");
+      $(mode+"Prog").textContent="進度 "+done+" / "+views.length; $(mode+"Ok").textContent="答對 "+right;
+      if(done===views.length) finish();
+    });
+  });
+  function finish(){
+    var pct=Math.round(right/views.length*100), byAx={};
+    views.forEach(function(v){ var a=byAx[v.q.a]=byAx[v.q.a]||{n:0,ok:0}; a.n++; if(wrongIds.indexOf(v.q.i)<0)a.ok++; });
+    $(mode+"End").innerHTML='<div class="fcard"><h2>完成！答對 '+right+' / '+views.length+'（'+pct+'%）</h2><p class="sub">'+
+      (pct>=80?"很穩！可以換下一個向度，或挑戰模擬考。":pct>=60?"有基礎了，錯的題已收進錯題本，明天再練一次。":"先別急，把錯題本練到畢業，再回來挑戰。")+'</p>'+
+      '<div class="actions"><button class="btn btn-primary" type="button" data-again>再練一回</button><button class="btn btn-ghost" type="button" data-gowr>看錯題本</button></div></div>';
+    var endEl=$(mode+"End");
+    endEl.querySelector("[data-again]").addEventListener("click",function(){ box.innerHTML=""; if(mode==="ax"){$("axSetup").style.display="";} window.scrollTo(0,0); });
+    endEl.querySelector("[data-gowr]").addEventListener("click",function(){ box.innerHTML=""; $("axSetup").style.display=""; showTab("wr"); window.scrollTo(0,0); });
+    save({mode:mode==="wr"?"retry":"axis",axis:meta.axis||"全部",n:views.length,ok:right,byAx:byAx,wrong:wrongIds},right,views.length);
+  }
+}
+
+/* 上傳＋本機歷程 */
+function save(d,score,max){
+  var h=L.local(K_HIST)||[]; h.push({ts:new Date().toISOString(),d:d,score:score,max:max}); L.local(K_HIST,h.slice(-60));
+  var id=ident();
+  if(id.sid&&id.cls){ L.send({app:"ai-empower",kind:"practice",sid:id.sid,cls:id.cls,score:score,max:max,detail:d}); }
+  renderMe(); renderWr();
+}
+
+/* ---------- 向度練習 ---------- */
+$("axGo").addEventListener("click",function(){
+  if(!BANK.mc.length)return;
+  var ax=radio("axis"), n=Number(radio("cnt"))||10, s=stat();
+  var pool=BANK.mc.filter(function(q){return !ax||q.a===ax;});
+  if($("axFresh").checked){ var fresh=shuffle(pool.filter(function(q){return !s[q.i];})), seen=shuffle(pool.filter(function(q){return s[q.i];})); pool=fresh.concat(seen); }
+  else pool=shuffle(pool);
+  $("axSetup").style.display="none";
+  runQuiz($("axRun"),pool.slice(0,n),"ax",{axis:ax});
+  window.scrollTo(0,0);
+});
+
+/* ---------- 錯題本 ---------- */
+function renderWr(){
+  var w=wrong(), ids=Object.keys(w).filter(function(k){return BYID[k];}), by={};
+  ids.forEach(function(k){var a=BYID[k].a; by[a]=(by[a]||0)+1;});
+  $("wrSum").textContent=ids.length?("目前 "+ids.length+" 題："+AXES.map(function(a){return a+" "+(by[a]||0);}).join("・")):"錯題本是空的——去「向度練習」做幾題吧！";
+  $("wrGo").disabled=!ids.length;
+}
+$("wrGo").addEventListener("click",function(){
+  var ids=Object.keys(wrong()).filter(function(k){return BYID[k];});
+  ids.sort(function(a,b){return wrong()[b].miss-wrong()[a].miss;});
+  runQuiz($("wrRun"),shuffle(ids.slice(0,20)).map(function(k){return BYID[k];}),"wr",{axis:"錯題"});
+});
+$("wrClear").addEventListener("click",function(){ L.local(K_WRONG,{}); wrBadge(); renderWr(); $("wrRun").innerHTML=""; });
+
+/* ---------- 模擬考 ---------- */
+var QUOTA={"硬體":8,"軟體":8,"網路":7,"物聯網":7}, ES_PTS=[9,8,8], LIMIT=50*60;
+function pickMock(){
+  var mc=[];
+  AXES.forEach(function(a){ mc=mc.concat(shuffle(BANK.mc.filter(function(q){return q.a===a;})).slice(0,QUOTA[a])); });
+  if(mc.length<30){ var have={}; mc.forEach(function(q){have[q.i]=1;}); mc=mc.concat(shuffle(BANK.mc.filter(function(q){return !have[q.i];})).slice(0,30-mc.length)); }
+  var es=[], used={};
+  shuffle(BANK.es).forEach(function(q){ if(es.length<3&&!used[q.a]){es.push(q);used[q.a]=1;} });
+  shuffle(BANK.es).forEach(function(q){ if(es.length<3&&es.indexOf(q)<0)es.push(q); });
+  return {mc:shuffle(mc),es:es};
+}
+$("mkGo").addEventListener("click",function(){
+  if(!BANK.mc.length)return;
+  var P=pickMock(), views=P.mc.map(view), pick={}, t0=Date.now(), timer;
+  $("mkSetup").style.display="none";
+  var h='<div class="stick"><span id="mkProg">已作答 0 / '+views.length+'</span><span id="mkClock">⏱ 50:00</span><button class="btn btn-primary" id="mkSubmit" type="button">交卷</button></div>';
+  h+='<div class="fcard"><h2>選擇站（30 題 × 2.5 分＝75 分）</h2><p class="sub">交卷前都可以改答案。</p></div>';
+  h+=views.map(function(v,k){return qHTML(v,k+1,views.length,false);}).join("");
+  h+='<div class="fcard"><h2>問答站（3 題＝25 分）</h2>'+(P.es.length?'<p class="sub">先在下面寫下你的答案（不上傳全文，只存在這台裝置），交卷後對照評分規準自評。</p>':'<p class="sub">問答題正在老師審核中，這次模擬考只計選擇站 75 分。審核通過後會自動出現在這裡。</p>')+'</div>';
+  h+=P.es.map(function(q,k){return '<div class="qcard"><div class="qhead"><span>問答 '+(k+1)+'・'+ES_PTS[k]+' 分・'+esc(q.a)+'</span><span>'+esc(q.i)+'</span></div><div class="qstem">'+esc(q.s)+'</div><div class="fq" style="margin:0"><textarea data-es="'+k+'" maxlength="1500" placeholder="寫下你的回答…"></textarea></div><div class="esr" data-k="'+k+'"></div></div>';}).join("");
+  h+='<div id="mkEnd"></div>';
+  $("mkRun").innerHTML=h; window.scrollTo(0,0);
+  Array.prototype.forEach.call($("mkRun").querySelectorAll(".qcard[data-i]"),function(card,k){
+    card.addEventListener("click",function(e){
+      var b=e.target.closest(".opt"); if(!b||card.dataset.done)return;
+      Array.prototype.forEach.call(card.querySelectorAll(".opt"),function(o){o.classList.remove("sel");}); b.classList.add("sel");
+      pick[k]=Number(b.dataset.j); $("mkProg").textContent="已作答 "+Object.keys(pick).length+" / "+views.length;
+    });
+  });
+  timer=setInterval(function(){
+    var left=LIMIT-Math.floor((Date.now()-t0)/1000), m=Math.floor(Math.abs(left)/60), s=Math.abs(left)%60;
+    $("mkClock").textContent=(left<0?"⏱ 超時 ":"⏱ ")+m+":"+(s<10?"0":"")+s; if(left<0)$("mkClock").style.color="var(--err)";
+  },1000);
+  $("mkSubmit").addEventListener("click",function(){
+    var miss=views.length-Object.keys(pick).length;
+    if(miss&&!confirmBox(miss))return;
+    clearInterval(timer); this.disabled=true;
+    var right=0, byAx={}, wrongIds=[];
+    $("mkRun").querySelectorAll(".qcard[data-i]").forEach(function(card,k){
+      var v=views[k], ok=pick[k]===v.ans, opts=card.querySelectorAll(".opt"); card.dataset.done=1;
+      Array.prototype.forEach.call(opts,function(o){o.disabled=true;}); opts[v.ans].classList.add("right"); if(pick[k]!=null&&!ok)opts[pick[k]].classList.add("wrong");
+      var a=byAx[v.q.a]=byAx[v.q.a]||{n:0,ok:0}; a.n++; if(ok){a.ok++;right++;} else wrongIds.push(v.q.i);
+      mark(v.q,ok,false);
+    });
+    var mcScore=Math.round(right*2.5*10)/10, mins=Math.round((Date.now()-t0)/600)/100;
+    /* 問答自評 */
+    P.es.forEach(function(q,k){
+      var box=$("mkRun").querySelector('.esr[data-k="'+k+'"]');
+      box.innerHTML='<div class="rub"><b>評分規準：</b>'+esc(q.r)+'</div><div class="fq"><span class="lb">對照規準，自評這題得分</span><div class="chips">'+
+        [["全部做到",1],["大部分",0.7],["一半",0.5],["少部分",0.25],["沒寫／離題",0]].map(function(o){return '<label><input type="radio" name="es'+k+'" value="'+o[1]+'">'+o[0]+'（'+Math.round(ES_PTS[k]*o[1])+'）</label>';}).join("")+'</div></div>';
+    });
+    var end=$("mkEnd");
+    function total(){ var es=0; P.es.forEach(function(q,k){var v=radio("es"+k); if(v!=="")es+=Math.round(ES_PTS[k]*Number(v));}); return es; }
+    function draw(){
+      var es=total(), all=Math.round((mcScore+es)*10)/10;
+      end.innerHTML='<div class="fcard"><h2>成績</h2><div class="big-score">'+all+' <span style="font-size:15px;color:var(--muted)">/ '+(P.es.length?100:75)+'</span></div>'+
+        '<p class="sub">選擇站 '+right+' / 30 題＝'+mcScore+' 分'+(P.es.length?'；問答站自評 '+es+' / 25 分':'')+'；用時 '+mins+' 分鐘</p>'+
+        AXES.map(function(a){var x=byAx[a]||{n:0,ok:0},p=x.n?Math.round(x.ok/x.n*100):0;return '<div class="axrow"><b>'+a+'</b><div class="bar"><i style="width:'+p+'%"></i></div><span>'+x.ok+'/'+x.n+'</span></div>';}).join("")+
+        '<p class="note">答錯的 '+wrongIds.length+' 題已收進錯題本。正確率最低的向度，就是下一步要練的。</p>'+
+        '<div class="actions"><button class="btn btn-primary" type="button" id="mkSave">'+(P.es.length?'完成自評並儲存':'儲存成績')+'</button><button class="btn btn-ghost" type="button" onclick="location.reload()">再考一次</button></div></div>';
+      $("mkSave").addEventListener("click",function(){
+        this.disabled=true; this.textContent="✔ 已儲存";
+        save({mode:"mock",n:30,ok:right,mc:mcScore,es:P.es.length?total():null,esIds:P.es.map(function(q){return q.i;}),byAx:byAx,wrong:wrongIds,mins:mins},mcScore,75);
+      });
+    }
+    draw();
+    $("mkRun").addEventListener("change",function(e){ if(e.target.name&&/^es\d$/.test(e.target.name)) draw(); });
+    end.scrollIntoView({behavior:"smooth"});
+  });
+});
+function confirmBox(miss){
+  var el=$("mkProg"); if(el.dataset.warned){return true;}
+  el.dataset.warned=1; el.textContent="還有 "+miss+" 題沒作答——再按一次「交卷」確定交出"; el.style.color="var(--err)"; return false;
+}
+
+/* ---------- 我的進步 ---------- */
+function renderMe(){
+  var s=stat(), by={};
+  Object.keys(s).forEach(function(k){ var q=BYID[k]; if(!q)return; var a=by[q.a]=by[q.a]||{n:0,ok:0,q:0}; a.n+=s[k].n; a.ok+=s[k].ok; a.q++; });
+  $("meAxis").innerHTML=AXES.map(function(a){
+    var x=by[a]||{n:0,ok:0,q:0}, tot=BANK.mc.filter(function(q){return q.a===a;}).length, p=x.n?Math.round(x.ok/x.n*100):0;
+    return '<div class="axrow"><b>'+a+'</b><div class="bar"><i style="width:'+p+'%"></i></div><span>'+(x.n?p+"%":"—")+'</span></div><div class="note" style="margin:-4px 0 6px 80px">做過 '+x.q+' / '+tot+' 題</div>';
+  }).join("");
+  var h=(L.local(K_HIST)||[]).slice(-10).reverse();
+  var NAME={axis:"向度練習",retry:"錯題重練",mock:"模擬考"};
+  $("meHist").innerHTML=h.length?h.map(function(x){var d=x.d;return '<li><b>'+(NAME[d.mode]||d.mode)+'</b> <span class="t">'+esc(L.fmt(x.ts))+'</span><br>'+
+    (d.mode==="mock"?('選擇站 '+d.ok+'/30（'+d.mc+' 分）'+(d.es!=null?'＋問答自評 '+d.es+' 分':'')):(esc(d.axis||"")+' '+d.ok+' / '+d.n))+'</li>';}).join(""):'<li>還沒有紀錄。</li>';
+}
+
+/* ---------- 載入題庫 ---------- */
+fetch("assets/bank/practice.json",{cache:"no-cache"}).then(function(r){ if(!r.ok)throw new Error("HTTP "+r.status); return r.json(); })
+  .then(function(b){
+    BANK={mc:b.mc||[],es:b.es||[]}; BANK.mc.concat(BANK.es).forEach(function(q){BYID[q.i]=q;});
+    $("bankNote").textContent="題庫 "+BANK.mc.length+" 題選擇＋"+BANK.es.length+" 題問答（更新於 "+(b.built||"")+"）";
+    $("mkEsNote").textContent=BANK.es.length>=3?("問答題庫 "+BANK.es.length+" 題，每次隨機抽 3 題（盡量不同向度）。"):"問答題目前由老師審核中，模擬考暫時只有選擇站（75 分）。";
+    wrBadge(); renderWr(); renderMe();
+  })
+  .catch(function(){ $("bankNote").textContent="題庫載入失敗，請重新整理頁面。"; $("axGo").disabled=true; $("mkGo").disabled=true; });
+})();
+</script>
+</body>
+</html>

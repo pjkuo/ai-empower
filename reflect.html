@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>學習回饋站｜ai-empower</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學平台">
+<meta property="og:title" content="學習回饋站｜ai-empower">
+<meta property="og:description" content="課後一分鐘回饋（匿名）、每週學習反思、我要提問——老師每週看、下週課就回應。">
+<meta name="description" content="課後一分鐘回饋（匿名）、每週學習反思、我要提問——老師每週看、下週課就回應。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/reflect.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<link rel="stylesheet" href="assets/learn.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/cloud.js"></script>
+<script src="assets/learn.js"></script>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span><span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="ioc.html">IOC 課程</a><a href="assess.html">我的評量</a>
+      <a href="reflect.html" aria-current="page">回饋站</a><a href="practice.html">題庫練習</a><a href="showcase.html">作品牆</a><a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+<main class="wrap" style="max-width:920px;padding-bottom:40px">
+  <header class="phead">
+    <h1>🗣 學習回饋站<span class="en">Feedback · Reflection · Questions</span></h1>
+    <p>下課前花一分鐘，告訴老師哪裡懂、哪裡卡。老師每週日彙整全班的聲音，<b>下週上課第一件事就是回應</b>。一分鐘回饋與提問是<b>匿名</b>的；每週反思會記名，存成你自己的學習歷程。</p>
+    <div class="idrow" data-aeid></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="fb">⏱ 一分鐘回饋</button>
+    <button type="button" role="tab" data-tab="rf">📝 每週反思</button>
+    <button type="button" role="tab" data-tab="qa">❓ 我要提問</button>
+  </div>
+
+  <!-- ===== 一分鐘回饋（匿名） ===== -->
+  <section class="pane lw" id="fb">
+    <form class="fcard" id="fbForm" autocomplete="off">
+      <h2>⏱ 課後一分鐘回饋 <span class="anon">匿名</span></h2>
+      <p class="sub">不記學號，只記班級與週次，老師只看全班統計。誠實就好，沒有標準答案。</p>
+      <div class="row2">
+        <div class="fq"><label for="fbWeek">週次</label><select id="fbWeek" name="week"></select></div>
+        <div class="fq"><label for="fbCls">班級</label><select id="fbCls" name="cls"></select></div>
+      </div>
+      <div class="fq"><span class="lb">今天的內容我理解了多少？</span>
+        <div class="chips" id="fbUnd">
+          <label class="big"><input type="radio" name="und" value="1">😵<small>1</small></label>
+          <label class="big"><input type="radio" name="und" value="2">😕<small>2</small></label>
+          <label class="big"><input type="radio" name="und" value="3">😐<small>3</small></label>
+          <label class="big"><input type="radio" name="und" value="4">🙂<small>4</small></label>
+          <label class="big"><input type="radio" name="und" value="5">🤩<small>5</small></label>
+        </div>
+      </div>
+      <div class="fq"><label for="fbClear">今天最清楚的一點<span class="hint">一句話即可</span></label><input type="text" id="fbClear" maxlength="200" placeholder="例如：終於搞懂 RAM 和儲存裝置的差別"></div>
+      <div class="fq"><label for="fbMuddy">今天最模糊的一點<span class="hint">老師最想知道這題</span></label><input type="text" id="fbMuddy" maxlength="200" placeholder="例如：IP 和 MAC 位址到底差在哪？"></div>
+      <div class="fq"><span class="lb">今天有用 AI 嗎？怎麼用？<span class="hint">可複選</span></span>
+        <div class="chips" id="fbAI">
+          <label><input type="checkbox" value="沒有使用">沒有使用</label>
+          <label><input type="checkbox" value="查概念">查概念／請它解釋</label>
+          <label><input type="checkbox" value="除錯">除錯／檢查程式</label>
+          <label><input type="checkbox" value="草稿">先產生草稿再修改</label>
+          <label><input type="checkbox" value="驗證">驗證我的答案</label>
+        </div>
+      </div>
+      <div class="fq"><label for="fbAsk">想問老師的一句話<span class="hint">選填；會進入 FAQ 候選</span></label><input type="text" id="fbAsk" maxlength="200"></div>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出回饋</button><span id="fbSeen" class="note" style="margin:0"></span></div>
+      <div class="msg" id="fbMsg"></div>
+    </form>
+  </section>
+
+  <!-- ===== 每週反思（記名） ===== -->
+  <section class="pane lw" id="rf">
+    <form class="fcard" id="rfForm" autocomplete="off">
+      <h2>📝 每週學習反思 <span class="named">記名・存成學習歷程</span></h2>
+      <p class="sub">用三個問題整理這一週：學到什麼 → 卡在哪、怎麼解 → 下週怎麼做。寫完會出現在下方「我的反思歷程」，期末可以回頭看自己怎麼成長。</p>
+      <div class="fq"><label for="rfWeek">週次</label><select id="rfWeek"></select></div>
+      <div class="fq"><label for="rfWhat">① 這週我學到了什麼？（What）</label><textarea id="rfWhat" maxlength="600" placeholder="用自己的話寫，不用抄講義。"></textarea></div>
+      <div class="fq"><label for="rfSo">② 我卡在哪裡？後來怎麼解決／打算怎麼解決？（So what）</label><textarea id="rfSo" maxlength="600" placeholder="例如：一開始搞混…，後來我用…驗證，發現…"></textarea></div>
+      <div class="fq"><label for="rfNow">③ 下週我要做的一件具體行動（Now what）</label><input type="text" id="rfNow" maxlength="200" placeholder="例如：課前先看 10 分鐘影片，把不懂的地方記下來"></div>
+      <div class="fq"><span class="lb">這週我的投入程度</span>
+        <div class="chips" id="rfEff">
+          <label><input type="radio" name="eff" value="1">1 很少</label><label><input type="radio" name="eff" value="2">2</label>
+          <label><input type="radio" name="eff" value="3">3 普通</label><label><input type="radio" name="eff" value="4">4</label>
+          <label><input type="radio" name="eff" value="5">5 全力</label>
+        </div>
+      </div>
+      <div class="fq"><label for="rfAI">AI 協作紀錄：用了哪個 AI 做什麼？我怎麼驗證它說的對不對？<span class="hint">選填</span></label><textarea id="rfAI" maxlength="400" placeholder="例如：用 ChatGPT 解釋子網路遮罩，再用課本範例自己算一次對照。"></textarea></div>
+      <label class="consent"><input type="checkbox" id="rfShare"><span>我同意老師<b>去識別化</b>摘錄我的反思，作為教學改進或對外分享的素材（不會出現學號或姓名；不同意也完全不影響成績）。</span></label>
+      <div class="actions"><button class="btn btn-primary" type="submit">儲存本週反思</button></div>
+      <div class="msg" id="rfMsg"></div>
+    </form>
+    <div class="fcard">
+      <h2>📚 我的反思歷程</h2>
+      <p class="sub" id="rfHistNote">讀取中…</p>
+      <ul class="hist" id="rfHist"></ul>
+    </div>
+  </section>
+
+  <!-- ===== 我要提問（匿名） ===== -->
+  <section class="pane lw" id="qa">
+    <form class="fcard" id="qaForm" autocomplete="off">
+      <h2>❓ 我要提問 <span class="anon">匿名</span></h2>
+      <p class="sub">不好意思在課堂上問的，都可以在這裡問。老師每週整理成 <a href="manual.html#s51" style="color:var(--primary);font-weight:700">手冊 FAQ</a>，同一個問題很多人問，就會優先在課堂上回答。</p>
+      <div class="row2">
+        <div class="fq"><label for="qaCat">問題類型</label>
+          <select id="qaCat"><option>課程內容</option><option>作業／專題</option><option>平台操作</option><option>評量與成績</option><option>其他</option></select></div>
+        <div class="fq"><label for="qaWeek">跟哪一週有關</label><select id="qaWeek"></select></div>
+      </div>
+      <div class="fq"><label for="qaCls">班級</label><select id="qaCls"></select></div>
+      <div class="fq"><label for="qaQ">我的問題</label><textarea id="qaQ" maxlength="500" placeholder="盡量具體：我在做…的時候，…，不知道為什麼…"></textarea></div>
+      <div class="fq"><label for="qaTry">我已經試過…<span class="hint">選填；先試再問，老師回得更準</span></label><input type="text" id="qaTry" maxlength="200" placeholder="例如：問過 AI、看過第 3 週講義第 5 頁"></div>
+      <label class="consent"><input type="checkbox" id="qaPub" checked><span>可以把這個問題（匿名）收進手冊 FAQ，讓其他同學也看得到答案。</span></label>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出問題</button><a class="btn btn-ghost" href="manual.html#s51">先看看 FAQ</a></div>
+      <div class="msg" id="qaMsg"></div>
+    </form>
+  </section>
+  <p class="note" style="text-align:center">資料流向：本頁 → 課程雲端試算表 → 老師每週彙整（Notion 只記人數與統計，不記學號）→ 下週課堂回應／手冊 FAQ。</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+var L=window.AELearn, $=function(id){return document.getElementById(id);};
+L.tabs();
+["fbWeek","rfWeek","qaWeek"].forEach(function(id){L.weekSelect($(id));});
+
+/* 班級：預設帶身分小卡的班級（匿名頁只取班級，不取學號） */
+function fillCls(sel){
+  var id=(window.AEId&&AEId.get())||{}, cur=String(id.cls||""), opts=L.classes(), h="", hit=false;
+  opts.forEach(function(c){var on=cur&&(cur===c||cur.indexOf(c.split(" ")[0])===0); if(on)hit=true; h+='<option'+(on?" selected":"")+'>'+L.esc(c)+'</option>';});
+  if(cur&&!hit) h='<option selected>'+L.esc(cur)+'</option>'+h;
+  sel.innerHTML=h;
+}
+function refreshCls(){ fillCls($("fbCls")); fillCls($("qaCls")); }
+refreshCls();
+document.addEventListener("ae:identity",function(){refreshCls();loadHist();});
+
+function say(el,txt,kind){ el.className="msg show "+(kind||"ok"); el.textContent=txt; }
+function radio(name){ var x=document.querySelector('input[name="'+name+'"]:checked'); return x?Number(x.value):0; }
+function checks(boxId){ return Array.prototype.map.call(document.querySelectorAll("#"+boxId+" input:checked"),function(i){return i.value;}); }
+
+/* ---------- 一分鐘回饋 ---------- */
+var SEEN="ae.fb.sent";
+function seenNote(){ var s=L.local(SEEN)||{}, w=$("fbWeek").value; $("fbSeen").textContent=s[w]?("本週已送過 "+s[w]+" 次（例如兩堂課可各送一次）"):""; }
+$("fbWeek").addEventListener("change",seenNote); seenNote();
+$("fbForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var und=radio("und"), m=$("fbMsg");
+  if(!und){ say(m,"請先點一個理解程度（1–5）。","warn"); return; }
+  if(!$("fbMuddy").value.trim()&&!$("fbClear").value.trim()){ say(m,"「最清楚」或「最模糊」至少寫一句，老師才知道怎麼調整。","warn"); return; }
+  var w=Number($("fbWeek").value);
+  var rec={app:"ai-empower",kind:"feedback",sid:"",name:"",cls:$("fbCls").value,score:und,max:5,
+    detail:{week:w,und:und,clear:$("fbClear").value.trim(),muddy:$("fbMuddy").value.trim(),ai:checks("fbAI"),ask:$("fbAsk").value.trim(),anon:1}};
+  this.querySelector("button[type=submit]").disabled=true;
+  var f=this;
+  L.send(rec).then(function(r){
+    var s=L.local(SEEN)||{}; s[w]=(s[w]||0)+1; L.local(SEEN,s); seenNote();
+    say(m,"✅ "+r.msg+" 下週上課老師會回應全班最常卡的地方。",r.queued?"warn":"ok");
+    f.reset(); L.weekSelect($("fbWeek"),w); refreshCls();
+  }).then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+
+/* ---------- 每週反思 ---------- */
+var RLOCAL="ae.reflect.mine", CLOUD=null;
+$("rfForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var m=$("rfMsg"), id=(window.AEId&&AEId.get())||null;
+  if(!id||!id.sid||!id.cls){ say(m,"反思會存成你的學習歷程，請先在上方身分小卡填學號後 4 碼與班級。","warn"); if(window.AEId&&AEId.prompt)AEId.prompt("填好身分，反思才會存成你的歷程。"); return; }
+  var what=$("rfWhat").value.trim(), so=$("rfSo").value.trim();
+  if(what.length<10||so.length<10){ say(m,"①、② 各寫至少一兩句（10 字以上），之後回頭看才看得出成長。","warn"); return; }
+  var w=Number($("rfWeek").value), eff=radio("eff");
+  var d={week:w,what:what,so:so,now:$("rfNow").value.trim(),eff:eff,ai:$("rfAI").value.trim(),share:$("rfShare").checked?1:0};
+  var rec={app:"ai-empower",kind:"reflection",sid:id.sid,cls:id.cls,score:"",max:"",detail:d};
+  var mine=L.local(RLOCAL)||[]; mine.push({ts:new Date().toISOString(),d:d}); L.local(RLOCAL,mine.slice(-40));
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send(rec).then(function(r){
+    say(m,"✅ 第 "+w+" 週反思已儲存。"+(r.queued?r.msg:""),r.queued?"warn":"ok");
+    f.reset(); L.weekSelect($("rfWeek"),w); renderHist(CLOUD);
+  }).then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+function parseD(s){ if(s&&typeof s==="object")return s; try{return JSON.parse(s);}catch(e){return null;} }
+function renderHist(cloud){
+  var byKey={}, list=[];
+  (L.local(RLOCAL)||[]).forEach(function(x){ var k=x.d.week+"|"+String(x.d.what).slice(0,20); byKey[k]=1; list.push({ts:x.ts,d:x.d,src:"本機"}); });
+  (cloud||[]).forEach(function(r){ var d=parseD(r.d); if(!d||!d.week)return; var k=d.week+"|"+String(d.what||"").slice(0,20); if(byKey[k])return; byKey[k]=1; list.push({ts:r.ts,d:d,src:"雲端"}); });
+  list.sort(function(a,b){return (b.d.week-a.d.week)||(String(b.ts)<String(a.ts)?-1:1);});
+  $("rfHist").innerHTML=list.map(function(x){var d=x.d;
+    return '<li><b>W'+(d.week<10?"0":"")+d.week+'</b> <span class="t">'+L.esc(L.fmt(x.ts).slice(0,10))+(d.eff?'・投入 '+d.eff+'/5':'')+'</span><br>'+
+      '① '+L.esc(d.what||"")+(d.so?'<br>② '+L.esc(d.so):'')+(d.now?'<br>③ '+L.esc(d.now):'')+'</li>';}).join("");
+  if(!list.length) $("rfHistNote").textContent="還沒有反思紀錄。第一篇寫完就會出現在這裡。";
+  else $("rfHistNote").textContent="共 "+list.length+" 篇。看看自己卡關的地方是不是越來越少？";
+}
+function loadHist(){
+  renderHist(CLOUD);
+  L.me("reflection").then(function(recs){ CLOUD=recs; renderHist(recs); })
+   .catch(function(e){ if(e.message==="noid") $("rfHistNote").textContent="填上方身分後，也會顯示你在其他裝置寫的反思。"; });
+}
+loadHist();
+
+/* ---------- 我要提問 ---------- */
+$("qaForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var m=$("qaMsg"), q=$("qaQ").value.trim();
+  if(q.length<6){ say(m,"問題寫具體一點（至少一句話），老師才回答得準。","warn"); return; }
+  var rec={app:"ai-empower",kind:"question",sid:"",cls:$("qaCls").value,score:"",max:"",
+    detail:{cat:$("qaCat").value,week:Number($("qaWeek").value),q:q,tried:$("qaTry").value.trim(),pub:$("qaPub").checked?1:0,anon:1}};
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send(rec).then(function(r){
+    say(m,"✅ 問題已送出。答案會整理在手冊 FAQ（通常在週日更新），常見問題老師會在課堂上回答。",r.queued?"warn":"ok");
+    $("qaQ").value=""; $("qaTry").value="";
+  }).then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+})();
+</script>
+</body>
+</html>
