@@ -1,0 +1,33 @@
+name: nl-default-tmp
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/nl-default-tmp.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: patch index.html
+        run: |
+          python3 - <<'EOF'
+          import hashlib
+          f = 'index.html'
+          b = open(f, 'rb').read()
+          assert hashlib.md5(b).hexdigest() == '55f0aa153db5b5982a3597a9e201ae98', 'pre md5 mismatch'
+          old = b"var NL='https://ai-empower-hub.netlify.app'"
+          new = b"var NL='https://ai-empower-hub.pages.dev'"
+          assert b.count(old) == 2, 'unexpected count'
+          b2 = b.replace(old, new)
+          assert hashlib.md5(b2).hexdigest() == '40ca128ecc67c196b5f7502820cebba6', 'post md5 mismatch'
+          open(f, 'wb').write(b2)
+          EOF
+      - name: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "AE Router／AE Parity：內建預設主站由 netlify.app 改為 pages.dev（route-config 讀取失敗時不再落到 Netlify）"
+          git push
