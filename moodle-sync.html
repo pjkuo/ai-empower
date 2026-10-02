@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Moodle 成績同步｜ai-empower 教師工作台</title>
+<meta name="description" content="教師工具：Moodle 測驗卷／作業成績匯入 ai-empower 評量資料庫，以及平台／備援成績轉成 Moodle 成績簿匯入檔（CSV）。">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<link rel="stylesheet" href="assets/learn.css">
+<script src="assets/theme.js"></script>
+<script src="assets/cloud.js"></script>
+<style>
+.embed .topnav{display:none}
+.steps{counter-reset:s;display:grid;gap:12px}
+.fcard h3{font-size:14px;color:var(--primary);margin:2px 0 8px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:14px;text-align:center;background:var(--soft);font-size:13px}
+.drop.on{border-color:var(--accent);background:var(--accent-soft)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{background:var(--soft);font-weight:800;position:sticky;top:0}
+.tbox{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.st-ok{color:var(--ok);font-weight:800}.st-warn{color:#B45309;font-weight:800}.st-bad{color:var(--err);font-weight:800}
+.kpis{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.kpi{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:12.5px}
+.kpi b{font-size:16px;color:var(--primary);margin-right:4px}
+.msg{font-size:13px;margin-top:8px;line-height:1.6}.msg.ok{color:var(--ok)}.msg.warn{color:#B45309}.msg.err{color:var(--err)}
+code{background:var(--soft);border-radius:5px;padding:1px 5px;font-size:12px}
+.flow{font-size:12.5px;line-height:1.8;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span><span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks"><a href="./">入口</a><a href="console.html">教師工作台</a><a href="moodle-sync.html" aria-current="page">Moodle 成績同步</a></div>
+  </div>
+</nav>
+<main class="wrap" style="max-width:1000px;padding-bottom:40px">
+  <header class="phead">
+    <h1>🔁 Moodle 成績同步<span class="en">Moodle ⇄ ai-empower</span></h1>
+    <p>正式成績以 <b>Moodle 成績簿</b>保存；同一份成績同步寫入 <b>ai-empower 評量資料庫</b>，學生的「我的學習週報」與教師總覽、單元評量分析即可看到。Moodle 異常時的備援成績（pjkuo 平台線上期中／exam-online）則反向轉成 Moodle 可匯入的 CSV。</p>
+  </header>
+
+  <div class="fcard">
+    <div class="row2">
+      <div class="fq" style="margin:0"><label for="tcode">教師碼<span class="hint">只存在本分頁，關閉即清除</span></label><input type="text" id="tcode" autocomplete="off" placeholder="與教師總覽相同"></div>
+      <div class="fq" style="margin:0"><label for="course">課程（決定班級欄位）</label><select id="course"></select></div>
+    </div>
+    <div class="msg" id="authMsg"></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="m2p">① Moodle → 平台</button>
+    <button type="button" role="tab" data-tab="p2m">② 平台／備援 → Moodle</button>
+    <button type="button" role="tab" data-tab="how">📘 操作說明</button>
+  </div>
+
+  <!-- ===== ① Moodle → 平台 ===== -->
+  <section class="pane" id="m2p">
+    <div class="fcard">
+      <h2>① 匯入 Moodle 成績到平台資料庫</h2>
+      <p class="sub">Moodle：課程 → <b>成績</b> → 匯出 → <b>純文字檔案（CSV）</b>（或測驗卷 → 結果 → 下載 CSV）。檔案拖進來即可；學號只取<b>後 4 碼</b>寫入資料庫。</p>
+      <div class="drop" id="dropA">把 Moodle 匯出的 <code>.csv</code>／<code>.xlsx</code> 拖到這裡，或 <input type="file" id="fileA" accept=".csv,.txt,.xlsx,.xls,.ods"></div>
+      <div id="mapA" hidden>
+        <div class="row2">
+          <div class="fq"><label for="colIdA">學號欄（ID號碼／使用者帳號／電子郵件）</label><select id="colIdA"></select></div>
+          <div class="fq"><label for="colNameA">姓名欄<span class="hint">可留空</span></label><select id="colNameA"></select></div>
+        </div>
+        <div class="row2">
+          <div class="fq"><label for="colScoreA">成績欄</label><select id="colScoreA"></select></div>
+          <div class="fq"><label for="colTsA">完成時間欄<span class="hint">可留空＝匯入當下</span></label><select id="colTsA"></select></div>
+        </div>
+        <div class="row2">
+          <div class="fq"><label for="kindA">寫入平台的評量種類</label>
+            <select id="kindA"><option value="midterm">midterm｜期中評量</option><option value="final">final｜期末專題報告</option><option value="quiz">quiz｜隨堂即時評量</option><option value="exam">exam｜課後評量</option></select></div>
+          <div class="fq"><label for="maxA">該欄滿分</label><input type="text" id="maxA" value="100"></div>
+        </div>
+        <label class="consent"><input type="checkbox" id="revA"><span><b>成績已更正、要重新匯入</b>：勾選後每筆紀錄加上版本碼，平台以最新一筆為準（未勾選時同一學生同一評量重送會被後端去重略過）。</span></label>
+        <div class="actions"><button class="btn btn-ghost" type="button" id="prevA">預覽</button><button class="btn btn-primary" type="button" id="pushA" disabled>寫入平台資料庫</button></div>
+        <div class="kpis" id="kpiA"></div>
+        <div class="tbox" id="tblA"></div>
+        <div class="msg" id="msgA"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ② 平台／備援 → Moodle ===== -->
+  <section class="pane" id="p2m">
+    <div class="fcard">
+      <h2>② 備援成績轉成 Moodle 成績簿匯入檔</h2>
+      <p class="sub">先在 Moodle 成績簿「設定 → 新增評分項目」建一個項目（例：<code>期中考備援成績</code>，滿分 100），再用這裡產生的 CSV 到「成績 → 匯入 → CSV 檔案」對應進去。</p>
+      <h3>步驟 1｜備援成績來源（可多選，同一學生取最高分）</h3>
+      <div class="row2">
+        <div class="fq"><label for="kindB">平台資料庫評量種類</label>
+          <select id="kindB"><option value="midterm">midterm｜pjkuo 平台線上期中評量</option><option value="final">final｜期末專題（含備援繳交）</option><option value="">（不從資料庫讀）</option></select></div>
+        <div class="fq"><label for="sinceB">只取此日期之後</label><input type="text" id="sinceB" value="2026-11-02" placeholder="YYYY-MM-DD"></div>
+      </div>
+      <div class="actions" style="margin-top:0"><button class="btn btn-ghost" type="button" id="pullB">從資料庫讀取</button><span class="note" id="pullMsg" style="margin:0"></span></div>
+      <div class="fq"><label>或上傳 exam-online／IOC 教師端匯出的成績檔<span class="hint">需含學號與總分欄</span></label><input type="file" id="fileB" accept=".csv,.txt,.xlsx,.xls,.ods"></div>
+      <div class="row2" id="mapB" hidden>
+        <div class="fq"><label for="colIdB">學號欄</label><select id="colIdB"></select></div>
+        <div class="fq"><label for="colScoreB">分數欄</label><select id="colScoreB"></select></div>
+      </div>
+      <div class="row2">
+        <div class="fq"><label for="maxB">上傳檔分數的滿分<span class="hint">exam-online＝90，IOC＝100</span></label><input type="text" id="maxB" value="100"></div>
+        <div class="fq"><label for="codesB">或貼上學生的成績碼（CCM1:…，一行一筆）</label><textarea id="codesB" style="min-height:44px"></textarea></div>
+      </div>
+      <h3>步驟 2｜Moodle 名單（成績簿匯出 CSV，用來把後 4 碼對回 Moodle 帳號）</h3>
+      <div class="fq"><input type="file" id="fileR" accept=".csv,.txt,.xlsx,.xls,.ods"></div>
+      <div class="row2" id="mapR" hidden>
+        <div class="fq"><label for="colKeyR">Moodle 對應欄（建議：電子郵件或 ID號碼）</label><select id="colKeyR"></select></div>
+        <div class="fq"><label for="colIdR">學號欄（取後 4 碼比對）</label><select id="colIdR"></select></div>
+      </div>
+      <h3>步驟 3｜輸出</h3>
+      <div class="row2">
+        <div class="fq"><label for="itemB">Moodle 評分項目名稱（與成績簿完全相同）</label><input type="text" id="itemB" value="期中考備援成績"></div>
+        <div class="fq"><label for="scaleB">換算為 Moodle 滿分</label><input type="text" id="scaleB" value="100"></div>
+      </div>
+      <div class="actions"><button class="btn btn-ghost" type="button" id="prevB">比對預覽</button><button class="btn btn-primary" type="button" id="dlB" disabled>下載 Moodle 匯入 CSV</button></div>
+      <div class="kpis" id="kpiB"></div>
+      <div class="tbox" id="tblB"></div>
+      <div class="msg" id="msgB"></div>
+    </div>
+  </section>
+
+  <!-- ===== 說明 ===== -->
+  <section class="pane" id="how">
+    <div class="fcard flow">
+      <h2>📘 資料流與時程</h2>
+      <p><b>正式：</b>Moodle 測驗卷／作業（伺服器計分）→ Moodle 成績簿（保存）→ 本頁 ① → 評量資料庫（kind＝midterm／final，app＝moodle）→ 我的學習週報、教師總覽、單元評量分析。</p>
+      <p><b>備援：</b>Moodle 異常 → 學生改用 W9「期中考備援入口」（計概＝pjkuo 平台線上期中；其他三門＝exam-online）或 W18「期末專題備援繳交」→ 本頁 ② 產生 CSV → Moodle 成績簿匯入。</p>
+      <p><b>建議時程：</b>期中 11/9（一）收卷後各課跑一次 ①；有備援作答者跑 ②。期末專題 1/17 評分完成後跑 ①（kind＝final）。</p>
+      <p><b>隱私：</b>資料庫只存學號後 4 碼；完整學號與電子郵件只在你的瀏覽器內比對，不上傳。下載的 CSV 請直接匯入 Moodle 後刪除。</p>
+      <p><b>去重：</b>紀錄 id＝<code>mdl-課程-種類-後4碼</code>；同一份成績重送不會重複。成績更正時勾「重新匯入」，id 會加版本碼。</p>
+    </div>
+  </section>
+  <p class="note">v1・2026-10-02｜Moodle 課程：38928 計概、38927 計概實習、39109 車輛一A、39400 機械一A。</p>
+</main>
+<script>
+(function(){
+"use strict";
+if(window.self!==window.top||/[?&]embed=1/.test(location.search)) document.documentElement.classList.add("embed");
+var $=function(id){return document.getElementById(id);};
+var COURSES=[
+ {id:"38928",name:"38928 計算機概論（資管一A）",cls:"資管一A 計算機概論"},
+ {id:"38927",name:"38927 計算機概論實習（資管一A）",cls:"資管一A 計算機概論"},
+ {id:"39109",name:"39109 數位科技與AI應用（車輛一A）",cls:"車輛一A 數位科技與AI應用"},
+ {id:"39400",name:"39400 數位科技與AI應用（機械一A）",cls:"機械一A 數位科技與AI應用"}];
+$("course").innerHTML=COURSES.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join("");
+function course(){var v=$("course").value;return COURSES.filter(function(c){return c.id===v;})[0];}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function say(el,t,k){el.className="msg "+(k||"");el.innerHTML=t;}
+
+/* ---------- 分頁 ---------- */
+var btns=document.querySelectorAll(".tabs [data-tab]");
+function show(id){Array.prototype.forEach.call(btns,function(b){b.setAttribute("aria-selected",b.dataset.tab===id?"true":"false");});
+ Array.prototype.forEach.call(document.querySelectorAll(".pane"),function(p){p.classList.toggle("on",p.id===id);});}
+Array.prototype.forEach.call(btns,function(b){b.addEventListener("click",function(){show(b.dataset.tab);});});
+show((location.hash||"#m2p").slice(1)==="p2m"?"p2m":((location.hash||"")==="#how"?"how":"m2p"));
+
+/* ---------- 教師碼 ---------- */
+var authed=false;
+$("tcode").value=AECloud.teacherCode()||"";
+function auth(){var c=$("tcode").value.trim(); if(!c){authed=false;return Promise.resolve(false);}
+ return AECloud.verify(c).then(function(){AECloud.teacherCode(c);authed=true;say($("authMsg"),"✓ 教師碼驗證通過","ok");return true;})
+  .catch(function(e){authed=false;say($("authMsg"),"教師碼驗證失敗："+esc(e.message),"err");return false;});}
+$("tcode").addEventListener("change",auth); if($("tcode").value) auth();
+
+/* ---------- 檔案解析（CSV 自寫；xlsx 延遲載入 SheetJS） ---------- */
+function parseCSV(text){
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1); var first=text.split(/\r?\n/)[0]||"";
+  var d=(first.split("\t").length>first.split(",").length)?"\t":(first.split(";").length>first.split(",").length?";":",");
+  var rows=[],row=[],f="",q=false;
+  for(var i=0;i<text.length;i++){var ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=ch; }
+    else if(ch==='"') q=true; else if(ch===d){row.push(f);f="";} else if(ch==="\n"){row.push(f.replace(/\r$/,""));rows.push(row);row=[];f="";} else f+=ch; }
+  if(f!==""||row.length){row.push(f.replace(/\r$/,""));rows.push(row);}
+  return rows.filter(function(r){return r.some(function(c){return String(c).trim()!=="";});});
+}
+var XLSX_URL="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+function loadXLSX(){ if(window.XLSX) return Promise.resolve(); return new Promise(function(res,rej){var s=document.createElement("script");s.src=XLSX_URL;s.onload=res;s.onerror=function(){rej(new Error("試算表元件載入失敗，請改用 CSV 匯出"));};document.head.appendChild(s);}); }
+function readFile(file){
+  if(/\.(xlsx|xls|ods)$/i.test(file.name)) return loadXLSX().then(function(){return file.arrayBuffer();}).then(function(buf){var wb=XLSX.read(buf,{type:"array"});var ws=wb.Sheets[wb.SheetNames[0]];return XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:""});});
+  return file.arrayBuffer().then(function(buf){var t; try{t=new TextDecoder("utf-8",{fatal:true}).decode(buf);}catch(e){t=new TextDecoder("big5").decode(buf);} return parseCSV(t);});
+}
+function table(rows){ var h=rows[0].map(function(x){return String(x).trim();}); return {head:h, body:rows.slice(1).map(function(r){var o={};h.forEach(function(k,i){o[k]=r[i]==null?"":String(r[i]).trim();});return o;})}; }
+function guess(head,re,not){for(var i=0;i<head.length;i++){if(re.test(head[i])&&!(not&&not.test(head[i])))return head[i];}return "";}
+function fill(sel,head,pick,blank){ $(sel).innerHTML=(blank?'<option value="">（不使用）</option>':"")+head.map(function(h){return '<option'+(h===pick?" selected":"")+'>'+esc(h)+'</option>';}).join(""); }
+var RE_ID=/ID\s*號碼|ID\s*number|^學號$|使用者帳號|^username$|帳號/i, RE_MAIL=/電子郵件|e-?mail/i,
+    RE_SCORE=/(測驗卷|作業|工作坊|quiz|assignment|workshop)\s*[:：]|成績\s*\/|grade\s*\/|實際分數|\(real\)|^總分$|^total$|^score$|^best$|最高分/i,
+    RE_TS=/^完成$|completed|finished|timestamp|^時間$/i;
+function sid4(v){ v=String(v||"").split("@")[0]; var d=(v.match(/\d/g)||[]).join(""); return d.length>=4?d.slice(-4):""; }
+function num(v){ v=String(v==null?"":v).replace(/,/g,"").trim(); if(v===""||v==="-"||v==="—") return null; var n=parseFloat(v); return isFinite(n)?n:null; }
+function nameOf(o,head){ var full=guess(head,/^姓名$|full\s*name/i); if(full) return o[full]; var ln=guess(head,/^姓氏$|last\s*name|surname/i), fn=guess(head,/^名字$|first\s*name/i); return ((ln?o[ln]:"")+(fn?o[fn]:"")).trim(); }
+
+/* ---------- ① Moodle → 平台 ---------- */
+var A=null, recsA=[];
+function loadA(file){ say($("msgA"),"讀取中…"); readFile(file).then(function(rows){ A=table(rows); A.file=file.name;
+  var idc=guess(A.head,RE_ID)||guess(A.head,RE_MAIL);
+  fill("colIdA",A.head,idc); fill("colNameA",A.head,guess(A.head,/^姓名$|full\s*name/i)||"",true);
+  fill("colScoreA",A.head,guess(A.head,RE_SCORE,/課程總分|course total/i)||guess(A.head,RE_SCORE)); fill("colTsA",A.head,guess(A.head,RE_TS),true);
+  var sc=$("colScoreA").value, m=sc.match(/\/\s*([\d.]+)/); if(m) $("maxA").value=String(parseFloat(m[1]));
+  $("mapA").hidden=false; say($("msgA"),"已讀入 "+A.body.length+" 列（"+esc(file.name)+"）。確認欄位後按「預覽」。","ok"); previewA();
+ }).catch(function(e){say($("msgA"),"讀取失敗："+esc(e.message),"err");}); }
+$("fileA").addEventListener("change",function(){ if(this.files[0]) loadA(this.files[0]); });
+["dragover","dragleave","drop"].forEach(function(ev){ $("dropA").addEventListener(ev,function(e){e.preventDefault(); $("dropA").classList.toggle("on",ev==="dragover"); if(ev==="drop"&&e.dataTransfer.files[0]) loadA(e.dataTransfer.files[0]);}); });
+["colIdA","colNameA","colScoreA","colTsA","kindA","maxA","course","revA"].forEach(function(id){ $(id).addEventListener("change",function(){ if(A) previewA(); }); });
+function isoTs(v){ if(!v) return ""; var s=String(v).replace(/年\s*|月\s*/g,"-").replace(/日\s*\([^)]*\)|日/g,"").replace(/\s+/g," ").trim(); var m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})\D+(\d{1,2}):(\d{2})/);
+  if(m){ var d=new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]); return isNaN(d)?"":d.toISOString(); } var d2=new Date(v); return isNaN(d2)?"":d2.toISOString(); }
+function previewA(){
+  var c=course(), kind=$("kindA").value, max=num($("maxA").value)||100, idc=$("colIdA").value, sc=$("colScoreA").value, nc=$("colNameA").value, tc=$("colTsA").value;
+  var rev=$("revA").checked?("-r"+new Date().toISOString().slice(0,16).replace(/\D/g,"")):"";
+  var best={}, skip={noid:0,noscore:0};
+  A.body.forEach(function(o){ var s=sid4(o[idc]); if(!s){skip.noid++;return;} var v=num(o[sc]); if(v===null){skip.noscore++;return;}
+    var ts=isoTs(tc?o[tc]:""); var nm=nc?o[nc]:nameOf(o,A.head);
+    if(!best[s]||v>best[s].score) best[s]={sid:s,name:nm,score:v,ts:ts}; });
+  recsA=Object.keys(best).sort().map(function(s){var b=best[s];
+    return {v:2,id:"mdl-"+c.id+"-"+kind+"-"+s+rev,ts:b.ts||new Date().toISOString(),app:"moodle",kind:kind,sid:s,name:b.name,cls:c.cls,score:b.score,max:max,
+      detail:{src:"moodle",course:c.id,item:sc,graded:true,tool:"moodle-sync v1"}};});
+  var pcts=recsA.map(function(r){return Math.max(0,Math.min(100,r.score/max*100));}); var avg=pcts.length?Math.round(pcts.reduce(function(a,b){return a+b;},0)/pcts.length):0;
+  $("kpiA").innerHTML='<span class="kpi"><b>'+recsA.length+'</b>位學生</span><span class="kpi"><b>'+avg+'</b>平均得分率%</span><span class="kpi"><b>'+skip.noscore+'</b>無成績（略過）</span><span class="kpi"><b>'+skip.noid+'</b>無學號列（如平均列）</span>';
+  $("tblA").innerHTML='<table class="tbl"><thead><tr><th>後4碼</th><th>班級</th><th>種類</th><th>分數</th><th>得分率</th><th>時間</th><th>紀錄 id</th></tr></thead><tbody>'+
+    recsA.map(function(r,i){return '<tr><td>'+r.sid+'</td><td>'+esc(r.cls)+'</td><td>'+r.kind+'</td><td>'+r.score+' / '+r.max+'</td><td>'+Math.round(pcts[i])+'%</td><td>'+esc(r.ts.slice(0,16).replace("T"," "))+'</td><td><code>'+esc(r.id)+'</code></td></tr>';}).join("")+'</tbody></table>';
+  $("pushA").disabled=!recsA.length;
+}
+$("prevA").addEventListener("click",function(){ if(A) previewA(); });
+$("pushA").addEventListener("click",function(){
+  auth().then(function(ok){ if(!ok){ say($("msgA"),"請先輸入正確的教師碼。","warn"); return; }
+    var btn=$("pushA"); btn.disabled=true; var chunks=[]; for(var i=0;i<recsA.length;i+=40) chunks.push(recsA.slice(i,i+40));
+    var saved=0,dup=0,fail=0;
+    chunks.reduce(function(p,ch,k){ return p.then(function(){ say($("msgA"),"寫入中… "+(k+1)+" / "+chunks.length);
+      return AECloud.push(ch,{spread:0}).then(function(r){ if(r.error||r.offline) fail+=ch.length; else {saved+=r.saved||0; dup+=r.dup||0;} }); }); },Promise.resolve())
+    .then(function(){ btn.disabled=false;
+      say($("msgA"),(fail?"⚠ ":"✅ ")+"完成：新增 "+saved+" 筆、重複略過 "+dup+" 筆"+(fail?"、暫存待補送 "+fail+" 筆（保持本頁開啟會自動補送）":"")+"。學生約 1 分鐘後可在「我的學習週報」看到。",fail?"warn":"ok"); });
+  });
+});
+
+/* ---------- ② 平台／備援 → Moodle ---------- */
+var B=null, R=null, dbRecs=[], outB=[];
+$("pullB").addEventListener("click",function(){
+  var k=$("kindB").value; if(!k){ $("pullMsg").textContent="未選資料庫種類。"; return; }
+  auth().then(function(ok){ if(!ok){ $("pullMsg").textContent="請先輸入正確的教師碼。"; return; }
+    $("pullMsg").textContent="讀取中…";
+    AECloud.pull(k,AECloud.teacherCode()).then(function(list){ var since=$("sinceB").value.trim(), c=course();
+      var canon=function(s){s=String(s||"");return /資管|資訊管理|計算機概論|^\s*(MIS|IM)\s*$/i.test(s)?"MIS":(/車輛|機械|數位科技/.test(s)?"VME":s);};
+      dbRecs=list.filter(function(r){ return (!since||String(r.ts)>=since)&&canon(r.cls)===canon(c.cls)&&String(r.app)!=="moodle"; });
+      $("pullMsg").textContent="資料庫 "+list.length+" 筆，符合本課程班級、"+(since||"不限")+" 之後、非 Moodle 匯入者 "+dbRecs.length+" 筆。";
+    }).catch(function(e){ $("pullMsg").textContent="讀取失敗："+e.message; });
+  });
+});
+$("fileB").addEventListener("change",function(){ var f=this.files[0]; if(!f) return; readFile(f).then(function(rows){ B=table(rows);
+  fill("colIdB",B.head,guess(B.head,/學號|studentid|^id$|ID\s*號碼/i)); fill("colScoreB",B.head,guess(B.head,/^總分$|total|最高|best|^score$|成績/i)); $("mapB").hidden=false;
+  if(/exam-?online|資訊科技導論/i.test(f.name)) $("maxB").value="90"; say($("msgB"),"備援檔讀入 "+B.body.length+" 列。","ok"); }).catch(function(e){say($("msgB"),"讀取失敗："+esc(e.message),"err");}); });
+$("fileR").addEventListener("change",function(){ var f=this.files[0]; if(!f) return; readFile(f).then(function(rows){ R=table(rows);
+  fill("colKeyR",R.head,guess(R.head,RE_MAIL)||guess(R.head,RE_ID)); fill("colIdR",R.head,guess(R.head,RE_ID)||guess(R.head,RE_MAIL)); $("mapR").hidden=false;
+  say($("msgB"),"Moodle 名單讀入 "+R.body.length+" 人。","ok"); }).catch(function(e){say($("msgB"),"讀取失敗："+esc(e.message),"err");}); });
+function pctOf(score,max){ var s=num(score), m=num(max); if(s===null) return null; if(m===null||m<=0) return Math.max(0,Math.min(100,s)); if(s>m&&s<=100) return s; return Math.max(0,Math.min(100,s/m*100)); }
+function decodeCodes(t){ var out=[]; String(t||"").split(/\s+/).forEach(function(line){ var m=line.match(/^CCM1:(.+)$/); if(!m) return;
+  try{ var o=JSON.parse(decodeURIComponent(escape(atob(m[1])))); out.push({sid:sid4(o.id),pct:pctOf(o.best,100),src:"成績碼"}); }catch(e){} }); return out; }
+$("prevB").addEventListener("click",function(){
+  if(!R){ say($("msgB"),"請先上傳 Moodle 名單（成績簿匯出 CSV）。","warn"); return; }
+  var src=[];
+  dbRecs.forEach(function(r){ var d=r.detail; if(typeof d==="string"){try{d=JSON.parse(d);}catch(e){d={};}}
+    var p=pctOf(r.score,r.max); if(p===null&&d&&d.correct!=null&&d.total) p=d.correct/d.total*100; if(p!==null) src.push({sid:sid4(r.sid)||String(r.sid).padStart(4,"0").slice(-4),pct:p,src:"資料庫 "+(r.app||"")}); });
+  if(B){ var mb=num($("maxB").value)||100; B.body.forEach(function(o){ var s=sid4(o[$("colIdB").value]), v=num(o[$("colScoreB").value]); if(s&&v!==null) src.push({sid:s,pct:Math.max(0,Math.min(100,v/mb*100)),src:"上傳檔"}); }); }
+  src=src.concat(decodeCodes($("codesB").value));
+  if(!src.length){ say($("msgB"),"沒有任何備援成績：請讀取資料庫、上傳成績檔或貼成績碼。","warn"); return; }
+  var best={}; src.forEach(function(x){ if(!best[x.sid]||x.pct>best[x.sid].pct) best[x.sid]=x; });
+  var key=$("colKeyR").value, idc=$("colIdR").value, idx={};
+  R.body.forEach(function(o){ var s=sid4(o[idc]); if(!s||!o[key]) return; (idx[s]=idx[s]||[]).push({key:o[key],name:nameOf(o,R.head)}); });
+  var scale=num($("scaleB").value)||100, ok=0, amb=0, miss=0;
+  outB=Object.keys(best).sort().map(function(s){ var b=best[s], m=idx[s]||[], st;
+    if(m.length===1){st="ok";ok++;} else if(m.length>1){st="amb";amb++;} else {st="miss";miss++;}
+    return {sid:s,key:m.length===1?m[0].key:"",name:m.length===1?m[0].name:"",grade:Math.round(b.pct*scale)/100,src:b.src,st:st,n:m.length}; });
+  $("kpiB").innerHTML='<span class="kpi"><b>'+outB.length+'</b>位有備援成績</span><span class="kpi"><b>'+ok+'</b>可匯入</span><span class="kpi"><b>'+amb+'</b>後4碼重複需人工</span><span class="kpi"><b>'+miss+'</b>名單查無</span>';
+  $("tblB").innerHTML='<table class="tbl"><thead><tr><th>後4碼</th><th>Moodle 對應</th><th>姓名</th><th>換算成績</th><th>來源</th><th>狀態</th></tr></thead><tbody>'+
+    outB.map(function(r){ return '<tr><td>'+r.sid+'</td><td>'+esc(r.key||"—")+'</td><td>'+esc(r.name||"")+'</td><td>'+r.grade+'</td><td>'+esc(r.src)+'</td><td>'+(r.st==="ok"?'<span class="st-ok">可匯入</span>':r.st==="amb"?'<span class="st-warn">名單有 '+r.n+' 人同後4碼</span>':'<span class="st-bad">名單查無</span>')+'</td></tr>'; }).join("")+'</tbody></table>';
+  $("dlB").disabled=!ok; say($("msgB"),ok?"確認無誤後下載 CSV。「需人工」與「查無」的學生不會寫進檔案，請在 Moodle 成績簿手動輸入。":"沒有可匯入的學生。",ok?"ok":"warn");
+});
+$("dlB").addEventListener("click",function(){
+  var item=$("itemB").value.trim()||"期中考備援成績", key=$("colKeyR").value;
+  var q=function(s){ s=String(s==null?"":s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  var lines=[[key,item].map(q).join(",")].concat(outB.filter(function(r){return r.st==="ok";}).map(function(r){return [r.key,r.grade].map(q).join(",");}));
+  var blob=new Blob([String.fromCharCode(0xFEFF)+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="moodle-import_"+course().id+"_"+item+".csv"; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  say($("msgB"),"已下載。Moodle：成績 → 匯入 → CSV 檔案 → 「從…對應」選 <code>"+esc(key)+"</code>、「對應到」選電子郵件／ID號碼 → 「"+esc(item)+"」對應到同名評分項目。","ok");
+});
+})();
+</script>
+</body>
+</html>

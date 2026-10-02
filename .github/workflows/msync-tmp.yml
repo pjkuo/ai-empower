@@ -1,0 +1,47 @@
+name: msync-tmp
+on:
+  push:
+    paths: ['.github/workflows/msync-tmp.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply kind-label edits with md5 gates
+        run: |
+          python3 - <<'PY'
+          import hashlib,sys
+          RULES=[
+           ('teacher.html', 'midterm:"期中評量",exam:"課後評量",repair:"3C 拆解"', 'midterm:"期中評量",final:"期末專題報告",exam:"課後評量",repair:"3C 拆解"'),
+           ('teacher.html', 'midterm:"#1E3A8A",exam:"#1E3A8A",repair:"#D97706"', 'midterm:"#1E3A8A",final:"#7C3AED",exam:"#1E3A8A",repair:"#D97706"'),
+           ('weekly.html', '  midterm:"期中線上評量", repair:"3C 拆裝實訓",', '  midterm:"期中評量", final:"期末專題報告", repair:"3C 拆裝實訓",'),
+           ('weekly.html', 'quiz:"ioc.html", exam:"ioc.html", midterm:"ioc.html",', 'quiz:"ioc.html", exam:"ioc.html", midterm:"ioc.html", final:"final.html",'),
+           ('unit-analysis.html', 'var EXCLUDE={presurvey:1,consensus:1,project:1,"project-run":1,"project-final":1,', 'var EXCLUDE={presurvey:1,consensus:1,project:1,"project-run":1,"project-final":1,final:1,'),
+           ('assess.html', 'kinds:["midterm"],', 'kinds:["midterm","final"],'),
+           ('console.html', '      <button class="tab" data-t="paper">📝 論文生成</button>', '      <button class="tab" data-t="paper">📝 論文生成</button>'+chr(10)+'      <button class="tab" data-t="msync">🔁 Moodle 成績同步</button>'),
+           ('console.html', '      <iframe id="f_paper" title="論文生成"></iframe>', '      <iframe id="f_paper" title="論文生成"></iframe>'+chr(10)+'      <iframe id="f_msync" title="Moodle 成績同步"></iframe>'),
+           ('console.html', 'stats:"stats.html",paper:"paper.html"};', 'stats:"stats.html",paper:"paper.html",msync:"moodle-sync.html"};'),
+          ]
+          BEFORE={"assess.html": "9eacffb55558151d195e5c6273b67766", "console.html": "c79e15156e07d4e6519e0a109a7abdf2", "teacher.html": "bc48985a2ad12c5b8304d7a384612a82", "unit-analysis.html": "98cf99ff495f9efcfeb82d52f5398d3c", "weekly.html": "4c4297c52df9726eb75a65d3820f70cc"}
+          AFTER={"assess.html": "8fdf0d072e09bd469b24d4b2e7804fb2", "console.html": "2a0ef1b688d6ddb7a19528ed00e5d0f2", "teacher.html": "2c5dc58e48f5837dfeb4b17e668ce606", "unit-analysis.html": "1dac4bac7deb8bb9e928ce9e966a1387", "weekly.html": "dd12b0c427223d7a57ae941307b12a23"}
+          for f,h in BEFORE.items():
+              got=hashlib.md5(open(f,'rb').read()).hexdigest()
+              if got!=h: sys.exit('before md5 mismatch '+f+' '+got)
+          for f,a,b in RULES:
+              s=open(f,encoding='utf-8').read()
+              if s.count(a)!=1: sys.exit('rule count '+f+' '+str(s.count(a)))
+              open(f,'w',encoding='utf-8',newline='').write(s.replace(a,b))
+          for f,h in AFTER.items():
+              got=hashlib.md5(open(f,'rb').read()).hexdigest()
+              if got!=h: sys.exit('after md5 mismatch '+f+' '+got)
+          print('all gates passed')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assess.html console.html teacher.html unit-analysis.html weekly.html
+          git commit -m "Moodle 成績同步：教師工作台加分頁、kind final（期末專題報告）標籤補齊"
+          git push
