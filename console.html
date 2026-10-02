@@ -87,6 +87,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
       <button class="tab" data-t="ct">🧩 運算思維練習</button>
       <button class="tab" data-t="stats">📈 統計分析</button>
       <button class="tab" data-t="paper">📝 論文生成</button>
+      <button class="tab" data-t="msync">🔁 Moodle 成績同步</button>
       <span class="spacer"></span>
       <span class="st"><span class="dot" id="cdot"></span><span id="ctxt">雲端檢查中…</span></span>
       <button class="x" id="btnOpen" title="在新分頁開啟目前頁面">↗ 另開</button>
@@ -99,6 +100,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
       <iframe id="f_ct" title="運算思維四大技巧練習"></iframe>
       <iframe id="f_stats" title="統計分析"></iframe>
       <iframe id="f_paper" title="論文生成"></iframe>
+      <iframe id="f_msync" title="Moodle 成績同步"></iframe>
     </div>
   </section>
 </main>
@@ -109,7 +111,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var KEY="ae.teacher.gate";
-var SRC={teacher:"teacher.html",presurvey:"presurvey-teacher.html",unit:"unit-analysis.html",ct:"ct-practice.html",stats:"stats.html",paper:"paper.html"};
+var SRC={teacher:"teacher.html",presurvey:"presurvey-teacher.html",unit:"unit-analysis.html",ct:"ct-practice.html",stats:"stats.html",paper:"paper.html",msync:"moodle-sync.html"};
 var loaded={};
 
 function unlock(code){

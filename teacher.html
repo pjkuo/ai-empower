@@ -167,8 +167,8 @@ table.data td.sm{font-size:11px;color:var(--muted);white-space:nowrap}
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var all=[], timer=null, sortKey="presurvey", sortDir=-1;
-var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中評量",exam:"課後評量",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度",feedback:"一分鐘回饋（匿名）",reflection:"每週反思",question:"匿名提問",practice:"題庫練習",work:"作品投稿",projreg:"專題登記",checkin:"專題打卡"};
-var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",exam:"#1E3A8A",repair:"#D97706",build:"#D97706",project:"#7C3AED",survey:"#DB2777",consensus:"#6B7280",progress:"#6B7280"};
+var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中評量",final:"期末專題報告",exam:"課後評量",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度",feedback:"一分鐘回饋（匿名）",reflection:"每週反思",question:"匿名提問",practice:"題庫練習",work:"作品投稿",projreg:"專題登記",checkin:"專題打卡"};
+var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",final:"#7C3AED",exam:"#1E3A8A",repair:"#D97706",build:"#D97706",project:"#7C3AED",survey:"#DB2777",consensus:"#6B7280",progress:"#6B7280"};
 var kname=function(k){return KN[k]||k;};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
