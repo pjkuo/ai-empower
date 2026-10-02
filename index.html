@@ -87,7 +87,7 @@ section{margin-top:26px}
    ?stay=1 強制留在本站;?embed=1(內嵌)不分流。轉址帶 ?r=&sid=&cls=,對方站自動帶入身分不必重填。 */
 (function(){
 "use strict";
-var NL='https://ai-empower-hub.netlify.app', GH='https://pjkuo.github.io/ai-empower';
+var NL='https://ai-empower-hub.pages.dev', GH='https://pjkuo.github.io/ai-empower';
 var aeH=location.hostname;
 var here=(aeH==='pjkuo.github.io')?'gh':((/\.pages\.dev$/.test(aeH)||/\.netlify\.app$/.test(aeH))?'nl':'');
 if(!here) return;
@@ -385,7 +385,7 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
 /* AE Parity — 學號單雙號分流:單號 → 主站(Netlify)、雙號 → 備援站(GitHub Pages);分流結果釘選(ae.route.v2) */
 (function(){
 "use strict";
-var NL='https://ai-empower-hub.netlify.app', GH='https://pjkuo.github.io/ai-empower';
+var NL='https://ai-empower-hub.pages.dev', GH='https://pjkuo.github.io/ai-empower';
 var here=(location.hostname==='pjkuo.github.io')?'gh':'nl';
 var btn=document.getElementById('aeParityBtn'), msg=document.getElementById('aeParityMsg');
 if(!btn) return;
