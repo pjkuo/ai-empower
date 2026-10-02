@@ -1,0 +1,33 @@
+name: assess-tmp
+on:
+  push:
+    paths: ['.github/workflows/assess-tmp.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply with md5 gates
+        run: |
+          python3 - <<'PY'
+          import hashlib,sys
+          f='assess.html'
+          A='desc:"正式評量：選擇站 30 題 75 分＋問答站 3 題 25 分，時間、地點與方式以 Moodle 公告為準。考前用「題庫自主練習」的模擬考暖身。",'
+          B='desc:"正式評量在 Moodle（期中 11/2–11/8）：計算機概論＝硬體・軟體・網路・物聯網各 10 題共 40 題、40 分鐘、3 次取最高；計概實習與數位科技與AI應用＝選擇 30 題＋問答 3 題、60 分鐘。期末為 W17–18 期末專題報告。Moodle 異常時改用課程頁的備援入口。考前用「題庫自主練習」暖身。",'
+          s=open(f,encoding='utf-8').read()
+          if hashlib.md5(s.encode()).hexdigest()!='8fdf0d072e09bd469b24d4b2e7804fb2': sys.exit('before md5 mismatch')
+          if s.count(A)!=1: sys.exit('rule count')
+          t=s.replace(A,B)
+          if hashlib.md5(t.encode()).hexdigest()!='23a5fb9023bf1b17d07adfb7b6e1ee06': sys.exit('after md5 mismatch')
+          open(f,'w',encoding='utf-8',newline='').write(t)
+          print('gates passed')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assess.html
+          git commit -m "評量中心：期中卡改寫為各課 Moodle 正式期中格式（計概 40 題版）與期末專題"
+          git push
