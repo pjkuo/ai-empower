@@ -130,7 +130,7 @@ function meAction_(e) {
     var score = row[col.score], max = row[col.max];
 
     if (!isAI && rCls === qCls && qCls !== '') { // 全班去識別化統計（僅計分紀錄；未填班級者不計）
-      var pct = mePct_(score, max);            // v3.4：與前端 pctOf 同一套規則
+      var pct = mePct_(score, max, det);            // v3.4：與前端 pctOf 同一套規則
       if (pct !== null) {
         var a = agg[kind] || (agg[kind] = { by: {}, all: [] });
         a.all.push(pct);
@@ -205,7 +205,10 @@ function meRawName_(bucket) {
 /* ★ v3.4 得分率（與 weekly.html 的 pctOf 逐字對齊）：
    score>max → 視為「百分比格式」（IOC warm/subquiz/live/xr/vidq：score＝%、max＝題數），≤100 才採計；
    否則 score/max*100 夾 0–100。score/max 非數值或 max≤0 → null（不計分）。 */
-function mePct_(score, max) {
+function mePct_(score, max, det) {
+  var m0 = parseFloat(max), dj = null;   // v3.7：detail.raw（答對題數）優先，修正「score＝百分比、max＝題數」在百分比<題數時被誤判
+  try { dj = det ? JSON.parse(det) : null; } catch (e) { dj = null; }
+  if (dj && dj.raw != null && dj.raw !== "" && m0 > 0 && Number(dj.raw) >= 0 && Number(dj.raw) <= m0) return Math.min(100, Number(dj.raw) / m0 * 100);
   var s = parseFloat(score), m = parseFloat(max);
   if (!isFinite(s) || !isFinite(m) || m <= 0) return null;
   if (s > m) return s <= 100 ? s : null;

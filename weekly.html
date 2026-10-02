@@ -210,7 +210,7 @@ function identity(){
   return null;
 }
 function fmtDT(d){ function z(n){return (n<10?"0":"")+n;} return (d.getMonth()+1)+"/"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes()); }
-function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; if(s>m) return s<=100?s:null; return Math.max(0,Math.min(100,s/m*100)); }
+function pctOf(r){ var _d=r.d||r.detail;if(typeof _d==="string"){try{_d=JSON.parse(_d);}catch(e){_d=null;}}var _m=Number(r.max);if(_d&&_d.raw!=null&&_d.raw!==""&&_m>0&&Number(_d.raw)>=0&&Number(_d.raw)<=_m)return Math.min(100,Number(_d.raw)/_m*100); var s=parseFloat(r.score), m=parseFloat(r.max); if(!isFinite(s)||!isFinite(m)||m<=0) return null; if(s>m) return s<=100?s:null; return Math.max(0,Math.min(100,s/m*100)); }
 /* 分數顯示：IOC 新制 kind（warm/subquiz/live/xr/vidq）score＝百分比、max＝題數 → 顯示「67%（6題）」而非易誤讀的 67/6 */
 function fmtScore(r){ var s=parseFloat(r.score), m=parseFloat(r.max); if(isFinite(s)&&isFinite(m)&&s>m) return esc(Math.round(s))+"%（"+esc(m)+"題）"; return esc(r.score)+"/"+esc(r.max); }
 function median(a){ if(!a.length) return null; var b=a.slice().sort(function(x,y){return x-y;}); var i=Math.floor(b.length/2); return b.length%2?b[i]:(b[i-1]+b[i])/2; }

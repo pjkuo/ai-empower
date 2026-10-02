@@ -265,7 +265,7 @@ $("prevB").addEventListener("click",function(){
   if(!R){ say($("msgB"),"請先上傳 Moodle 名單（成績簿匯出 CSV）。","warn"); return; }
   var src=[];
   dbRecs.forEach(function(r){ var d=r.detail; if(typeof d==="string"){try{d=JSON.parse(d);}catch(e){d={};}}
-    var p=pctOf(r.score,r.max); if(p===null&&d&&d.correct!=null&&d.total) p=d.correct/d.total*100; if(p!==null) src.push({sid:sid4(r.sid)||String(r.sid).padStart(4,"0").slice(-4),pct:p,src:"資料庫 "+(r.app||"")}); });
+    var p=(d&&d.raw!=null&&d.raw!==""&&num(r.max)>0&&num(d.raw)>=0&&num(d.raw)<=num(r.max))?Math.min(100,num(d.raw)/num(r.max)*100):pctOf(r.score,r.max); if(p===null&&d&&d.correct!=null&&d.total) p=d.correct/d.total*100; if(p!==null) src.push({sid:sid4(r.sid)||String(r.sid).padStart(4,"0").slice(-4),pct:p,src:"資料庫 "+(r.app||"")}); });
   if(B){ var mb=num($("maxB").value)||100; B.body.forEach(function(o){ var s=sid4(o[$("colIdB").value]), v=num(o[$("colScoreB").value]); if(s&&v!==null) src.push({sid:s,pct:Math.max(0,Math.min(100,v/mb*100)),src:"上傳檔"}); }); }
   src=src.concat(decodeCodes($("codesB").value));
   if(!src.length){ say($("msgB"),"沒有任何備援成績：請讀取資料庫、上傳成績檔或貼成績碼。","warn"); return; }
