@@ -1,0 +1,42 @@
+name: pct-tmp
+on:
+  push:
+    paths: ['.github/workflows/pct-tmp.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply with md5 gates
+        run: |
+          python3 - <<'PY'
+          import hashlib,sys
+          RULES=[
+           ('teacher.html', 'function pctOf(r){if(r.score===""||r.score==null)return null;', 'function pctOf(r){var _d=r.d||r.detail;if(typeof _d==="string"){try{_d=JSON.parse(_d);}catch(e){_d=null;}}var _m=Number(r.max);if(_d&&_d.raw!=null&&_d.raw!==""&&_m>0&&Number(_d.raw)>=0&&Number(_d.raw)<=_m)return Math.min(100,Number(_d.raw)/_m*100);if(r.score===""||r.score==null)return null;'),
+           ('unit-analysis.html', 'function pctOf(r){if(r.score===""||r.score==null)return null;', 'function pctOf(r){var _d=r.d||r.detail;if(typeof _d==="string"){try{_d=JSON.parse(_d);}catch(e){_d=null;}}var _m=Number(r.max);if(_d&&_d.raw!=null&&_d.raw!==""&&_m>0&&Number(_d.raw)>=0&&Number(_d.raw)<=_m)return Math.min(100,Number(_d.raw)/_m*100);if(r.score===""||r.score==null)return null;'),
+           ('weekly.html', 'function pctOf(r){ var s=parseFloat(r.score), m=parseFloat(r.max);', 'function pctOf(r){ var _d=r.d||r.detail;if(typeof _d==="string"){try{_d=JSON.parse(_d);}catch(e){_d=null;}}var _m=Number(r.max);if(_d&&_d.raw!=null&&_d.raw!==""&&_m>0&&Number(_d.raw)>=0&&Number(_d.raw)<=_m)return Math.min(100,Number(_d.raw)/_m*100); var s=parseFloat(r.score), m=parseFloat(r.max);'),
+           ('moodle-sync.html', 'var p=pctOf(r.score,r.max); if(p===null&&d&&d.correct!=null&&d.total)', 'var p=(d&&d.raw!=null&&d.raw!==""&&num(r.max)>0&&num(d.raw)>=0&&num(d.raw)<=num(r.max))?Math.min(100,num(d.raw)/num(r.max)*100):pctOf(r.score,r.max); if(p===null&&d&&d.correct!=null&&d.total)'),
+           ('gas/me-patch.gs', 'function mePct_(score, max) {'+chr(10)+'  var s = parseFloat(score), m = parseFloat(max);', 'function mePct_(score, max, det) {'+chr(10)+'  var m0 = parseFloat(max), dj = null;   // v3.7：detail.raw（答對題數）優先，修正「score＝百分比、max＝題數」在百分比<題數時被誤判'+chr(10)+'  try { dj = det ? JSON.parse(det) : null; } catch (e) { dj = null; }'+chr(10)+'  if (dj && dj.raw != null && dj.raw !== "" && m0 > 0 && Number(dj.raw) >= 0 && Number(dj.raw) <= m0) return Math.min(100, Number(dj.raw) / m0 * 100);'+chr(10)+'  var s = parseFloat(score), m = parseFloat(max);'),
+           ('gas/me-patch.gs', 'var pct = mePct_(score, max);', 'var pct = mePct_(score, max, det);'),
+          ]
+          BEFORE={"gas/me-patch.gs": "082d09e534aaf1d7cafdb765c56b17bf", "moodle-sync.html": "3a2f2f270f3aaca33df4e4462e96310b", "teacher.html": "2c5dc58e48f5837dfeb4b17e668ce606", "unit-analysis.html": "1dac4bac7deb8bb9e928ce9e966a1387", "weekly.html": "dd12b0c427223d7a57ae941307b12a23"}
+          AFTER={"gas/me-patch.gs": "2462f66deab2f360c9c7f2613188cadb", "moodle-sync.html": "2b8d8f3ffffcc6b469623a10ba82b94b", "teacher.html": "89d2a14d7e9394e3492dc3d80d613533", "unit-analysis.html": "9afda03258476217a7315dadbe8290e1", "weekly.html": "0617e40441ead8c3869a7a27b77e48f4"}
+          for f,h in BEFORE.items():
+              if hashlib.md5(open(f,'rb').read()).hexdigest()!=h: sys.exit('before md5 mismatch '+f)
+          for f,a,b in RULES:
+              s=open(f,encoding='utf-8').read()
+              if s.count(a)!=1: sys.exit('rule count '+f)
+              open(f,'w',encoding='utf-8',newline='').write(s.replace(a,b))
+          for f,h in AFTER.items():
+              if hashlib.md5(open(f,'rb').read()).hexdigest()!=h: sys.exit('after md5 mismatch '+f)
+          print('all gates passed')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gas/me-patch.gs moodle-sync.html teacher.html unit-analysis.html weekly.html
+          git commit -m "得分率：detail.raw（答對題數）優先，修正線上期中 score＝百分比、max＝題數在百分比低於題數時被誤判（教師總覽／單元分析／我的週報／Moodle 成績同步；me-patch.gs v3.7 待重新部署）"
+          git push
