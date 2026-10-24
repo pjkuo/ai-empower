@@ -29,6 +29,7 @@
 | `presurvey-teacher.html` | 課前評量教師儀表板：貼回覆碼／匯入 JSON／CSV → 準備度分群、五向度、各班、12 條判準建議、18 週逐週調整、答對率、分布、逐人清單；匯出 JSON／CSV；一鍵帶到 `stats.html`（scheme `presurvey`） |
 | `stats.html` | 統計分析：匯入 4C 評量 JSON／運算思維 JSON／CSV → 配對 t、Cohen's dz（Hedges gz）、95% CI、Cronbach's α、前後測比較圖、CSV 匯出 |
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
+| `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標），並與論文成效基線（M1–M9）對照；教師工作台「🎯 AI-empower-KPI」分頁 |
 
 ## 設計原則
 
