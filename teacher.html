@@ -167,8 +167,8 @@ table.data td.sm{font-size:11px;color:var(--muted);white-space:nowrap}
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var all=[], timer=null, sortKey="presurvey", sortDir=-1;
-var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中評量",final:"期末專題報告",exam:"課後評量",repair:"3C 拆解",build:"虛擬組裝",project:"專題",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度",feedback:"一分鐘回饋（匿名）",reflection:"每週反思",question:"匿名提問",practice:"題庫練習",work:"作品投稿",projreg:"專題登記",checkin:"專題打卡"};
-var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",final:"#7C3AED",exam:"#1E3A8A",repair:"#D97706",build:"#D97706",project:"#7C3AED",survey:"#DB2777",consensus:"#6B7280",progress:"#6B7280"};
+var KN={presurvey:"課前評量",assess4c:"4C 評量",quiz:"即時測驗",midterm:"期中評量",final:"期末專題報告",exam:"課後評量",repair:"3C 拆解",build:"虛擬組裝",project:"專題",ipo:"IPO 架構表",survey:"學習後測問卷",consensus:"師生共識",progress:"學習進度",feedback:"一分鐘回饋（匿名）",reflection:"每週反思",question:"匿名提問",practice:"題庫練習",work:"作品投稿",projreg:"專題登記",checkin:"專題打卡"};
+var KC={presurvey:"#0D9488",assess4c:"#059669",quiz:"#3B82F6",midterm:"#1E3A8A",final:"#7C3AED",exam:"#1E3A8A",repair:"#D97706",build:"#D97706",project:"#7C3AED",ipo:"#0891B2",survey:"#DB2777",consensus:"#6B7280",progress:"#6B7280"};
 var kname=function(k){return KN[k]||k;};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
@@ -270,7 +270,7 @@ function render(){
   /* 風險名單 */
   var risk=[];
   Object.keys(students).forEach(function(s){var st=students[s], form=[],formSum=0,formN=0;
-    ["quiz","midterm","exam","repair","build","project","assess4c"].forEach(function(k){var v=st.kinds[k];if(v&&v.pct!==null){form.push(k);formSum+=v.pct;formN++;}});
+    ["quiz","midterm","exam","repair","build","project","ipo","assess4c"].forEach(function(k){var v=st.kinds[k];if(v&&v.pct!==null){form.push(k);formSum+=v.pct;formN++;}});
     var avg=formN?Math.round(formSum/formN):null, quiet=now-Date.parse(st.last||0)>14*864e5;
     if(st.level==="starter"&&(avg===null||avg<60)) risk.push({sid:s,cls:st.cls,lv:"r",why:"課前起步型"+(avg===null?"，尚無任何平時紀錄":"，平時平均 "+avg+"%")+"→ 建議第一週主動關心、配進異質小組。"});
     else if(avg!==null&&avg<60) risk.push({sid:s,cls:st.cls,lv:"w",why:"平時平均 "+avg+"%（"+form.map(kname).join("、")+"）→ 檢查是哪個模組卡住。"});
@@ -309,7 +309,7 @@ function renderMatrix(ks){
 function kindInterp(kinds,students){
   var out=[], n=Object.keys(students).length;
   var ps=(kinds.presurvey||[]).filter(function(r){return (r.detail.stage||"pre")==="pre";}); if(ps.length){var lv={starter:0,steady:0,advanced:0};ps.forEach(function(r){if(r.detail.level)lv[r.detail.level]++;});out.push("課前評量 "+ps.length+" 份：起步 "+lv.starter+"、穩健 "+lv.steady+"、進階 "+lv.advanced+"。");}
-  ["quiz","midterm","exam","assess4c","repair","build","project"].forEach(function(k){var rs=kinds[k];if(!rs)return;var p=rs.map(pctOf).filter(function(v){return v!==null;});if(!p.length)return;var m=Math.round(mean(p)),lo=p.filter(function(v){return v<60;}).length;
+  ["quiz","midterm","exam","assess4c","repair","build","project","ipo"].forEach(function(k){var rs=kinds[k];if(!rs)return;var p=rs.map(pctOf).filter(function(v){return v!==null;});if(!p.length)return;var m=Math.round(mean(p)),lo=p.filter(function(v){return v<60;}).length;
     out.push(kname(k)+"平均 "+m+"%"+(m<60?"（偏低，建議回頭補強該模組）":m>=85?"（掌握良好）":"")+(lo?"，"+lo+" 筆低於 60%":"")+"。");});
   var c=kinds.consensus||[]; if(ps.length)out.push("師生共識已確認 "+c.length+" / "+ps.length+"。");
   if(!out.length)out.push("尚無可解讀的分數資料。");
