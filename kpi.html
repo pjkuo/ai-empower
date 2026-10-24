@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI-empower-KPI｜AI 賦能教學 Hub</title>
+<meta name="description" content="由作而管三層人機協作評量 KPI：以 HITL、HOTL、HOOTL 為參數計算綜合指標，並與論文成效基線對照。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/kpi.html">
+<meta name="theme-color" content="#1E3A8A">
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<link rel="stylesheet" href="assets/ae.css">
+<script src="assets/theme.js"></script>
+<script>
+(function(){ if(window.top!==window.self || /[?&]embed=1/.test(location.search)) return; try{ if(sessionStorage.getItem("ae.teacher.gate")==="1") return; }catch(e){} location.replace("console.html#kpi"); })();
+</script>
+<style>
+.layout{display:grid;grid-template-columns:300px 1fr;gap:var(--gap);align-items:start;margin-top:16px}
+@media(max-width:960px){.layout{grid-template-columns:1fr}}
+.layout>*{min-width:0}#tcode{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card)}.side select,.side input{max-width:100%;min-width:0}
+.side{position:sticky;top:64px}@media(max-width:960px){.side{position:static}}
+.card+.card{margin-top:var(--gap)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+.prm{display:grid;grid-template-columns:1fr 78px;gap:6px 8px;align-items:center;font-size:12.5px;margin-top:8px}
+.prm input{padding:5px 8px;font-size:12.5px;text-align:right}
+.hero{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:center}
+@media(max-width:700px){.hero{grid-template-columns:1fr}}
+.big{text-align:center;padding:14px;border-radius:14px;background:var(--soft)}
+.big b{display:block;font-size:46px;line-height:1.1;color:var(--primary);font-variant-numeric:tabular-nums}
+.big span{font-size:12px;color:var(--muted)}
+.band{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;border-radius:999px;padding:3px 12px}
+.band.g{background:var(--ok-bg);color:var(--ok)}.band.o{background:var(--warn-bg);color:var(--warn)}.band.r{background:var(--err-bg);color:var(--err)}.band.n{background:var(--soft);color:var(--muted)}
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:700px){.layers{grid-template-columns:1fr}}
+.ly{border:1px solid var(--line);border-radius:12px;padding:10px 12px;border-top:4px solid var(--c)}
+.ly h3{font-size:13.5px;margin:0;color:var(--ink)}
+.ly .v{font-size:26px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums}
+.ly .s{font-size:11.5px;color:var(--muted);line-height:1.6}
+.bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--c)}
+.pill{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pill.g{background:var(--ok-bg);color:var(--ok)}.pill.o{background:var(--warn-bg);color:var(--warn)}.pill.r{background:var(--err-bg);color:var(--err)}.pill.n{background:var(--soft);color:var(--muted)}.pill.p{background:var(--accent-soft);color:var(--primary)}
+table.data td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.data td.sm{font-size:11px;color:var(--muted)}
+.grp td{background:var(--soft);font-weight:800;color:var(--primary)}
+.dist{display:flex;height:22px;border-radius:8px;overflow:hidden;margin-top:8px;background:var(--line)}
+.dist i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:5px;vertical-align:-1px}
+.todo{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:6px;font-size:12.5px}
+.todo li{padding:7px 10px;border-radius:9px;background:var(--soft)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.demo{background:var(--warn-bg);color:#92400E;border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:10px;display:none}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span>
+      <span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="ioc.html">IOC 課程</a>
+      <a href="presurvey.html">課前評量</a><a aria-current="page" href="console.html">教師工作台</a>
+      <a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div class="layout">
+    <div class="side">
+      <div class="card">
+        <h2>🎯 AI-empower-KPI <span class="en">由作而管評量指標</span></h2>
+        <p class="sub">以 HITL、HOTL、HOOTL 為參數的綜合指標，並與論文《由操作而監管，先思考後驗證》之成效基線對照。</p>
+        <label class="fld" for="tcode" style="margin-top:0">教師碼</label>
+        <input type="password" id="tcode" placeholder="已從工作台登入者可留空" autocomplete="off">
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btnPull" type="button">⟳ 從雲端載入</button>
+          <button class="btn btn-ghost" id="btnDemo" type="button">🧪 示範資料</button>
+        </div>
+        <div class="msg" id="cloudMsg"></div>
+        <label class="fld" for="clsSel">班級</label>
+        <select id="clsSel"><option value="">全部班級</option></select>
+        <label class="fld" for="since">起算日（第 1 週週一）</label>
+        <input type="text" id="since" value="2026-09-14" placeholder="YYYY-MM-DD">
+        <h3 style="font-size:13px;margin:14px 0 0;color:var(--primary)">參數</h3>
+        <div class="prm">
+          <label for="w1">w₁ HITL 權重</label><input id="w1" type="number" step="0.05" min="0" max="1">
+          <label for="w2">w₂ HOTL 權重</label><input id="w2" type="number" step="0.05" min="0" max="1">
+          <label for="w3">w₃ HOOTL 權重</label><input id="w3" type="number" step="0.05" min="0" max="1">
+          <label for="t1">τ₁ 監管閘門</label><input id="t1" type="number" step="5" min="0" max="100">
+          <label for="t2">τ₂ 治理閘門</label><input id="t2" type="number" step="5" min="0" max="100">
+          <label for="rho">ρ* 人類投入目標</label><input id="rho" type="number" step="0.05" min="0" max="1">
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="btnReset" type="button">↺ 預設參數</button>
+          <button class="btn btn-ghost" id="btnCsv" type="button">⬇️ KPI CSV</button>
+        </div>
+        <p class="hint">權重自動正規化為總和 1。參數只存在這台電腦的瀏覽器。成效面板讀取「統計分析」最近載入的前後測資料。</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card empty" id="emptyCard">
+        <h2 style="justify-content:center">還沒有資料</h2>
+        <p class="sub">輸入教師碼從雲端載入，或按「示範資料」先看看計算方式。論文成效基線不需載入即可在下方查看。</p>
+      </div>
+      <div id="dash" style="display:none">
+        <div class="demo" id="demoNote">目前顯示的是示範資料，不是任何班級的真實紀錄。</div>
+        <div class="card">
+          <h2>綜合指標 <span class="en" id="scopeTxt"></span></h2>
+          <div class="hero">
+            <div class="big"><b id="aek">—</b><span>AI-empower-KPI（0–100）</span><br><span class="band n" id="aekBand">—</span></div>
+            <div class="layers" id="layers"></div>
+          </div>
+          <p class="hint" id="aekNote"></p>
+        </div>
+        <div class="card">
+          <h2>三層 KPI <span class="en">HITL・HOTL・HOOTL</span></h2>
+          <div style="overflow-x:auto"><table class="data" id="kpiTable"></table></div>
+          <p class="hint">得分 s：達門檻為 100；未達者依實測／門檻比例計（愈低愈好者反向）。≥ 90 達標、60–89 接近、&lt; 60 未達；「待資料」不計入層級指數。</p>
+        </div>
+        <div class="card">
+          <h2>AI 呼叫層級分布 <span class="en" id="aiN"></span></h2>
+          <div class="dist" id="dist"></div>
+          <div class="legend" id="distLegend"></div>
+          <p class="hint">依 AI 代理呼叫的系統提示角色詞歸類（不讀學生提問內容）；平台寫入 detail.layer 後以該欄為準。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>成效與方法品質 <span class="en">論文鎖定基線 vs 本學期</span></h2>
+        <p class="sub" id="mSrc">本學期欄讀取「統計分析」最近載入的資料集；不計入綜合指標。</p>
+        <div style="overflow-x:auto"><table class="data" id="mTable"></table></div>
+        <p class="hint">只有 M1–M4 可寫入論文「研究結果」；其餘為方法品質與限制改善目標。dz 之 95% CI 以近似標準誤 × t 臨界值估計，與論文一致。</p>
+      </div>
+      <div class="card">
+        <h2>待補儀器化</h2>
+        <ul class="todo" id="todo"></ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/cloud.js"></script>
+<script src="assets/stats-engine.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var PKEY="ae.kpi.params.v1", DEF={w1:0.5,w2:0.3,w3:0.2,t1:60,t2:60,rho:0.7};
+var all=[], demo=false;
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;}
+function loadP(){var p={};try{p=JSON.parse(localStorage.getItem(PKEY)||"{}")||{};}catch(e){}Object.keys(DEF).forEach(function(k){$(k).value=(p[k]!=null?p[k]:DEF[k]);});}
+function saveP(){var p={};Object.keys(DEF).forEach(function(k){p[k]=Number($(k).value);});try{localStorage.setItem(PKEY,JSON.stringify(p));}catch(e){}}
+function P(){var p={};Object.keys(DEF).forEach(function(k){var v=Number($(k).value);p[k]=isFinite(v)?v:DEF[k];});var s=p.w1+p.w2+p.w3;if(!(s>0)){p.w1=DEF.w1;p.w2=DEF.w2;p.w3=DEF.w3;s=1;}p.w1/=s;p.w2/=s;p.w3/=s;return p;}
+
+/* ---------- 資料前處理 ---------- */
+function det(r){var d=r.detail;if(typeof d==="string"){try{d=JSON.parse(d);}catch(e){d={};}}return d||{};}
+function clsKey(c){c=String(c||"").trim();if(/資管|資訊管理|計算機概論|^(MIS|IM)$/i.test(c))return"資管一A";if(/車輛/.test(c))return"車輛一A";if(/機械/.test(c))return"機械一A";return c;}
+function isTest(c){return /LOADTEST|^test$|測試|示範/i.test(String(c||""));}
+function isAI(r,d){return r.kind==="ai"||d.action==="ai"||((r.score===""||r.score==null)&&!!(d.model||d.system));}
+function aiLayer(d){if(d.layer&&/^(HITL|HOTL|HOOTL)$/.test(d.layer))return d.layer;var s=String(d.system||"");
+  if(/測試助手/.test(s))return"x";if(/影片|旁白|提示語|翻譯|Translate|簡報|學術寫作|字幕/i.test(s))return"HOOTL";
+  if(/系統分析|骨架|轉換|歸因|分解/.test(s))return"HOTL";if(/審稿|審查|程式碼|教學助手|除錯|邏輯/.test(s))return"HITL";return"?";}
+function scope(){var c=$("clsSel").value, since=$("since").value.trim();
+  return all.filter(function(r){return !isTest(r.cls)&&(!c||clsKey(r.cls)===c)&&(!since||String(r.ts)>=since);});}
+function median(a){if(!a.length)return null;var b=a.slice().sort(function(x,y){return x-y;}),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2;}
+function latestBySid(rs){var o={};rs.forEach(function(r){var s=String(r.sid||"");if(!s)return;if(!o[s]||String(r.ts)>String(o[s].ts))o[s]=r;});return Object.keys(o).map(function(k){return o[k];});}
+
+/* ---------- KPI 計算 ---------- */
+function score(v,T,dir){if(v==null||isNaN(v))return null;if(dir==="band"){var lo=T[0],hi=T[1];if(v>=lo&&v<=hi)return 100;return v<lo?100*v/lo:100*hi/v;}
+  if(dir==="low"){if(v<=0)return 100;return Math.min(100,100*T/v);}return Math.min(100,100*v/T);}
+function compute(){
+  var R=scope(), p=P(), D=R.map(function(r){return{r:r,d:det(r)};});
+  var ai=D.filter(function(x){return isAI(x.r,x.d);}), hum=D.filter(function(x){return !isAI(x.r,x.d);});
+  var bySid={};hum.forEach(function(x){var s=String(x.r.sid||"");if(!s)return;(bySid[s]=bySid[s]||{h:0,a:0}).h++;});
+  ai.forEach(function(x){var s=String(x.r.sid||"");if(!s)return;(bySid[s]=bySid[s]||{h:0,a:0}).a++;});
+  var proj=hum.filter(function(x){return x.r.kind==="project";}), run=hum.filter(function(x){return x.r.kind==="project-run";}),
+      fin=hum.filter(function(x){return x.r.kind==="project-final";}), ipoAll=hum.filter(function(x){return x.r.kind==="ipo";}),
+      ipo=latestBySid(ipoAll.map(function(x){return x.r;})).map(function(r){return{r:r,d:det(r)};}).filter(function(x){return !x.d.missing;});
+  var st={};function mark(s,k){if(!s)return;(st[s]=st[s]||{})[k]=1;}
+  proj.forEach(function(x){var n=Number(x.d.step||x.r.score)||0,s=String(x.r.sid||"");if(n>=1)mark(s,1);if(n>=2)mark(s,2);if(n>=3)mark(s,3);mark(s,"p");});
+  ipoAll.forEach(function(x){var s=String(x.r.sid||"");mark(s,"p");if(!x.d.missing&&Number(x.r.score)>0)mark(s,2);});
+  hum.filter(function(x){return x.r.kind==="ipopractice";}).forEach(function(x){mark(String(x.r.sid||""),"p");});
+  run.forEach(function(x){if(Number(x.r.score)>=1)mark(String(x.r.sid||""),4);});
+  var part=Object.keys(st).filter(function(s){return st[s].p;}), h1=null;
+  if(part.length){var c=0;part.forEach(function(s){[1,2,3,4].forEach(function(k){if(st[s][k])c++;});});h1=c/(4*part.length);}
+  var h2=ipo.length?ipo.reduce(function(a,x){return a+Math.max(0,Math.min(100,Number(x.r.score)/(Number(x.r.max)||100)*100));},0)/ipo.length:null;
+  var withDims=ipo.filter(function(x){return x.d.dims&&x.d.dims.ct!=null;});
+  var h3=withDims.length?withDims.filter(function(x){return Number(x.d.dims.ct)>=18;}).length/withDims.length:null;
+  var rhos=Object.keys(bySid).map(function(s){var o=bySid[s];return o.h/(o.h+o.a);}), h4=median(rhos);
+  var tr=D.filter(function(x){return x.d.layer==="HOTL"&&!isAI(x.r,x.d);});
+  var o1=tr.length?tr.filter(function(x){return x.d.approve!=null;}).length/tr.length:null;
+  var dec=tr.filter(function(x){return x.d.decision;});
+  var o3=dec.length?dec.filter(function(x){return /modify|reject|修改|退回/.test(String(x.d.decision));}).length/dec.length:null;
+  var o2=ipo.length?ipo.filter(function(x){var t=(x.d.tags||[]).join("|");return /AI 內容未檢核|主題不符/.test(t);}).length/ipo.length:null;
+  var starters={};proj.forEach(function(x){if(x.r.sid)starters[x.r.sid]=1;});
+  var done={};fin.forEach(function(x){if(x.r.sid&&Number(x.r.score)>=5)done[x.r.sid]=1;});
+  var ns=Object.keys(starters).length, x1=ns?Object.keys(done).filter(function(s){return starters[s];}).length/ns:null;
+  var finals=D.filter(function(x){return x.r.kind==="final";});
+  var x2=finals.length?(finals.filter(function(x){return x.d.governance;}).length/finals.length):null;
+  var cnt={HITL:0,HOTL:0,HOOTL:0,"?":0};ai.forEach(function(x){var l=aiLayer(x.d);if(l!=="x")cnt[l]++;});
+  var cls=cnt.HITL+cnt.HOTL+cnt.HOOTL, x3=cls?cnt.HOOTL/cls:null;
+  var K=[
+   {L:"HITL",c:"H1",n:"四站完成率",v:h1,T:0.8,dir:"high",f:"pct",note:part.length+" 人參與"},
+   {L:"HITL",c:"H2",n:"IPO 驗收品質",v:h2,T:70,dir:"high",f:"n1",note:ipo.length+" 份已評分"},
+   {L:"HITL",c:"H3",n:"判斷門檻具備率",v:h3,T:0.5,dir:"high",f:"pct",note:"運算思維面向 ≥ 18／25"},
+   {L:"HITL",c:"H4",n:"人類投入比 ρ",v:h4,T:p.rho,dir:"high",f:"r2",note:rhos.length+" 人中位數"},
+   {L:"HOTL",c:"O1",n:"轉換核可紀錄率",v:o1,T:0.9,dir:"high",f:"pct",note:tr.length?tr.length+" 次轉換":"待儀器化"},
+   {L:"HOTL",c:"O2",n:"AI 產出未檢核率",v:o2,T:0.05,dir:"low",f:"pct",note:"愈低愈好"},
+   {L:"HOTL",c:"O3",n:"AI 修正介入率",v:o3,T:[0.1,0.4],dir:"band",f:"pct",note:dec.length?dec.length+" 次決策":"待儀器化"},
+   {L:"HOOTL",c:"X1",n:"專題完成率",v:x1,T:0.75,dir:"high",f:"pct",note:ns+" 人啟動專題"},
+   {L:"HOOTL",c:"X2",n:"治理決策紀錄率",v:x2,T:0.9,dir:"high",f:"pct",note:finals.length?finals.length+" 份期末專題":"待期末評分登錄"},
+   {L:"HOOTL",c:"X3",n:"AI 自主產出集中度",v:x3,T:0.4,dir:"high",f:"pct",note:"暫定門檻；"+cls+" 次已歸類"}];
+  K.forEach(function(k){k.s=score(k.v,k.T,k.dir);});
+  var th={};["HITL","HOTL","HOOTL"].forEach(function(L){var ks=K.filter(function(k){return k.L===L;}),av=ks.filter(function(k){return k.s!=null;});
+    th[L]={v:av.length?av.reduce(function(a,k){return a+k.s;},0)/av.length:null,cov:av.length+"／"+ks.length};});
+  var g1=th.HITL.v==null?null:Math.min(1,th.HITL.v/p.t1), hotS=th.HOTL.v==null||g1==null?null:th.HOTL.v*g1;
+  var g2=hotS==null?null:Math.min(1,hotS/p.t2), hootS=th.HOOTL.v==null||g2==null?null:th.HOOTL.v*g2;
+  var parts=[[p.w1,th.HITL.v],[p.w2,hotS],[p.w3,hootS]].filter(function(x){return x[1]!=null;}), ws=parts.reduce(function(a,x){return a+x[0];},0);
+  var aek=parts.length?parts.reduce(function(a,x){return a+x[0]*x[1];},0)/ws:null;
+  return{tagged:ai.filter(function(x){return !!x.d.layer;}).length,K:K,th:th,g1:g1,g2:g2,hotS:hotS,hootS:hootS,aek:aek,full:parts.length===3,cnt:cnt,nAI:ai.length,nR:R.length,p:p};
+}
+
+/* ---------- 呈現 ---------- */
+function fmt(v,f){if(v==null||isNaN(v))return"—";if(f==="pct")return(v*100).toFixed(1)+"%";if(f==="r2")return v.toFixed(2);return v.toFixed(1);}
+function tfmt(k){if(k.dir==="band")return(k.T[0]*100)+"–"+(k.T[1]*100)+"%";var t=k.f==="pct"?(k.T*100)+"%":(k.f==="r2"?k.T.toFixed(2):k.T);return(k.dir==="low"?"≤ ":"≥ ")+t;}
+function pill(s){if(s==null)return'<span class="pill n">待資料</span>';if(s>=90)return'<span class="pill g">達標</span>';if(s>=60)return'<span class="pill o">接近</span>';return'<span class="pill r">未達</span>';}
+function band(v){if(v==null)return["n","待資料"];if(v>=80)return["g","穩健"];if(v>=60)return["o","發展中"];return["r","需介入"];}
+var LC={HITL:"#2563EB",HOTL:"#0891B2",HOOTL:"#7C3AED"}, LN={HITL:"HITL 由操作",HOTL:"HOTL 由監管",HOOTL:"HOOTL 自主產出"};
+var last=null;
+function render(){
+  if(!all.length)return; var o=compute(); last=o;
+  $("emptyCard").style.display="none";$("dash").style.display="";$("demoNote").style.display=demo?"block":"none";
+  $("scopeTxt").textContent=($("clsSel").value||"全部班級")+"・"+($("since").value||"不限")+" 起・"+o.nR+" 筆紀錄";
+  $("aek").textContent=o.aek==null?"—":o.aek.toFixed(1);var b=band(o.aek);$("aekBand").className="band "+b[0];$("aekBand").textContent=b[1];
+  var eff={HITL:o.th.HITL.v,HOTL:o.hotS,HOOTL:o.hootS}, gate={HITL:null,HOTL:o.g1,HOOTL:o.g2}, w={HITL:o.p.w1,HOTL:o.p.w2,HOOTL:o.p.w3};
+  $("layers").innerHTML=["HITL","HOTL","HOOTL"].map(function(L){var v=o.th[L].v,e=eff[L];
+    return'<div class="ly" style="--c:'+LC[L]+'"><h3>'+LN[L]+'</h3><div class="v">'+(v==null?"—":v.toFixed(1))+'</div><div class="bar"><i style="width:'+(v==null?0:Math.max(0,Math.min(100,v)))+'%"></i></div>'+
+    '<div class="s">權重 '+w[L].toFixed(2)+'・覆蓋 '+o.th[L].cov+(gate[L]!=null?'<br>閘門係數 '+gate[L].toFixed(2)+' → 計入 '+(e==null?"—":e.toFixed(1)):'')+'</div></div>';}).join("");
+  $("aekNote").textContent=(o.full?"":"部分層級尚無資料，綜合指標以有資料的層級重新加權。")+(o.g1!=null&&o.g1<1?"HITL 未達監管閘門，HOTL 得分已打折（先操作、後監管）。":"")+"綜合指標為教學管理指標，不作研究成效宣稱。";
+  var rows="<tr><th>代號</th><th>KPI</th><th>實測</th><th>門檻</th><th>得分 s</th><th>狀態</th><th>說明</th></tr>";
+  ["HITL","HOTL","HOOTL"].forEach(function(L){rows+='<tr class="grp"><td colspan="7">'+LN[L]+'</td></tr>';
+    o.K.filter(function(k){return k.L===L;}).forEach(function(k){rows+="<tr><td>"+k.c+"</td><td>"+esc(k.n)+'</td><td class="num">'+fmt(k.v,k.f)+'</td><td class="num">'+tfmt(k)+'</td><td class="num">'+(k.s==null?"—":k.s.toFixed(0))+"</td><td>"+pill(k.s)+'</td><td class="sm">'+esc(k.note)+"</td></tr>";});});
+  $("kpiTable").innerHTML=rows;
+  var tot=o.cnt.HITL+o.cnt.HOTL+o.cnt.HOOTL+o.cnt["?"], seg=[["HITL",LC.HITL,"HITL 審查型"],["HOTL",LC.HOTL,"HOTL 轉換型"],["HOOTL",LC.HOOTL,"HOOTL 彙整型"],["?","#94A3B8","未歸類"]];
+  $("aiN").textContent=o.nAI+" 次 AI 呼叫";
+  $("dist").innerHTML=tot?seg.map(function(s){return'<i title="'+s[2]+" "+o.cnt[s[0]]+'" style="width:'+(o.cnt[s[0]]/tot*100)+'%;background:'+s[1]+'"></i>';}).join(""):"";
+  $("distLegend").innerHTML=seg.map(function(s){return'<span style="--c:'+s[1]+'">'+s[2]+" "+o.cnt[s[0]]+(tot?"（"+Math.round(o.cnt[s[0]]/tot*100)+"%）":"")+"</span>";}).join("");
+  renderTodo(o);
+}
+function renderTodo(o){var k=function(c){return o?o.K.filter(function(x){return x.c===c;})[0]:null;};
+  var items=[["AI-empower-platform 的 AI 呼叫帶入 detail.layer",o&&o.tagged>0],["站間轉換寫入 detail.approve 與 detail.decision（O1、O3）",o&&k("O1").v!=null],
+    ["期末專題評分登錄治理決策紀錄 detail.governance（X2）",o&&k("X2").v!=null],["HOTL AI 監管素養量表正式施測（O4）",false]];
+  $("todo").innerHTML=items.map(function(i){return"<li>"+(i[1]?"✅ ":"⬜ ")+esc(i[0])+"</li>";}).join("");}
+
+/* ---------- 成效面板 ---------- */
+var BASE=[
+ ["M1","CT 整體效果量","n = 24，2.81 → 4.12，dz = 1.11 [0.57, 1.64]","dz ≥ 0.80，CI 下界 > 0"],
+ ["M2","4C 整體效果量","n = 32，3.18 → 4.52，dz = 1.66 [1.13, 2.20]","dz ≥ 0.80，CI 下界 > 0"],
+ ["M3","構面一致性","CT 1.02–1.10；4C 面向 1.42–1.69；素養 1.55–1.71","各構面 dz ≥ 0.80，Holm 後顯著"],
+ ["M4","分階段信度","CT .963／.986；4C .967／.975","α ≥ .90"],
+ ["M5","前後測配對率","CT 17.4%；4C 41.0%","≥ 50%"],
+ ["M6","可配對樣本數","CT 24；4C 32","n ≥ 34"],
+ ["M7","直線作答率","CT 後測 58%（14／24）","≤ 15%"],
+ ["M8","留存差距（選擇效應）","85% 對 17%，差 68 個百分點","≤ 20 個百分點"],
+ ["M9","依賴風險顧慮","M = 3.95（SD 1.07，n = 43）","監測"]];
+function dzCI(dz,n){var se=Math.sqrt(1/n+dz*dz/(2*n)),tc=AE.tCritical?AE.tCritical(0.05,n-1):1.96;return[dz-tc*se,dz+tc*se];}
+function holm(ps){var idx=ps.map(function(p,i){return[p,i];}).sort(function(a,b){return a[0]-b[0];}),m=ps.length,out=[],prev=0;
+  idx.forEach(function(x,r){var v=Math.min(1,Math.max(prev,(m-r)*x[0]));prev=v;out[x[1]]=v;});return out;}
+function cur(){var s=null;try{s=JSON.parse(localStorage.getItem((window.AE&&AE.DATASET_KEY)||"ae.dataset.v1")||"null");}catch(e){}
+  if(!s||!s.raw||!window.AE)return null;try{var pr=AE.parseRecords(s.raw),recs=pr.records||pr,key=s.schemeKey||AE.guessScheme(recs),a=AE.analyse(recs,key);
+    var bp=AE.buildPairs(recs,a.itemCount),flat=bp.pairs.filter(function(p){return p.post.every(function(v){return v===p.post[0];});}).length;
+    a.flat=bp.pairs.length?flat/bp.pairs.length:null;a.savedAt=s.savedAt;return a;}catch(e){return null;}}
+function renderM(){var a=cur(),C={};
+  if(a){var ov=a.results[0].test,isCT=a.schemeKey==="ct",isFC=a.schemeKey==="fourc";
+    if(ov){var ci=dzCI(ov.dz,ov.n),t="n = "+ov.n+"，"+ov.preMean.toFixed(2)+" → "+ov.postMean.toFixed(2)+"，dz = "+ov.dz.toFixed(2)+" ["+ci[0].toFixed(2)+", "+ci[1].toFixed(2)+"]",ok=ov.dz>=0.8&&ci[0]>0;
+      if(isCT)C.M1=[t,ok];else if(isFC)C.M2=[t,ok];}
+    var subs=a.results.slice(1).filter(function(r){return r.test;});
+    if(subs.length){var hp=holm(subs.map(function(r){return r.test.p;})),mn=Math.min.apply(null,subs.map(function(r){return r.test.dz;}));
+      var hm=Math.max.apply(null,hp);C.M3=["最小 dz = "+mn.toFixed(2)+"，Holm 後最大 p "+(hm<0.001?"< .001":"= "+hm.toFixed(3)),mn>=0.8&&Math.max.apply(null,hp)<0.05];}
+    var ap=a.alphaPre&&a.alphaPre.alpha,aq=a.alphaPost&&a.alphaPost.alpha;if(ap!=null&&aq!=null)C.M4=["α = "+ap.toFixed(3)+"／"+aq.toFixed(3),ap>=0.9&&aq>=0.9];
+    var pre=a.pairs+(a.preOnly||0);if(pre)C.M5=[(a.pairs/pre*100).toFixed(1)+"%（"+a.pairs+"／"+pre+"）",a.pairs/pre>=0.5];
+    C.M6=["n = "+a.pairs,a.pairs>=34];if(a.flat!=null)C.M7=[(a.flat*100).toFixed(1)+"%",a.flat<=0.15];
+    $("mSrc").textContent="本學期欄：統計分析資料集（"+(a.scheme&&a.scheme.name||a.schemeKey)+"，載入於 "+String(a.savedAt||"").slice(0,16).replace("T"," ")+"）；不計入綜合指標。";}
+  $("mTable").innerHTML="<tr><th>代號</th><th>KPI</th><th>論文鎖定基線</th><th>本學期</th><th>門檻</th><th>狀態</th></tr>"+BASE.map(function(b){var c=C[b[0]];
+    return"<tr><td>"+b[0]+"</td><td>"+esc(b[1])+'</td><td class="sm">'+esc(b[2])+'</td><td class="sm">'+(c?esc(c[0]):"待後測")+'</td><td class="sm">'+esc(b[3])+"</td><td>"+(c?(c[1]?'<span class="pill g">達標</span>':'<span class="pill r">未達</span>'):'<span class="pill n">待資料</span>')+"</td></tr>";}).join("");}
+
+/* ---------- 載入 ---------- */
+function fillCls(){var cur0=$("clsSel").value,set={};all.forEach(function(r){if(r.cls&&!isTest(r.cls))set[clsKey(r.cls)]=1;});
+  $("clsSel").innerHTML='<option value="">全部班級</option>'+Object.keys(set).sort().map(function(c){return"<option"+(c===cur0?" selected":"")+">"+esc(c)+"</option>";}).join("");}
+function pull(){var code=$("tcode").value.trim()||AECloud.teacherCode();if(!code){msg("請輸入教師碼。","warn");return;}
+  msg("讀取中…","warn");AECloud.pull("",code,{incremental:true}).then(function(list){AECloud.teacherCode(code);demo=false;all=list.slice();fillCls();render();msg("已載入 "+list.length+" 筆紀錄。","ok");})
+  .catch(function(e){msg("讀取失敗："+e.message,"err");});}
+function makeDemo(){var out=[],t0=Date.parse("2026-09-21T02:00:00Z"),sys=["你是嚴格但建設性的審稿專家","你是專題系統分析師","你是專業中文影片編劇","你是專業中文旁白撰寫者","你是嚴謹的程式碼審查者","你是專題教學助手"];
+  for(var i=1;i<=30;i++){var sid="9"+String(100+i).slice(1),cls="機械一A 數位科技與AI應用",steps=1+(i*7)%5;
+    for(var s=1;s<=steps;s++)out.push({id:"d-p-"+i+"-"+s,ts:new Date(t0+(i+s)*36e5*20).toISOString(),kind:"project",sid:sid,cls:cls,score:s,max:5,detail:{step:s}});
+    if(steps>=4)out.push({id:"d-r-"+i,ts:new Date(t0+i*9e6).toISOString(),kind:"project-run",sid:sid,cls:cls,score:1,max:1,detail:{}});
+    if(steps>=5&&i%3)out.push({id:"d-f-"+i,ts:new Date(t0+i*9e6).toISOString(),kind:"project-final",sid:sid,cls:cls,score:5,max:5,detail:{}});
+    var ct=10+(i*5)%15;out.push({id:"d-i-"+i,ts:new Date(t0+i*8e6).toISOString(),kind:"ipo",sid:sid,cls:cls,score:55+(i*7)%40,max:100,detail:{dims:{ct:ct},tags:i%9===0?["AI 內容未檢核"]:[]}});
+    for(var a=0;a<i%6;a++)out.push({id:"d-a-"+i+"-"+a,ts:new Date(t0+(i+a)*7e6).toISOString(),kind:"ai",sid:sid,cls:cls,score:"",max:2000,detail:{action:"ai",system:sys[(i+a)%sys.length]}});}
+  return out;}
+$("btnPull").addEventListener("click",pull);
+$("btnDemo").addEventListener("click",function(){demo=true;all=makeDemo();fillCls();render();msg("已載入示範資料（30 位虛擬學生）。","ok");});
+["clsSel","since"].forEach(function(id){$(id).addEventListener("change",render);});
+Object.keys(DEF).forEach(function(k){$(k).addEventListener("change",function(){saveP();render();});});
+$("btnReset").addEventListener("click",function(){try{localStorage.removeItem(PKEY);}catch(e){}loadP();render();});
+$("btnCsv").addEventListener("click",function(){if(!last){msg("請先載入資料。","warn");return;}
+  var q=function(s){s=String(s==null?"":s);return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  var lines=[["層級","代號","KPI","實測","門檻","得分","說明"].join(",")].concat(last.K.map(function(k){return[k.L,k.c,k.n,fmt(k.v,k.f),tfmt(k),k.s==null?"":k.s.toFixed(1),k.note].map(q).join(",");}));
+  lines.push(["綜合","AEK","AI-empower-KPI",last.aek==null?"":last.aek.toFixed(1),"","",""].map(q).join(","));
+  var blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="AI-empower-KPI_"+new Date().toISOString().slice(0,10)+".csv";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);});
+loadP();renderM();renderTodo(null);
+if(AECloud.teacherCode())pull();
+})();
+</script>
+</body>
+</html>
