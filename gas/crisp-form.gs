@@ -1,6 +1,6 @@
 /**
  * crisp-form.gs — CRISP 提示工坊（Google 表單問卷版）產生器＋送出處理
- * 屏東科技大學．生成式 AI 提示工程｜2026-10-30 v1.0
+ * 屏東科技大學．生成式 AI 提示工程｜2026-10-30 v1.0.1（學號後 4 碼保留開頭的 0）
  *
  * 一支獨立 Apps Script 專案就夠：
  *   ① buildCrispForm()：建立分段 Google 表單（C 背景、R 角色、I 指令、S 規格、P 驗證），
@@ -18,6 +18,9 @@
  *   3. 上方函式選 buildCrispForm → 執行 → 依提示授權（表單、試算表、外部連線、寄信、觸發器）。
  *   4. 執行紀錄會印出：學生填答網址（含短網址）、表單編輯網址、回覆試算表網址。
  *   5. 只想檢查組提示邏輯、不寫任何資料：執行 selfTest()。
+ *
+ * 【已部署】2026-10-30：學生填答 https://forms.gle/gE7LyjTX9HMxNqXcA
+ *   Apps Script 專案「CRISP 提示工坊_Google表單產生器」（kuo0615@gmail.com），觸發器 onCrispFormSubmit（提交表單時）。
  *
  * 【不計評分】score 存的是「CRISP 五面向完成度」（每面向 20 分），detail.graded = false。
  * 【隱私】Email 只用來寄信，不寫進評量資料庫；學號只推後 4 碼（與 ai-empower 其他頁一致）。
@@ -281,7 +284,7 @@ function onCrispFormSubmit(e) {
     var ssId = PropertiesService.getScriptProperties().getProperty('SS_ID');
     if (ssId) {
       var sh = SpreadsheetApp.openById(ssId).getSheetByName('組好的提示');
-      if (sh) sh.appendRow([e.response.getTimestamp(), sid4, a.name || '', a.cls || '', a.task || '', built.score,
+      if (sh) sh.appendRow([e.response.getTimestamp(), "'" + sid4, a.name || '', a.cls || '', a.task || '', built.score,
         built.filled.join('、'), built.text, aiText, mailed || '（沒填 Email）', pushed]);
     }
   } catch (err) {
