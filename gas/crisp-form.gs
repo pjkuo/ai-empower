@@ -35,7 +35,7 @@ var CFG = {
   AI_PROXY:  'https://script.google.com/macros/s/AKfycbzeZIdckk825BFGen2C2l9WYG_qYSJUDTTAzLMAmhg6fdvi_HrwZsa518PSAurleMSm/exec',  // 老師代管 Gemini 代理
   AI_CODE:   'MIS2026',
   WEB_URL:   'https://pjkuo.github.io/ai-empower/crisp.html',
-  PICKUP_URL: '',   // 取件頁（本專案部署成網頁應用程式後的 /exec 網址）
+  PICKUP_URL: 'https://script.google.com/macros/s/AKfycbxsKFJwD9sTM4eVyaRWiz6Zot0YwQLVGZ4qVcGJJtfX3QwELPL1jdp94O8J5GDXDKDH/exec',   // 取件頁（本專案部署成網頁應用程式後的 /exec 網址；自行複製專案請改成自己的）
   TITLE:     'CRISP 提示工坊（問卷版）',
   APP:       'crisp-form',
   KIND:      'prompt'
