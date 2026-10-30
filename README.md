@@ -29,6 +29,7 @@
 | `presurvey-teacher.html` | 課前評量教師儀表板：貼回覆碼／匯入 JSON／CSV → 準備度分群、五向度、各班、12 條判準建議、18 週逐週調整、答對率、分布、逐人清單；匯出 JSON／CSV；一鍵帶到 `stats.html`（scheme `presurvey`） |
 | `stats.html` | 統計分析：匯入 4C 評量 JSON／運算思維 JSON／CSV → 配對 t、Cohen's dz（Hedges gz）、95% CI、Cronbach's α、前後測比較圖、CSV 匯出 |
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
+| `crisp.html` | CRISP 提示工坊（2026-10-30，獨立版面）：生成式 AI 提示工程 100 分鐘課的學生工具。① 寫提示：C 背景（含附檔）／R 角色／I 指令（IPO、分步驟、先問我、比較方案）／S 規格（表格、圖表、網頁、流程圖、Python、條列＋條件）／P 驗證（程式模擬、邊界自查、迭代、影音驗證、驗收清單）五張填空卡，5 張任務卡範例；② 抓幻覺；③ CO₂ 驗收帳 8 題（先寫預測才能問 AI）；④ 提示卡與交件檢查。**Google Apps Script 互動**：`<meta name="ae-ai-proxy">` 接老師代管 Gemini 代理（AI-empower-platform `gas/ai-proxy.gs`，班級碼）在頁內直接問 AI、驗收帳自動帶入 AI 判定；「☁ 交件上傳」以 `AECloud.push` 送 `kind=prompt`（`score`＝繳交完整度、`detail.graded=false`、`detail.unit=prompt`）。身分與 `identity.js` 同步（學號後 4 碼＋班級）；資料存 `localStorage`（`crisp-workshop-v1`）；零 CDN |
 | `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標），並與論文成效基線（M1–M9）對照；教師工作台「🎯 AI-empower-KPI」分頁 |
 
 ## 設計原則
@@ -96,3 +97,9 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 
 - 匿名 kind（feedback／question）`sid` 一律留空：`teacher.html` 不會把它算成學生；`assess.html` 對匿名項目只顯示「匿名・不記錄完成」。
 - 練習題答案在前端可見，只供自學；正式期中／期末走 Moodle（GIFT 匯入，伺服器端計分）。需要保密的考試題，在 Notion 題庫把「用途」設為「考試保留」即不會匯出。
+
+## 2026-10-30 更新（CRISP 提示工坊）
+- 新增 `crisp.html`（獨立版面，不套 `ae.css`；共用 `theme.js`／`identity.js`／`cloud.js`）：五個面向填空組提示、一鍵複製或「複製並開啟」Claude／ChatGPT／Gemini。
+- Google Apps Script 互動版：班級碼（同 AI-empower-platform，例 MIS2026）→ 老師代管 Gemini 代理直接回答；交件以 `kind=prompt` 寫入「ai-empower 評量資料庫」，後端不需改版（每個 kind 自動一張工作表）。
+- 入口 `index.html`「🎨 AI 賦能專題創作」新增卡片；`_headers` 加 `crisp.html` 不快取規則。
+

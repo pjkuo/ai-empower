@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>CRISP 提示工坊｜ai-empower</title>
+<meta name="description" content="生成式 AI 提示工程：C 背景、R 角色、I 指令、S 規格、P 驗證五個面向選填空格，組好提示一鍵複製；輸入班級碼可直接問老師代管的 Gemini，交件上傳雲端。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/crisp.html">
+<meta name="theme-color" content="#18233A">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學 Hub">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:url" content="https://pjkuo.github.io/ai-empower/crisp.html">
+<meta property="og:title" content="CRISP 提示工坊｜ai-empower">
+<meta property="og:description" content="生成式 AI 提示工程：C 背景、R 角色、I 指令、S 規格、P 驗證五個面向選填空格，組好提示一鍵複製；輸入班級碼可直接問老師代管的 Gemini，交件上傳雲端。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<!-- Google Apps Script 互動：① 評量資料庫（AECloud，kind=prompt）② 老師代管 Gemini 代理（AI-empower-platform/gas/ai-proxy.gs，班級碼） -->
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<meta name="ae-ai-proxy" content="https://script.google.com/macros/s/AKfycbzeZIdckk825BFGen2C2l9WYG_qYSJUDTTAzLMAmhg6fdvi_HrwZsa518PSAurleMSm/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/cloud.js"></script>
+<style>
+/* CRISP 提示工坊 v1.0（2026-10-30）· 獨立版面，零 CDN（系統字型）
+   Layout：打孔提示卡。左邊五張填空卡（C 背景、R 角色、I 指令、S 規格、P 驗證），右邊一張即時組好的提示卡（五個孔），四個分頁照課堂順序 1→4 */
+:root{
+  --bg:#ECEFF3; --surface:#FFFFFF; --sunk:#F5F7FA; --ink:#172033; --muted:#5A6476; --line:#D2D9E2;
+  --band:#18233A; --band-ink:#F2F5FA; --band-muted:#B3C2D8;
+  --c:#0E7F83; --r:#6B4BC0; --i:#2152D4; --s:#9A5B00; --p:#BE3655; --x:#4F5B6E;
+  --key-ink:#FFFFFF;
+  --ok:#1B7A47; --bad:#BF3A2C; --warn:#94600A;
+  --f-display:"DFKai-SB","BiauKai","標楷體","Kaiti TC","KaiTi",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:ui-monospace,"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F131A; --surface:#171C25; --sunk:#1D2330; --ink:#E6EAF1; --muted:#9BA5B5; --line:#2B3342;
+    --band:#0A0E14; --band-ink:#EEF2F8; --band-muted:#8E9DB3;
+    --c:#4DC3C6; --r:#AA94F2; --i:#7FA3FF; --s:#EDB04D; --p:#F27D96; --x:#9BA5B5;
+    --key-ink:#0D1117; --ok:#5BC98A; --bad:#F2806F; --warn:#E5B456;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F131A; --surface:#171C25; --sunk:#1D2330; --ink:#E6EAF1; --muted:#9BA5B5; --line:#2B3342;
+  --band:#0A0E14; --band-ink:#EEF2F8; --band-muted:#8E9DB3;
+  --c:#4DC3C6; --r:#AA94F2; --i:#7FA3FF; --s:#EDB04D; --p:#F27D96; --x:#9BA5B5;
+  --key-ink:#0D1117; --ok:#5BC98A; --bad:#F2806F; --warn:#E5B456;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+html{-webkit-text-size-adjust:100%}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.25}
+h2{font-size:23px}
+h3{font-size:17px;margin:0;font-weight:700}
+p{margin:0}
+a{color:var(--i)}
+:focus-visible{outline:2px solid var(--i);outline-offset:2px}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:14px;font-weight:400}
+.k-c{--k:var(--c)} .k-r{--k:var(--r)} .k-i{--k:var(--i)} .k-s{--k:var(--s)} .k-p{--k:var(--p)} .k-x{--k:var(--x)}
+
+/* header band */
+.band{background:var(--band);color:var(--band-ink)}
+.band-in{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-end;justify-content:space-between;padding-block:28px 24px}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--band-muted)}
+.band h1{font-size:clamp(32px,5vw,46px);margin:4px 0 8px}
+.band h1 .crisp{font-family:var(--f-mono);font-weight:600;letter-spacing:.04em}
+.band h1 .crisp span:nth-child(1){color:#5FD0D3} .band h1 .crisp span:nth-child(2){color:#B9A6F7} .band h1 .crisp span:nth-child(3){color:#8DB0FF} .band h1 .crisp span:nth-child(4){color:#F4BE62} .band h1 .crisp span:nth-child(5){color:#F78FA5}
+.lede{max-width:42em;color:var(--band-muted)}
+.lede b{color:var(--band-ink);font-weight:500}
+.legend5{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:14px;color:var(--band-muted)}
+.legend5 b{font-family:var(--f-mono);font-weight:600}
+.legend5 span:nth-child(1) b{color:#5FD0D3} .legend5 span:nth-child(2) b{color:#B9A6F7} .legend5 span:nth-child(3) b{color:#8DB0FF} .legend5 span:nth-child(4) b{color:#F4BE62} .legend5 span:nth-child(5) b{color:#F78FA5}
+.who{display:flex;gap:12px;flex-wrap:wrap}
+.who label{display:grid;gap:4px;font-size:13px;color:var(--band-muted)}
+.who input{width:150px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:var(--band-ink);border-radius:8px;padding:8px 10px;font:inherit;font-size:15px}
+.who input::placeholder{color:rgba(230,236,245,.45)}
+
+/* tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs-in{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tab{appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-size:16px;padding:14px 14px 12px;border-bottom:3px solid transparent;cursor:pointer;display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.tab b{font-family:var(--f-mono);font-weight:600;font-size:14px;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1.5px solid currentColor}
+.tab small{font-family:var(--f-mono);font-size:12px;opacity:.8}
+.tab .ts{font-family:var(--f-mono);font-size:12px;padding:1px 7px;border-radius:99px;background:var(--sunk);color:var(--muted)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+.tab[aria-selected="true"] b{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* layout */
+main{padding-block:24px 40px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+@media (min-width:980px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,440px)}.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);max-height:calc(100vh - 86px);overflow:auto;border-radius:14px}}
+.form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0}
+.form>*{min-width:0}
+.block,.fbody,.sub,.card,.pbox,.checks{grid-template-columns:minmax(0,1fr)}
+.side{min-width:0}
+.block{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:grid;gap:12px;min-width:0}
+.block>p{max-width:46em}
+.intro{background:none;border:0;padding:4px 2px 2px}
+
+/* inputs */
+input:not([type]),input[type=text],textarea,select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+textarea{resize:vertical;min-height:72px;line-height:1.6}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--k,var(--i));outline-offset:0;border-color:transparent}
+input:disabled{opacity:.5}
+.lbl{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-weight:700;font-size:17px}
+.lbl .en{font-family:var(--f-mono);font-weight:600;font-size:13px;color:var(--k);letter-spacing:.03em}
+.lbl .q{font-weight:400;color:var(--muted);font-size:14px}
+.stack{display:grid;gap:6px;font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>input{flex:1 1 220px;min-width:0}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:15px;cursor:pointer;line-height:1.9}
+.chk>input[type=checkbox]{width:18px;height:18px;margin-top:6px;accent-color:var(--k,var(--i));flex:none}
+.checks{display:grid;gap:4px}
+.chk>span{min-width:0;flex:1 1 auto}
+
+/* fill-in-the-blank sentences */
+.sent{font-size:16px;line-height:2.4;overflow-wrap:anywhere}
+.sent .blank,.chk .blank{display:inline-block;width:auto;min-width:4em;max-width:100%;font:inherit;font-size:16px;line-height:1.5;color:var(--ink);background:color-mix(in srgb,var(--k,var(--i)) 9%,var(--surface));border:0;border-bottom:2px solid var(--k,var(--i));border-radius:5px 5px 0 0;padding:2px 8px;margin:0 2px;vertical-align:baseline}
+.sent select.blank,.chk select.blank{padding-right:4px;cursor:pointer}
+.sent .blank::placeholder,.chk .blank::placeholder{color:var(--muted);opacity:.85}
+.sent .blank:focus,.chk .blank:focus{outline:2px solid var(--k,var(--i));outline-offset:1px}
+.blank.tiny{min-width:3.2em;text-align:center}
+.chiprow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:baseline}
+.chiprow>span{font-size:13px;color:var(--muted);white-space:nowrap}
+
+/* chips + segmented */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:4px 12px;cursor:pointer;line-height:1.5}
+.chip:hover{border-color:var(--k,var(--ink))}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .tagx{font-size:12px;opacity:.75;margin-left:4px}
+.scen .chip{font-size:15px;padding:8px 14px;border-radius:8px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:100%}
+.seg button{appearance:none;font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:0;border-right:1px solid var(--line);padding:7px 14px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--k);color:var(--key-ink);font-weight:700}
+.segrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.segrow>span{font-size:14px;color:var(--muted)}
+
+/* CRISP field */
+.field{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px 18px 16px}
+.key{width:52px;height:52px;border-radius:10px;background:var(--k);color:var(--key-ink);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:28px;line-height:1}
+.fbody{display:grid;gap:10px;min-width:0}
+.sub{display:grid;gap:8px;padding:10px 14px;background:var(--sunk);border-radius:8px}
+
+/* buttons */
+.btn{appearance:none;font:inherit;font-size:15px;font-weight:700;border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{opacity:.9}
+.btn.small{font-size:13px;padding:6px 12px;font-weight:500}
+.btn.locked{opacity:.45}
+
+/* prompt card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px;box-shadow:0 1px 0 var(--line),0 10px 30px -18px rgba(20,30,50,.35)}
+.card-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.card-title{font-family:var(--f-display);font-weight:700;font-size:19px}
+.holes{display:flex;gap:10px;flex-wrap:wrap}
+.hole{width:44px;height:44px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:17px;color:var(--muted);transition:background .2s,border-color .2s,color .2s}
+.hole.on{background:var(--k);border:2px solid var(--k);color:var(--key-ink)}
+.status{font-size:14px;color:var(--muted)}
+.status.ok{color:var(--ok);font-weight:700}
+.warn{font-size:14px;color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,var(--surface));border-radius:8px;padding:8px 10px}
+.prompt{display:grid;gap:6px;font-size:15px;line-height:1.7;background:var(--sunk);border-radius:10px;padding:14px;min-width:0;overflow-wrap:anywhere}
+.side .prompt{max-height:42vh;overflow:auto}
+.ln{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px}
+.ln .tg{font-family:var(--f-mono);font-weight:600;font-size:13px;color:var(--k);padding-top:2px}
+.ln span:last-child{white-space:pre-wrap}
+.empty{color:var(--muted);font-size:14px}
+.ai-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.ai{font-size:14px;font-weight:500;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:4px 12px}
+.ai:hover{border-color:var(--ink)}
+.ai::after{content:" ↗";color:var(--muted)}
+.ai.locked{opacity:.45}
+.ver{display:grid;gap:8px;padding-top:12px;border-top:1px dashed var(--line)}
+.ver label{font-size:14px;font-weight:700}
+.pbox{display:grid;gap:10px}
+.pbox .btn{justify-self:start}
+
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:13px;color:var(--muted);font-weight:700;background:var(--sunk);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td input,td select{padding:6px 8px;font-size:15px}
+#testTbl{min-width:720px}
+#testTbl td:first-child,#paperTbl td:first-child{font-family:var(--f-mono);color:var(--muted);width:32px}
+#testTbl .vcell input{width:90px;font-family:var(--f-mono)}
+#paperTbl{min-width:660px}
+.kind{font-size:12px;padding:2px 8px;border-radius:99px;white-space:nowrap;border:1px solid var(--line)}
+.kind.n{color:var(--muted)} .kind.b{color:var(--s);border-color:var(--s)} .kind.w{color:var(--p);border-color:var(--p)}
+.mark{font-weight:700;font-size:17px}
+.mark.ok{color:var(--ok)} .mark.bad{color:var(--bad)}
+tr.miss td{background:color-mix(in srgb,var(--bad) 7%,var(--surface))}
+.links{display:flex;gap:10px;flex-wrap:wrap;font-size:14px;white-space:nowrap}
+.rule{display:grid;gap:4px;padding:12px 14px;border-left:4px solid var(--s);background:var(--sunk);border-radius:0 8px 8px 0}
+.rule .tagx{font-size:12px;color:var(--s);font-weight:700;letter-spacing:.05em}
+.rounds{display:grid;gap:8px}
+.round{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--sunk)}
+.round b{font-family:var(--f-mono)}
+.lockmsg{font-size:14px;font-weight:700;color:var(--warn)}
+.lockmsg.ok{color:var(--ok)}
+
+/* stats */
+.meter{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--sunk)}
+.meter i{display:block;height:100%}
+.legend{display:grid;gap:4px;font-size:14px}
+.legend span{display:flex;gap:8px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.qlist{display:grid;gap:10px}
+.qlist .chk b{font-weight:700}
+
+/* card tab */
+dl.sum{display:grid;gap:8px;margin:0}
+dl.sum div{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
+dl.sum dt{font-family:var(--f-mono);font-weight:600;color:var(--k)}
+dl.sum dd{margin:0;font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+dl.sum dd.none{color:var(--muted)}
+.vers{display:grid;gap:8px}
+.vers details{border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--sunk)}
+.vers summary{cursor:pointer;font-size:15px}
+.vers summary b{font-family:var(--f-mono)}
+.vers pre{white-space:pre-wrap;font-family:var(--f-body);font-size:14px;margin:8px 0 2px;overflow-wrap:anywhere}
+.pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.pill.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.pill.todo{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,var(--surface))}
+ul.rubric{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.rubric li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
+ul.rubric .pts{font-family:var(--f-mono);color:var(--muted);font-size:13px}
+ul.rubric .need{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.export details summary{cursor:pointer;font-size:14px;color:var(--muted)}
+.export pre{white-space:pre-wrap;font-family:var(--f-body);font-size:13px;line-height:1.6;max-height:360px;overflow:auto;background:var(--sunk);border-radius:8px;padding:12px;margin:8px 0 0}
+
+/* hub link, Apps Script 互動（直接問 AI、交件上傳） */
+.back{display:inline-block;color:var(--band-muted);font-size:14px;text-decoration:none;margin-bottom:10px}
+.back:hover{color:var(--band-ink)}
+.askai{display:grid;gap:10px;padding-top:12px;border-top:1px dashed var(--line)}
+.btn.ask{border-color:var(--i);color:var(--i)}
+.btn.ask:hover{background:color-mix(in srgb,var(--i) 8%,var(--surface))}
+.btn:disabled{opacity:.55;cursor:wait}
+.answer{border:1px solid var(--line);border-radius:10px;background:var(--surface);min-width:0}
+.ans-top{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ans-top b{color:var(--ink)}
+.ans-body{padding:12px;white-space:pre-wrap;font-size:14.5px;line-height:1.7;max-height:46vh;overflow:auto;overflow-wrap:anywhere}
+.ans-body.err{color:var(--bad)}
+.ans-body.wait{color:var(--muted)}
+.cloud{display:grid;gap:8px}
+.cloudmsg{font-size:14px;color:var(--muted)}
+.cloudmsg.ok{color:var(--ok);font-weight:700}
+
+/* footer, toast, overlay */
+.foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-block:8px 32px;color:var(--muted);font-size:14px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px);text-align:center;z-index:30}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.overlay{position:fixed;inset:0;background:rgba(10,14,20,.55);display:grid;place-items:center;z-index:40;padding:16px}
+.sheet{background:var(--surface);color:var(--ink);border-radius:14px;padding:18px;display:grid;gap:12px;width:min(560px,100%)}
+.sheet textarea{min-height:200px;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.field{grid-template-columns:minmax(0,1fr);padding:14px}.key{width:40px;height:40px;font-size:22px}.who input{width:130px}.chiprow{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap band-in">
+    <div>
+      <a class="back" href="./">← AI 賦能教學 Hub</a>
+      <p class="eyebrow">生成式 AI 提示工程 · 大一通識 100 分鐘</p>
+      <h1><span class="crisp"><span>C</span><span>R</span><span>I</span><span>S</span><span>P</span></span> 提示工坊</h1>
+      <p class="lede">五個面向選填空格，右邊即時組好提示，<b>複製貼給 Gen AI 就能完成任務</b>；填上 AI 班級碼，也能在本頁<b>直接問老師代管的 Gemini</b>。AI 交回來的成果，由你來驗證：先思考，後驗證。</p>
+      <p class="legend5"><span><b>C</b> 背景與附檔</span><span><b>R</b> 角色定位</span><span><b>I</b> 指令與步驟</span><span><b>S</b> 格式與條件</span><span><b>P</b> 驗證與迭代</span></p>
+    </div>
+    <div class="who">
+      <label for="sid">學號<input id="sid" data-b="sid" placeholder="B11356001" autocomplete="off"></label>
+      <label for="sname">姓名<input id="sname" data-b="name" placeholder="王小明" autocomplete="off"></label>
+      <label for="scls">班級<input id="scls" data-b="cls" list="clsList" placeholder="資管一A 計算機概論" autocomplete="off"></label>
+      <label for="aicode">AI 班級碼<input id="aicode" data-b="aiCode" placeholder="老師公布，例：MIS2026" autocomplete="off"></label>
+      <datalist id="clsList"></datalist>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="課堂四段">
+  <div class="wrap tabs-in" role="tablist">
+    <button class="tab" role="tab" data-tab="write" id="t-write"><b>1</b>寫提示<small>00–50</small><span class="ts" id="ts-write"></span></button>
+    <button class="tab" role="tab" data-tab="halluc" id="t-halluc"><b>2</b>抓幻覺<small>50–62</small><span class="ts" id="ts-halluc"></span></button>
+    <button class="tab" role="tab" data-tab="test" id="t-test"><b>3</b>驗收帳<small>62–81</small><span class="ts" id="ts-test"></span></button>
+    <button class="tab" role="tab" data-tab="card" id="t-card"><b>4</b>提示卡與交件<small>81–100</small><span class="ts" id="ts-card"></span></button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1 寫提示 -->
+<section class="panel" data-panel="write" role="tabpanel" aria-labelledby="t-write">
+  <div class="cols">
+    <div class="form">
+      <div class="block">
+        <h2>選一張任務卡</h2>
+        <p class="hint">每張卡都填好了範例空格，直接改成你的版本；換卡不會弄丟你改過的內容。</p>
+        <div class="chips scen" id="scenChips"></div>
+      </div>
+
+      <div class="block">
+        <label class="lbl" for="vague">模糊版提示 <span class="q">先猜 AI 會回什麼，寫在紙上，再複製去問</span></label>
+        <div class="row"><input id="vague" data-b="$.vague" autocomplete="off"><button class="btn" data-copy="vague">複製模糊版</button></div>
+      </div>
+
+      <!-- C -->
+      <div class="field k-c">
+        <div class="key" aria-hidden="true">C</div>
+        <div class="fbody">
+          <div class="lbl"><span class="en">Context</span>背景<span class="q">提供背景與細節資訊，如上傳附檔</span></div>
+          <p class="sent">我是 <input class="blank" id="cWho" data-b="$.C.who" placeholder="哪一系的學生" aria-label="我是誰" autocomplete="off">，正在做 <input class="blank" id="cProj" data-b="$.C.proj" placeholder="什麼專題或作業" aria-label="正在做什麼" autocomplete="off">。</p>
+          <div class="chiprow"><span>系別</span><div class="chips" data-chips="who"></div></div>
+          <label class="stack" for="cDetail">細節資訊 <span class="hint">數字、時間、對象、門檻。沒給的資料，AI 會自己編</span><textarea id="cDetail" data-b="$.C.detail" rows="3"></textarea></label>
+          <p class="sent">附檔：<select class="blank" id="cFile" data-b="$.C.file" aria-label="附檔類型"></select><span id="cFileMore">，檔名 <input class="blank" id="cFname" data-b="$.C.fname" placeholder="檔名" aria-label="附檔檔名" autocomplete="off">，內容是 <input class="blank" id="cFdesc" data-b="$.C.fdesc" placeholder="檔案裡有什麼" aria-label="附檔內容" autocomplete="off"></span>。</p>
+        </div>
+      </div>
+
+      <!-- R -->
+      <div class="field k-r">
+        <div class="key" aria-hidden="true">R</div>
+        <div class="fbody">
+          <div class="lbl"><span class="en">Role</span>角色<span class="q">角色扮演定位：AI 是誰、說給誰聽</span></div>
+          <p class="sent">請你扮演 <input class="blank" id="rRole" data-b="$.R.role" placeholder="什麼專家" aria-label="角色" autocomplete="off">，對象是 <input class="blank" id="rAud" data-b="$.R.aud" placeholder="誰要看" aria-label="對象" autocomplete="off">，用 <input class="blank" id="rTone" data-b="$.R.tone" placeholder="什麼語氣" aria-label="語氣" autocomplete="off"> 的語氣說明。</p>
+          <div class="chiprow"><span>角色</span><div class="chips" data-chips="role"></div></div>
+          <div class="chiprow"><span>對象</span><div class="chips" data-chips="aud"></div></div>
+          <div class="chiprow"><span>語氣</span><div class="chips" data-chips="tone"></div></div>
+        </div>
+      </div>
+
+      <!-- I -->
+      <div class="field k-i">
+        <div class="key" aria-hidden="true">I</div>
+        <div class="fbody">
+          <div class="lbl"><span class="en">Instruction</span>指令<span class="q">提問形式與執行步驟，如 IPO 架構</span></div>
+          <p class="sent">任務：請幫我 <input class="blank" id="iTask" data-b="$.I.task" placeholder="做什麼（用交代的，不要用問的）" aria-label="任務" autocomplete="off">。</p>
+          <div class="chiprow"><span>動作</span><div class="chips" data-chips="task"></div></div>
+          <div class="segrow"><span>提問形式</span>
+            <div class="seg" role="group" aria-label="提問形式">
+              <button data-iform="ipo">IPO 架構</button><button data-iform="steps">分步驟</button><button data-iform="ask">先問我</button><button data-iform="compare">比較方案</button>
+            </div>
+          </div>
+          <div class="sub" id="iIpo">
+            <p class="sent">輸入 Input <input class="blank" id="iIn" data-b="$.I.in" placeholder="給什麼資料" aria-label="輸入" autocomplete="off">；處理 Process <input class="blank" id="iProc" data-b="$.I.proc" placeholder="怎麼判斷、計算" aria-label="處理" autocomplete="off">；輸出 Output <input class="blank" id="iOut" data-b="$.I.out" placeholder="要得到什麼" aria-label="輸出" autocomplete="off">。</p>
+          </div>
+          <div class="sub" id="iSteps">
+            <p class="sent">① <input class="blank" id="iS1" data-b="$.I.s1" placeholder="第一步" aria-label="第一步" autocomplete="off"> ② <input class="blank" id="iS2" data-b="$.I.s2" placeholder="第二步" aria-label="第二步" autocomplete="off"> ③ <input class="blank" id="iS3" data-b="$.I.s3" placeholder="第三步" aria-label="第三步" autocomplete="off"></p>
+            <label class="chk" for="iPause"><input type="checkbox" id="iPause" data-b="$.I.pause">每一步做完先停下來，等我確認再做下一步</label>
+          </div>
+          <div class="sub" id="iAsk">
+            <p class="sent">開始之前，先問我 <select class="blank tiny" id="iNq" data-b="$.I.nq" aria-label="問題數"><option>3</option><option>5</option></select> 個你需要釐清的問題，等我回答再做。</p>
+          </div>
+          <div class="sub" id="iCmp">
+            <p class="sent">請提出 <select class="blank tiny" id="iNopt" data-b="$.I.nopt" aria-label="方案數"><option>2</option><option>3</option></select> 個方案比較優缺點，最後建議一個並說明理由。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S -->
+      <div class="field k-s">
+        <div class="key" aria-hidden="true">S</div>
+        <div class="fbody">
+          <div class="lbl"><span class="en">Specifics</span>規格<span class="q">指定輸出格式與條件，如視覺化圖表與網頁</span></div>
+          <div class="segrow"><span>輸出成</span>
+            <div class="seg" role="group" aria-label="輸出格式">
+              <button data-sout="table">表格</button><button data-sout="chart">圖表</button><button data-sout="web">網頁</button><button data-sout="mermaid">流程圖</button><button data-sout="python">Python 程式</button><button data-sout="list">條列</button>
+            </div>
+          </div>
+          <div class="sub" id="sTable">
+            <p class="sent">表格欄位是 <input class="blank" id="sCols" data-b="$.S.cols" placeholder="欄位A｜欄位B｜欄位C" aria-label="表格欄位" autocomplete="off">。</p>
+            <label class="chk" for="sEx"><input type="checkbox" id="sEx" data-b="$.S.ex"><span>給一列範例：<input class="blank" id="sExample" data-b="$.S.example" placeholder="先示範一列，AI 會照著寫" aria-label="範例列" autocomplete="off"></span></label>
+          </div>
+          <div class="sub" id="sChart">
+            <p class="sent">用 Python 畫 <select class="blank" id="sChartType" data-b="$.S.chart" aria-label="圖表類型"><option>折線圖</option><option>長條圖</option><option>散布圖</option><option>圓餅圖</option></select>，X 軸是 <input class="blank" id="sX" data-b="$.S.x" placeholder="橫軸" aria-label="X 軸" autocomplete="off">，Y 軸是 <input class="blank" id="sY" data-b="$.S.y" placeholder="縱軸" aria-label="Y 軸" autocomplete="off">。</p>
+          </div>
+          <div class="sub" id="sWeb">
+            <p class="sent">做成單一 HTML 網頁，要有 <input class="blank" id="sWebIn" data-b="$.S.web" placeholder="輸入欄、按鈕、結果怎麼顯示" aria-label="網頁內容" autocomplete="off">。</p>
+          </div>
+          <div class="sub" id="sFlow">
+            <p class="sent">畫成 Mermaid 流程圖，要包含 <input class="blank" id="sFlowIn" data-b="$.S.flow" placeholder="開始、判斷、結束" aria-label="流程圖內容" autocomplete="off">。</p>
+          </div>
+          <div class="sub" id="sPy">
+            <p class="sent">寫成能在 Google Colab 執行的 Python，<input class="blank" id="sPyIn" data-b="$.S.py" placeholder="輸入輸出怎麼做" aria-label="程式要求" autocomplete="off">。</p>
+          </div>
+          <div class="sub" id="sList">
+            <p class="sent">條列 <select class="blank tiny" id="sN" data-b="$.S.n" aria-label="條列點數"><option>3</option><option>5</option><option>7</option></select> 點，每點一句話。</p>
+          </div>
+          <div class="checks" id="sChecks"></div>
+          <p class="sent">其他條件：<input class="blank" id="sCond" data-b="$.S.cond" placeholder="門檻、等號、配色、單位…" aria-label="其他條件" autocomplete="off"></p>
+        </div>
+      </div>
+
+      <!-- P -->
+      <div class="field k-p">
+        <div class="key" aria-hidden="true">P</div>
+        <div class="fbody">
+          <div class="lbl"><span class="en">Proof</span>驗證<span class="q">模擬驗證、迭代修正，如程式模擬、影音驗證情境可行性</span></div>
+          <div class="checks">
+            <label class="chk" for="pSim"><input type="checkbox" id="pSim" data-b="$.P.sim"><span><b>程式模擬</b>：用這些測試資料模擬執行 <input class="blank" id="pData" data-b="$.P.data" placeholder="一般值、卡線值、怪資料" aria-label="測試資料" autocomplete="off">，列出預期與實際結果</span></label>
+            <label class="chk" for="pEdge"><input type="checkbox" id="pEdge" data-b="$.P.edge"><span><b>邊界自查</b>：自己檢查等號、空值、負數、單位，錯了就修正並說明改了哪裡</span></label>
+            <label class="chk" for="pIter"><input type="checkbox" id="pIter" data-b="$.P.iter"><span><b>迭代修正</b>：不符合 <input class="blank" id="pGoal" data-b="$.P.goal" placeholder="什麼標準" aria-label="通過標準" autocomplete="off"> 就修正再驗證，最多 <select class="blank tiny" id="pRounds" data-b="$.P.rounds" aria-label="迭代輪數"><option>1</option><option>2</option><option>3</option></select> 輪</span></label>
+            <label class="chk" for="pVideo"><input type="checkbox" id="pVideo" data-b="$.P.video"><span><b>影音驗證</b>：設計 <select class="blank tiny" id="pSec" data-b="$.P.sec" aria-label="影片秒數"><option>15</option><option>30</option><option>60</option></select> 秒情境影片分鏡，讓我到 <input class="blank" id="pPlace" data-b="$.P.place" placeholder="哪裡" aria-label="拍攝地點" autocomplete="off"> 實拍，驗證情境可行性</span></label>
+            <label class="chk" for="pList"><input type="checkbox" id="pList" data-b="$.P.list"><span><b>驗收清單</b>：給我 <select class="blank tiny" id="pNlist" data-b="$.P.nlist" aria-label="清單項數"><option>3</option><option>5</option><option>8</option></select> 項清單，讓我在 <input class="blank" id="pWhere" data-b="$.P.where" placeholder="哪裡" aria-label="驗收地點" autocomplete="off"> 自己檢查</span></label>
+            <label class="chk" for="pUnsure"><input type="checkbox" id="pUnsure" data-b="$.P.unsure"><span><b>標出不確定</b>：列出不確定的地方，與我該去哪裡查證</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>對照紀錄 <span class="hint">交件用：模糊版、CRISP 版各問一次並截圖</span></h3>
+        <label class="stack" for="cmpIssue">模糊版的答案有什麼問題？<textarea id="cmpIssue" data-b="cmp.issue" rows="2" placeholder="例：只給一般建議，沒有用到我的濕度數字"></textarea></label>
+        <label class="stack" for="cmpBetter">CRISP 版好在哪？（一句話，說出是加了哪個字母）<textarea id="cmpBetter" data-b="cmp.better" rows="2" placeholder="例：加了 C 的門檻和 P 的測試資料，AI 自己抓到剛好 40% 判錯並修正"></textarea></label>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card">
+        <div class="card-top"><span class="card-title">組好的提示</span><span class="muted" id="scenName"></span></div>
+        <div class="holes" id="holes">
+          <span class="hole k-c" data-k="C" title="C 背景">C</span><span class="hole k-r" data-k="R" title="R 角色">R</span><span class="hole k-i" data-k="I" title="I 指令">I</span><span class="hole k-s" data-k="S" title="S 規格">S</span><span class="hole k-p" data-k="P" title="P 驗證">P</span>
+        </div>
+        <p class="status" id="missing"></p>
+        <p class="warn" id="askWarn" hidden>任務寫成問句了。改成交代句：「請幫我＿＿」，AI 才知道要交什麼。</p>
+        <div class="prompt" id="pWrite"></div>
+        <p class="warn" id="fileWarn" hidden></p>
+        <div class="row"><button class="btn primary" data-copy="write">複製提示</button></div>
+        <div class="ai-row">複製並開啟
+          <a class="ai" data-copy="write" href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>
+          <a class="ai" data-copy="write" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+          <a class="ai" data-copy="write" href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a>
+        </div>
+        <div class="askai">
+          <div class="row"><button class="btn ask" data-askbtn="write">🤖 直接問 AI</button><span class="hint">老師代管 Gemini，免帳號；用上方「AI 班級碼」</span></div>
+          <div class="answer" id="ans-write" hidden><div class="ans-top"><span><b>AI 回應</b> <span id="ansm-write"></span></span><span class="row"><button class="btn small" data-act="copyAns" data-k="write">複製回應</button></span></div><div class="ans-body" id="ansb-write"></div></div>
+        </div>
+        <div class="ver">
+          <label for="vnote">存成提示卡的新版本</label>
+          <div class="row"><input id="vnote" data-b="vnote" placeholder="這版改了什麼？例：P 加了卡線的測試資料" autocomplete="off"><button class="btn" data-act="saveVersion">存成 v<span id="nextV">1</span></button></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- 2 抓幻覺 -->
+<section class="panel" data-panel="halluc" role="tabpanel" aria-labelledby="t-halluc" hidden>
+  <div class="cols">
+    <div class="form">
+      <div class="block intro">
+        <h2>幻覺實驗：AI 會不會編論文？</h2>
+        <p>AI 不知道答案時，常會編一個「看起來很像」的答案。先用陷阱題問一次，再一篇一篇查。</p>
+      </div>
+      <div class="block">
+        <label class="stack" for="hTopic">主題<input id="hTopic" data-b="h.topic" autocomplete="off"></label>
+        <div class="pbox"><div class="prompt" id="pHA"></div><div class="row"><button class="btn primary" data-copy="hA">複製陷阱題</button><button class="btn ask" data-askbtn="hA">🤖 直接問 AI</button></div><div class="answer" id="ans-hA" hidden><div class="ans-top"><span><b>AI 回應</b> <span id="ansm-hA"></span></span><span class="row"><button class="btn small" data-act="copyAns" data-k="hA">複製回應</button></span></div><div class="ans-body" id="ansb-hA"></div></div></div>
+      </div>
+      <div class="block">
+        <h3>一篇一篇查</h3>
+        <p class="hint">把 AI 給的標題和 DOI 貼進來，點連結查。查無此篇，或作者、年份對不上，就是幻覺。</p>
+        <div class="tbl">
+          <table id="paperTbl">
+            <thead><tr><th>#</th><th>AI 給的標題</th><th>DOI</th><th>去查</th><th>結果</th></tr></thead>
+            <tbody id="paperBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="block">
+        <h3>加上 S 條件和 P 驗證，再問一次</h3>
+        <div class="pbox"><div class="prompt" id="pHB"></div><div class="row"><button class="btn" data-copy="hB">複製解藥版</button><button class="btn ask" data-askbtn="hB">🤖 直接問 AI</button></div><div class="answer" id="ans-hB" hidden><div class="ans-top"><span><b>AI 回應</b> <span id="ansm-hB"></span></span><span class="row"><button class="btn small" data-act="copyAns" data-k="hB">複製回應</button></span></div><div class="ans-body" id="ansb-hB"></div></div></div>
+        <label class="stack" for="hChange">同一題，答案有什麼變化？<textarea id="hChange" data-b="h.change" rows="2" placeholder="例：它承認找不到確定的 DOI，改列查詢關鍵字"></textarea></label>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <div class="card-top"><span class="card-title">查證結果</span><span class="muted" id="hCount"></span></div>
+        <div class="meter" id="hMeter"></div>
+        <div class="legend" id="hLegend"></div>
+        <div class="ver qlist">
+          <h3>查核三問</h3>
+          <p class="hint">AI 給的任何答案，交出去前都問這三句。</p>
+          <label class="chk" for="q1"><input type="checkbox" id="q1" data-b="h.q.real"><span><b>是真的嗎？</b>找得到原始出處嗎？</span></label>
+          <label class="chk" for="q2"><input type="checkbox" id="q2" data-b="h.q.doable"><span><b>做得到嗎？</b>電源、預算、誰來維護？</span></label>
+          <label class="chk" for="q3"><input type="checkbox" id="q3" data-b="h.q.who"><span><b>誰負責？</b>做錯的代價是什麼？有沒有隱私問題？</span></label>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- 3 驗收帳 -->
+<section class="panel" data-panel="test" role="tabpanel" aria-labelledby="t-test" hidden>
+  <div class="cols">
+    <div class="form">
+      <div class="block intro">
+        <h2>驗收帳：CO₂ 門檻 8 題</h2>
+        <p>P 驗證的課堂練習。情境：教室裝了 CO₂ 感測器。<b>先寫你的預測，再請 AI 判定</b>，逐題對答案。8 題裡有一般值 3 題、剛好卡線 3 題、怪資料 2 題。</p>
+      </div>
+      <div class="block k-s">
+        <div class="rule"><span class="tagx">S 條件：目前的規則</span><p id="ruleText"></p></div>
+        <label class="chk" for="tEq"><input type="checkbox" id="tEq" data-b="t.eq">把等號寫清楚：剛好 1000、剛好 1500 算哪一級</label>
+        <label class="chk" for="tWeird"><input type="checkbox" id="tWeird" data-b="t.weird">交代怪資料：負數、不是數字的要怎麼判</label>
+        <p class="hint">第一輪先不要勾，看看 AI 和你哪裡不一樣，再決定要不要改規則。</p>
+      </div>
+      <div class="block">
+        <div class="tbl">
+          <table id="testTbl">
+            <thead><tr><th>#</th><th>數值 ppm</th><th>類型</th><th>我的預測</th><th>AI 判定</th><th>一致</th><th>不一致的原因</th></tr></thead>
+            <tbody id="testBody"></tbody>
+          </table>
+        </div>
+        <p id="testStat" class="status"></p>
+        <p id="testHint" class="warn" hidden></p>
+        <div class="row">
+          <button class="btn" data-act="saveRound">記下這一輪</button>
+          <button class="btn" data-act="clearAI">清空 AI 判定，改規則再跑</button>
+        </div>
+        <div class="rounds" id="rounds"></div>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <div class="card-top"><span class="card-title">驗收帳提示</span><span class="muted" id="ruleVer"></span></div>
+        <p class="lockmsg" id="testLock"></p>
+        <div class="prompt" id="pTest"></div>
+        <div class="row"><button class="btn primary" data-copy="test" id="testCopy">複製提示</button></div>
+        <div class="ai-row">複製並開啟
+          <a class="ai" data-copy="test" href="https://claude.ai/new" target="_blank" rel="noopener">Claude</a>
+          <a class="ai" data-copy="test" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+          <a class="ai" data-copy="test" href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a>
+        </div>
+        <div class="askai">
+          <div class="row"><button class="btn ask" data-askbtn="test">🤖 直接問 AI</button><span class="hint">老師代管 Gemini，免帳號；用上方「AI 班級碼」</span></div>
+          <div class="answer" id="ans-test" hidden><div class="ans-top"><span><b>AI 回應</b> <span id="ansm-test"></span></span><span class="row"><button class="btn small" data-act="fillAI">帶入 AI 判定</button><button class="btn small" data-act="copyAns" data-k="test">複製回應</button></span></div><div class="ans-body" id="ansb-test"></div></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- 4 提示卡 -->
+<section class="panel" data-panel="card" role="tabpanel" aria-labelledby="t-card" hidden>
+  <div class="cols">
+    <div class="form">
+      <div class="block intro">
+        <h2>提示卡</h2>
+        <p>把通過驗證的提示存成一張卡：下次直接拿來用，也能帶進 AI 賦能專題。</p>
+      </div>
+      <div class="block">
+        <label class="stack" for="cPurpose"><b>用途</b><span class="hint">自己科系或生活裡真的會用到的事</span><input id="cPurpose" data-b="card.purpose" autocomplete="off"></label>
+        <div class="chips" data-chips="purpose"></div>
+      </div>
+      <div class="block">
+        <h3>CRISP 內容 <a href="#write" class="hint">回 1 修改</a></h3>
+        <dl class="sum" id="crispSum"></dl>
+      </div>
+      <div class="block">
+        <h3>驗收方式</h3>
+        <textarea id="cVerify" data-b="card.verify" rows="3" placeholder="例：用 7 組測試資料（一般、卡線、怪資料）在 Colab 實跑，全部一致才算通過"></textarea>
+        <div class="row"><button class="btn small" data-act="fillVerify">用驗收帳的結果帶入</button></div>
+      </div>
+      <div class="block">
+        <h3>版本紀錄 <span class="pill" id="verBadge"></span></h3>
+        <div class="vers" id="verList"></div>
+        <p class="hint">在「1 寫提示」右下角按「存成新版本」，至少要有 2 版。</p>
+      </div>
+      <div class="block">
+        <h3>請 AI 當檢查員</h3>
+        <p class="hint">只要它提建議，不要它重寫。改不改、怎麼改，由你決定，這就是 HITL。</p>
+        <div class="pbox"><div class="prompt" id="pChecker"></div><div class="row"><button class="btn" data-copy="checker">複製檢查員提示</button><button class="btn ask" data-askbtn="checker">🤖 直接問 AI</button></div><div class="answer" id="ans-checker" hidden><div class="ans-top"><span><b>AI 回應</b> <span id="ansm-checker"></span></span><span class="row"><button class="btn small" data-act="copyAns" data-k="checker">複製回應</button></span></div><div class="ans-body" id="ansb-checker"></div></div></div>
+      </div>
+      <div class="block">
+        <h3>互評 <span class="hint">4 人一組互換實測，同學寫給你的</span></h3>
+        <label class="stack" for="pGood">1 個亮點<input id="pGood" data-b="card.peer.good" autocomplete="off"></label>
+        <label class="stack" for="pRisk">1 個風險<input id="pRisk" data-b="card.peer.risk" autocomplete="off"></label>
+        <label class="stack" for="pAsk">1 個提問<input id="pAsk" data-b="card.peer.ask" autocomplete="off"></label>
+      </div>
+      <div class="block">
+        <h3>AI 使用聲明（三行）</h3>
+        <span class="stack">我用了哪個 AI<span class="chips" data-chips="tools"></span></span>
+        <label class="stack" for="dWhere">AI 幫我做了什麼<input id="dWhere" data-b="decl.where" placeholder="例：依我的提示產出程式、模擬測試、檢查提示缺了什麼" autocomplete="off"></label>
+        <label class="stack" for="dMine">哪些是我自己判斷、修改的<input id="dMine" data-b="decl.mine" placeholder="例：測試資料、判斷 AI 哪裡錯、把等號寫進條件" autocomplete="off"></label>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card export">
+        <div class="card-top"><span class="card-title">交件檢查</span><span class="muted" id="rubricSum"></span></div>
+        <ul class="rubric" id="rubric"></ul>
+        <div class="cloud">
+          <div class="row"><button class="btn primary" data-act="submitCloud">☁ 交件上傳</button><button class="btn" data-copy="export">複製全部交件內容</button></div>
+          <p class="cloudmsg" id="cloudMsg"></p>
+        </div>
+        <p class="hint">「☁ 交件上傳」送到老師的試算表（Google Apps Script），可以重複上傳，老師看最新一筆。再把內容貼到 Word，兩份 AI 答案截圖也貼進去，存成「<b id="fname">學號_提示工程</b>」上傳 Moodle。提示卡 3 天內可以補強重傳。</p>
+        <details><summary>預覽交件內容</summary><pre id="exportPre"></pre></details>
+      </div>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <p>填寫內容存在這台電腦的瀏覽器裡，換電腦不會跟著走；按「☁ 交件上傳」才會送到老師的試算表。</p>
+  <div class="confirm" id="resetBox"><button class="btn small" data-act="askReset">清空重來</button></div>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div class="overlay" id="copyBox" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="copyMsg">
+    <p id="copyMsg">瀏覽器沒讓我直接複製。文字已經選好，請按 Ctrl+C（Mac 按 ⌘+C，手機長按後選「拷貝」）。</p>
+    <textarea id="copyArea" readonly></textarea>
+    <div class="row"><button class="btn primary" data-act="closeCopy">好了</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const KEY='crisp-workshop-v1';
+const metaOf=n=>{const m=document.querySelector('meta[name="'+n+'"]');return m?(m.getAttribute('content')||'').trim():'';};
+const AI_PROXY=metaOf('ae-ai-proxy');
+const AI_SYSTEM='你是大學通識課的 AI 助教。請用繁體中文回答，嚴格依照使用者提示中的格式與條件作答；不確定的地方要明說，不要編造數字或出處。';
+const NAME={C:'背景',R:'角色',I:'指令',S:'規格',P:'驗證'};
+const FILE={none:'不附檔',excel:'資料檔（Excel／CSV）',pdf:'PDF 文件',photo:'照片',code:'程式碼檔',video:'影片'};
+
+const clone=o=>JSON.parse(JSON.stringify(o));
+function merge(base,src){
+  if(!src||typeof src!=='object'||Array.isArray(src))return base;
+  for(const k in base){
+    if(!(k in src))continue;
+    const b=base[k],s=src[k];
+    if(Array.isArray(b))base[k]=Array.isArray(s)?s:b;
+    else if(b&&typeof b==='object')base[k]=merge(b,s);
+    else base[k]=(typeof s===typeof b)?s:b;
+  }
+  return base;
+}
+const BLANK={vague:'',
+  C:{who:'',proj:'',detail:'',file:'none',fname:'',fdesc:''},
+  R:{role:'',aud:'',tone:''},
+  I:{task:'',form:'ipo',in:'',proc:'',out:'',s1:'',s2:'',s3:'',pause:true,nq:'3',nopt:'2'},
+  S:{out:'',cols:'',ex:true,example:'',chart:'折線圖',x:'',y:'',web:'',flow:'',py:'',n:'3',checks:['zh','unsure'],words:'200',cond:''},
+  P:{sim:false,data:'',edge:false,iter:false,goal:'',rounds:'2',video:false,sec:'30',place:'',list:false,nlist:'5',where:'',unsure:false}};
+const mk=o=>merge(clone(BLANK),o);
+const PRESETS={
+  water:{name:'智慧澆水',tag:'示範',d:mk({vague:'幫我做一個自動澆水的程式',
+    C:{who:'植物醫學系大一學生',proj:'「智慧澆水」AI 賦能專題',detail:'溫室的土壤濕度感測器每 10 分鐘回傳一次數值（0–100%）。番茄適合的濕度是 40–70%：低於 40% 要澆水，高於 70% 要停止。',file:'excel',fname:'一週濕度紀錄.xlsx',fdesc:'7 天、每 10 分鐘一筆的濕度資料'},
+    R:{role:'有 IoT 經驗的農業技師',aud:'完全沒寫過程式的大一新生',tone:'白話、一步一步'},
+    I:{task:'設計自動澆水的判斷規則，並寫成程式',form:'ipo',in:'土壤濕度（%）',proc:'低於 40% 開水、高於 70% 關水，中間維持原狀',out:'「澆水／停止／維持」與一句提示'},
+    S:{out:'python',py:'用 input() 讓我輸入濕度，印出判斷結果',checks:['zh','own','comment'],cond:'剛好 40% 算要澆水，剛好 70% 算要停止'},
+    P:{sim:true,data:'25%、40%、55%、70%、85%、-5%、abc',edge:true,iter:true,goal:'我給的門檻',rounds:'2',list:true,nlist:'5',where:'Google Colab',unsure:true}})},
+  tire:{name:'輪胎檢查',tag:'課堂',d:mk({vague:'幫我看輪胎要不要換',
+    C:{who:'車輛工程系大一學生',proj:'保養紀錄整理',detail:'四個輪胎的胎紋深度：左前 4.2 mm、右前 2.8 mm、左後 1.4 mm、右後 3.5 mm。'},
+    R:{role:'汽車保養廠的資深技師',aud:'剛買二手車的學生',tone:'直接'},
+    I:{task:'判斷四個輪胎要不要換，並排出更換的先後順序',form:'ipo',in:'四輪胎紋深度（mm）',proc:'低於 1.6 mm 必換、低於 3.0 mm 建議換',out:'每一輪的判定與理由'},
+    S:{out:'table',cols:'輪位｜深度｜判定｜理由',ex:true,example:'左後輪｜1.4 mm｜必須更換｜低於 1.6 mm 法規下限',checks:['own','unsure'],cond:''},
+    P:{sim:true,data:'1.6、1.5、3.0、2.9 mm',edge:true,list:true,nlist:'3',where:'保養廠',unsure:true}})},
+  co2:{name:'教室 CO₂ 提醒',d:mk({vague:'教室空氣不好怎麼辦？',
+    C:{who:'環境工程系大一學生',proj:'教室空氣品質專題',detail:'教室有 CO₂ 感測器（單位 ppm），一堂課 50 分鐘、約 60 人。1000 ppm 以上該開窗，1500 ppm 以上要警示。'},
+    R:{role:'室內空氣品質工程師',aud:'同班同學',tone:'簡潔'},
+    I:{task:'設計 CO₂ 開窗提醒的規則和畫面',form:'steps',s1:'整理判斷規則',s2:'畫出流程圖',s3:'做出提醒網頁',pause:true},
+    S:{out:'web',web:'一個輸入 CO₂ 數值的欄位、一個判斷按鈕，結果用綠／黃／紅顯示「正常／開窗／警示」',checks:['zh','unsure'],cond:'剛好 1000、1500 算較高的那一級'},
+    P:{sim:true,data:'650、999、1000、1500、2100、-80、12OO',edge:true,video:true,sec:'30',place:'教室',list:true,nlist:'5',where:'手機和電腦'}})},
+  fish:{name:'魚塭水質警示',d:mk({vague:'魚塭的水要怎麼顧？',
+    C:{who:'水產養殖系大一學生',proj:'魚塭水質監測專題',detail:'吳郭魚魚塭有溶氧和水溫感測器。溶氧低於 3 mg/L 魚會浮頭，要開增氧機；水溫高於 32°C 也要注意。',file:'photo',fname:'魚塭現場照片',fdesc:'增氧機和感測器的位置'},
+    R:{role:'養殖場的水質管理員',aud:'剛接手魚塭的新手',tone:'實務'},
+    I:{task:'比較「自動開增氧機」和「手機通知人工處理」兩種做法',form:'compare',nopt:'2'},
+    S:{out:'chart',chart:'折線圖',x:'時間（24 小時）',y:'溶氧（mg/L）與水溫（°C）',checks:['zh','own'],cond:'在 3 mg/L 畫一條紅色警戒線'},
+    P:{sim:true,data:'溶氧 5.2、4.0、3.0、2.4 mg/L；水溫 28、33°C',edge:true,video:true,sec:'60',place:'魚塭',list:true,nlist:'5',where:'魚塭現場',unsure:true}})},
+  own:{name:'自己的題目',d:mk({})}
+};
+const SCHECKS=[
+  {id:'zh',t:'用繁體中文'},
+  {id:'own',t:'只用我給的資料，不要自己編數字或出處'},
+  {id:'unsure',t:'不確定就說不確定'},
+  {id:'comment',t:'程式每一段加中文註解'},
+  {id:'words',t:'全部 N 字以內'}
+];
+const CHIPS={
+  who:{path:'$.C.who',mode:'set',items:['植物醫學系大一學生','環境工程系大一學生','水產養殖系大一學生','資訊管理系大一學生','車輛工程系大一學生']},
+  role:{path:'$.R.role',mode:'set',items:['有 IoT 經驗的農業技師','資料分析師','Python 助教','網頁設計師','專題指導老師','審查委員']},
+  aud:{path:'$.R.aud',mode:'set',items:['完全沒寫過程式的大一新生','同班同學','農友','評審老師']},
+  tone:{path:'$.R.tone',mode:'set',items:['白話、一步一步','簡潔','專業','鼓勵']},
+  task:{path:'$.I.task',mode:'add',items:['設計判斷規則','寫成程式','畫成圖表','做成網頁','整理成表','找出錯誤']},
+  purpose:{path:'card.purpose',mode:'set',items:['保養紀錄整理','實驗數據畫圖','感測器警示規則','考前出練習題','社團活動預算']},
+  tools:{path:'decl.tools',mode:'toggle',items:['Claude','ChatGPT','Gemini','Copilot']}
+};
+const LEVELS=['正常','開窗','警示','資料異常'];
+const WHY=['提示沒寫清楚','AI 判錯','我預測錯'];
+const PAPER_R=['查到，資訊正確','查到，但作者／年份／DOI 有錯','查無此篇'];
+const KCLS={'一般':'n','卡線':'b','怪資料':'w'};
+
+function fresh(){
+  const d={};for(const k in PRESETS)d[k]=clone(PRESETS[k].d);
+  return {cur:'water',d,sid:'',name:'',cls:'',aiCode:'',ans:{write:'',hA:'',hB:'',test:'',checker:''},aiCalls:0,submits:[],vnote:'',cmp:{issue:'',better:''},
+    h:{topic:'胎紋深度與行車安全',papers:[0,1,2].map(()=>({t:'',doi:'',r:''})),change:'',q:{real:false,doable:false,who:false}},
+    t:{eq:false,weird:false,
+      rows:[['650','一般'],['1230','一般'],['2100','一般'],['999','卡線'],['1000','卡線'],['1500','卡線'],['-80','怪資料'],['12OO','怪資料']].map(([v,k])=>({v,k,pred:'',ai:'',why:''})),
+      rounds:[]},
+    card:{purpose:'',verify:'',versions:[],peer:{good:'',risk:'',ask:''}},
+    decl:{tools:[],where:'',mine:''}};
+}
+let st=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw)st=merge(fresh(),JSON.parse(raw));}catch(e){}
+if(!st.d[st.cur])st.cur='water';
+let saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}},250);}
+
+const cur=()=>st.d[st.cur];
+function ref(path){
+  const parts=path.split('.');let o=st;
+  if(parts[0]==='$'){o=cur();parts.shift();}
+  const last=parts.pop();
+  for(const p of parts)o=o[p];
+  return [o,last];
+}
+const getV=p=>{const [o,k]=ref(p);return o[k];};
+const setV=(p,v)=>{const [o,k]=ref(p);o[k]=v;};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tidy=s=>String(s||'').trim().replace(/[。．.；;，,、？?！!\s]+$/,'');
+const bar=s=>s.replace(/\s*\|\s*/g,'｜');
+const today=()=>new Date().toLocaleDateString('zh-TW');
+const textOf=L=>L.map(l=>l[1]).join('\n');
+
+/* ---------- CRISP prompt builder ---------- */
+function cLines(d){
+  const C=d.C,L=[],who=tidy(C.who),proj=tidy(C.proj);
+  if(who||proj)L.push(['C','背景：'+(who?'我是'+who:'')+(who&&proj?'，':'')+(proj?'正在做'+proj:'')+'。']);
+  if(tidy(C.detail))L.push(['C','細節：'+tidy(C.detail)+'。']);
+  if(C.file&&C.file!=='none'){
+    const fn=tidy(C.fname),fd=tidy(C.fdesc);
+    L.push(['C',`附檔：我上傳了${FILE[C.file]}${fn?'「'+fn+'」':''}${fd?'，內容是'+fd:''}，請先讀完附檔再回答。`]);
+  }
+  return L;
+}
+function rLines(d){
+  const role=tidy(d.R.role).replace(/^你是/,''),aud=tidy(d.R.aud),tone=tidy(d.R.tone);
+  if(!role&&!aud&&!tone)return [];
+  const parts=[];
+  if(role)parts.push('請你扮演'+role);
+  if(aud)parts.push('對象是'+aud);
+  if(tone)parts.push('用'+tone+'的語氣說明');
+  return [['R',parts.join('，')+'。']];
+}
+function iLines(d){
+  const I=d.I,L=[];
+  const task=tidy(I.task).replace(/^(請你|請|麻煩你|麻煩)/,'').replace(/^(幫我|幫忙)/,'');
+  if(task)L.push(['I','任務：請幫我'+task+'。']);
+  if(I.form==='ipo'){
+    const a=[['輸入（Input）',I.in],['處理（Process）',I.proc],['輸出（Output）',I.out]].filter(x=>tidy(x[1]));
+    L.push(['I',a.length?'請用 IPO 架構思考：'+a.map(x=>x[0]+'：'+tidy(x[1])).join('；')+'。':'請先用 IPO 架構（輸入、處理、輸出）整理這個任務，再開始做。']);
+  }else if(I.form==='steps'){
+    const s=[I.s1,I.s2,I.s3].map(tidy).filter(Boolean),n='①②③';
+    L.push(['I',(s.length?'請分步驟執行：'+s.map((x,i)=>n[i]+x).join('　'):'請分步驟執行，一次只做一步')+(I.pause?'。每一步做完先停下來，等我確認再做下一步。':'。')]);
+  }else if(I.form==='ask'){
+    L.push(['I',`開始之前，先問我 ${I.nq} 個你需要釐清的問題，等我回答再做。`]);
+  }else if(I.form==='compare'){
+    L.push(['I',`請提出 ${I.nopt} 個方案並比較優缺點，最後建議一個並說明理由。`]);
+  }
+  return L;
+}
+function sOutLines(d){
+  const S=d.S,L=[];
+  if(S.out==='table'){
+    const cols=bar(tidy(S.cols));
+    L.push(['S',cols?`輸出：表格，欄位是 ${cols}；一列一筆，不要加表格外的說明。`:'輸出：表格，一列一筆，不要加表格外的說明。']);
+    if(S.ex&&tidy(S.example))L.push(['S','照這一列的寫法完成其他列。範例：'+bar(tidy(S.example))]);
+  }else if(S.out==='chart'){
+    const x=tidy(S.x),y=tidy(S.y);
+    L.push(['S',`輸出：用 Python（matplotlib）畫${S.chart}${x?'，X 軸是'+x:''}${y?'，Y 軸是'+y:''}；標題和座標軸用中文，能在 Google Colab 直接執行。`]);
+  }else if(S.out==='web'){
+    const w=tidy(S.web);
+    L.push(['S',`輸出：一個單一 HTML 檔的網頁${w?'，要有'+w:''}；不要用外部檔案，手機也能看。`]);
+  }else if(S.out==='mermaid'){
+    const f=tidy(S.flow);
+    L.push(['S',`輸出：Mermaid 流程圖${f?'，要包含'+f:''}；判斷條件放在菱形裡。`]);
+  }else if(S.out==='python'){
+    const p=tidy(S.py);
+    L.push(['S',`輸出：Python 程式，能在 Google Colab 直接執行${p?'，'+p:''}。`]);
+  }else if(S.out==='list'){
+    L.push(['S',`輸出：條列 ${S.n} 點，每點一句話。`]);
+  }
+  return L;
+}
+function sCondItems(d){
+  const S=d.S,items=[];
+  SCHECKS.forEach(c=>{if(S.checks.includes(c.id))items.push(c.id==='words'?`全部 ${tidy(S.words)||'200'} 字以內`:c.t);});
+  if(tidy(S.cond))items.push(tidy(S.cond));
+  return items;
+}
+function sLines(d){
+  const L=sOutLines(d),items=sCondItems(d);
+  if(items.length)L.push(['S','條件：'+items.join('；')+'。']);
+  return L;
+}
+function pLines(d){
+  const P=d.P,L=[];
+  if(P.sim){const data=tidy(P.data);L.push(['P',`驗證：請用${data?'這些測試資料模擬執行：'+data:' 3 組測試資料（一般值、剛好卡在門檻、怪資料）模擬執行'}，列出「輸入｜預期結果｜實際結果｜是否一致」。`]);}
+  if(P.edge)L.push(['P','完成後自己檢查邊界條件（等號、空值、負數、單位），發現錯誤就修正，並說明改了哪裡。']);
+  if(P.iter){const g=tidy(P.goal);L.push(['P',`如果結果不符合${g||'我的需求'}，請修正後再驗證一次，最多 ${P.rounds} 輪，每輪寫一行修改紀錄。`]);}
+  if(P.video){const pl=tidy(P.place);L.push(['P',`請設計一段 ${P.sec} 秒的情境影片分鏡（場景、動作、要拍到的證據），讓我到${pl||'現場'}實拍，驗證這個方案是否可行；拍完我會上傳照片或影片截圖，請幫我判斷。`]);}
+  if(P.list){const w=tidy(P.where);L.push(['P',`最後給我一份 ${P.nlist} 項的驗收清單，讓我自己在${w||'現場'}檢查。`]);}
+  if(P.unsure)L.push(['P','列出你不確定的地方，與我應該去哪裡查證。']);
+  return L;
+}
+const linesWrite=d=>[...cLines(d),...rLines(d),...iLines(d),...sLines(d),...pLines(d)];
+function statusOf(d){
+  return {C:!!(tidy(d.C.detail)||(d.C.file&&d.C.file!=='none')),R:!!tidy(d.R.role),I:!!tidy(d.I.task),S:!!d.S.out,P:pLines(d).length>0};
+}
+const sReqOK=d=>{const S=d.S;return S.out==='table'?!!tidy(S.cols):S.out==='chart'?!!(tidy(S.x)&&tidy(S.y)):S.out==='web'?!!tidy(S.web):S.out==='mermaid'?!!tidy(S.flow):!!S.out;};
+
+/* ---------- other prompts ---------- */
+const linesHA=()=>[['I',`請列出 3 篇關於「${tidy(st.h.topic)||'＿＿'}」的學術論文，附上作者、年份與 DOI。`]];
+const linesHB=()=>[...linesHA(),['S','條件：不確定就說不確定；沒有把握的論文和 DOI 不要寫。'],['P','最後列出你不確定的地方，與我應該去哪裡查證。']];
+function ruleText(){
+  return st.t.eq
+    ?'CO₂ 未滿 1000 為「正常」；1000（含）以上、未滿 1500 為「開窗」；1500（含）以上為「警示」。'
+    :'CO₂ 超過 1000 要開窗，超過 1500 要發警示。';
+}
+function ruleLabel(t){
+  const a=[];if(t.eq)a.push('等號');if(t.weird)a.push('怪資料');
+  return a.length?'v2：寫清楚'+a.join('＋'):'v1：口語版';
+}
+function linesTest(){
+  const L=[
+    ['C','背景：教室裝了二氧化碳（CO₂）感測器，單位是 ppm。'],
+    ['R','你是室內空氣品質的檢查員。'],
+    ['I','請判定下面 8 筆資料。'],
+    ['S','輸出：表格，欄位是 編號｜數值｜判定｜理由；一列一筆，不要加表格外的說明。判定只能填：正常、開窗、警示、資料異常。'],
+    ['S','條件：'+ruleText()]
+  ];
+  if(st.t.weird)L.push(['S','負數、不是數字的資料一律判「資料異常」，不要自己修正或猜測。']);
+  L.push(['S','不確定就說不確定。']);
+  L.push(['P','最後自我檢查：剛好卡在門檻的數值有沒有照規則判定，列出你不確定的題目。']);
+  L.push(['C','資料：\n'+st.t.rows.map((r,i)=>`${i+1}. ${r.v}`).join('\n')]);
+  return L;
+}
+function linesChecker(){
+  const w=textOf(linesWrite(cur()));
+  return [
+    ['I','這是我寫的提示。請照 CRISP（C 背景、R 角色、I 指令、S 規格、P 驗證）五個面向，檢查它缺了什麼。'],
+    ['S','條件：只提建議，不要幫我重寫；每個面向一句話。'],
+    ['C','我的提示：\n「'+(w||'（先到 1 寫提示填好）')+'」']
+  ];
+}
+
+/* ---------- test helpers ---------- */
+const rows=()=>st.t.rows;
+const predsDone=()=>rows().every(r=>r.pred);
+const aiDone=()=>rows().every(r=>r.ai);
+const agreeN=()=>rows().filter(r=>r.pred&&r.ai&&r.pred===r.ai).length;
+
+/* ---------- render ---------- */
+function renderLines(el,L,empty){
+  el.innerHTML=L.length?L.map(([k,t])=>`<div class="ln k-${k==='+'?'x':k.toLowerCase()}"><span class="tg">${k}</span><span>${esc(t)}</span></div>`).join(''):`<p class="empty">${empty||''}</p>`;
+}
+function autosize(el){
+  if(!el||el.tagName!=='INPUT'||!el.classList.contains('blank'))return;
+  const v=el.value||el.placeholder||'';let w=0;
+  for(const ch of v)w+=/[\x00-\xff]/.test(ch)?.62:1.06;
+  el.style.width=Math.min(Math.max(w+1.8,4),40)+'em';
+}
+function renderWrite(){
+  const d=cur(),L=linesWrite(d),s=statusOf(d);
+  $$('#holes .hole').forEach(h=>h.classList.toggle('on',!!s[h.dataset.k]));
+  const miss=['C','R','I','S','P'].filter(k=>!s[k]);
+  const m=$('#missing');
+  m.textContent=miss.length?'還缺：'+miss.map(k=>k+' '+NAME[k]).join('、'):'CRISP 五個面向齊全，可以複製去問 AI 了。';
+  m.classList.toggle('ok',!miss.length);
+  const I=String(d.I.task||'').trim();
+  $('#askWarn').hidden=!(/[？?]$/.test(I)||/^(什麼|怎麼|如何|為什麼|為何|可以|能不能|是不是|有沒有)/.test(I));
+  renderLines($('#pWrite'),L,'左邊填一個空格，這裡就多一行。');
+  const fw=$('#fileWarn'),hasFile=d.C.file&&d.C.file!=='none';
+  fw.hidden=!hasFile;
+  if(hasFile)fw.textContent=`貼上提示前，先在 AI 對話框按迴紋針或「＋」，把${tidy(d.C.fname)?'「'+tidy(d.C.fname)+'」':'檔案'}真的上傳。`;
+  $('#cFileMore').hidden=!hasFile;
+  $$('[data-iform]').forEach(b=>b.setAttribute('aria-pressed',String(d.I.form===b.dataset.iform)));
+  $('#iIpo').hidden=d.I.form!=='ipo';$('#iSteps').hidden=d.I.form!=='steps';$('#iAsk').hidden=d.I.form!=='ask';$('#iCmp').hidden=d.I.form!=='compare';
+  $$('[data-sout]').forEach(b=>b.setAttribute('aria-pressed',String(d.S.out===b.dataset.sout)));
+  const so={table:'#sTable',chart:'#sChart',web:'#sWeb',mermaid:'#sFlow',python:'#sPy',list:'#sList'};
+  for(const k in so)$(so[k]).hidden=d.S.out!==k;
+  $('#sExample').disabled=!d.S.ex;
+  $$('#scenChips [data-scen]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.scen===st.cur)));
+  $('#scenName').textContent='任務：'+PRESETS[st.cur].name;
+  $('#nextV').textContent=st.card.versions.length+1;
+  $('#ts-write').textContent=(5-miss.length)+'/5';
+  renderChipStates();
+}
+function renderChipStates(){
+  $$('[data-chip]').forEach(b=>{
+    const c=CHIPS[b.dataset.chip],v=getV(c.path);
+    const on=c.mode==='toggle'?v.includes(b.dataset.val):(c.mode==='set'&&tidy(v)===b.dataset.val);
+    b.setAttribute('aria-pressed',String(on));
+  });
+}
+function renderHalluc(){
+  renderLines($('#pHA'),linesHA());
+  renderLines($('#pHB'),linesHB());
+  st.h.papers.forEach((p,i)=>{
+    const sch=$('#sch'+i),doi=$('#doi'+i);
+    const t=tidy(p.t),dv=tidy(p.doi).replace(/^https?:\/\/(dx\.)?doi\.org\//i,'');
+    sch.href='https://scholar.google.com/scholar?q='+encodeURIComponent(t);sch.hidden=!t;
+    doi.href='https://doi.org/'+dv;doi.hidden=!dv;
+    $('#nolink'+i).hidden=!!(t||dv);
+  });
+  const cnt=[0,0,0];let done=0;
+  st.h.papers.forEach(p=>{const k=PAPER_R.indexOf(p.r);if(k>=0){cnt[k]++;done++;}});
+  const col=['var(--ok)','var(--warn)','var(--bad)'];
+  $('#hMeter').innerHTML=done?cnt.map((n,k)=>n?`<i style="width:${n/3*100}%;background:${col[k]}"></i>`:'').join(''):'';
+  $('#hLegend').innerHTML=PAPER_R.map((r,k)=>`<span><i class="dot" style="background:${col[k]}"></i>${esc(r)}：${cnt[k]} 篇</span>`).join('');
+  $('#hCount').textContent=`已查 ${done}/3 篇`;
+  $('#ts-halluc').textContent=done?`幻覺 ${cnt[1]+cnt[2]}/${done}`:'0/3';
+}
+function renderTest(){
+  $('#ruleText').textContent=ruleText();
+  $('#ruleVer').textContent=ruleLabel(st.t);
+  renderLines($('#pTest'),linesTest());
+  const pd=rows().filter(r=>r.pred).length,ok=predsDone();
+  const lock=$('#testLock');
+  lock.textContent=ok?'預測寫完了，可以複製提示去問 AI。':`先寫完 8 題預測（${pd}/8），才能複製提示：先思考，後驗證。`;
+  lock.classList.toggle('ok',ok);
+  $$('[data-copy="test"]').forEach(b=>b.classList.toggle('locked',!ok));
+  let bMiss=false,wMiss=false;
+  rows().forEach((r,i)=>{
+    const has=r.pred&&r.ai,same=has&&r.pred===r.ai;
+    const mk=$('#m'+i);
+    mk.textContent=has?(same?'✔':'✘'):'';
+    mk.className='mark '+(has?(same?'ok':'bad'):'');
+    $('#tr'+i).classList.toggle('miss',!!(has&&!same));
+    $('#w'+i).hidden=!(has&&!same);
+    if(has&&!same&&r.k==='卡線')bMiss=true;
+    if(has&&!same&&r.k==='怪資料')wMiss=true;
+  });
+  const aiN=rows().filter(r=>r.ai).length;
+  $('#testStat').textContent=aiN?`一致 ${agreeN()}/${aiN} 題`+(aiDone()?'':`（AI 判定還有 ${8-aiN} 題沒填）`):'問完 AI 後，把它的判定填進「AI 判定」欄。';
+  const tips=[];
+  if(bMiss&&!st.t.eq)tips.push('卡線的題目不一致？把「含不含等號」寫進 S 條件（勾上面「把等號寫清楚」），再跑一輪。');
+  if(wMiss&&!st.t.weird)tips.push('怪資料不一致？勾「交代怪資料」，告訴 AI 負數和非數字要怎麼判。');
+  const oo=rows().findIndex(r=>/O/i.test(r.v)&&/\d/.test(r.v));
+  if(oo>=0&&rows()[oo].ai&&rows()[oo].ai!=='資料異常')tips.push(`第 ${oo+1} 題的「${rows()[oo].v}」裡是英文字母 O，不是數字 0。AI 有發現嗎？`);
+  const h=$('#testHint');h.hidden=!tips.length;h.textContent=tips.join(' ');
+  $('#rounds').innerHTML=st.t.rounds.map((rd,n)=>{
+    const bad=rd.rows.map((r,i)=>({...r,i})).filter(r=>r.pred!==r.ai);
+    return `<div class="round"><b>第 ${n+1} 輪</b>　${esc(rd.rule)}　一致 <b>${rd.agree}/8</b>`+
+      (bad.length?'<br>不一致：'+bad.map(r=>`#${r.i+1} ${esc(r.v)}（我：${esc(r.pred)}／AI：${esc(r.ai)}${r.why?'，'+esc(r.why):''}）`).join('、'):'')+'</div>';
+  }).join('');
+  $('#ts-test').textContent=`${pd}/8`;
+}
+function groupLines(d){
+  const g={C:[],R:[],I:[],S:[],P:[]};
+  linesWrite(d).forEach(([k,t])=>{if(g[k])g[k].push(t);});
+  return g;
+}
+function rubricItems(){
+  const d=cur(),s=statusOf(d),five=Object.values(s).every(Boolean);
+  const sOK=!!d.S.out&&sReqOK(d)&&sCondItems(d).length>0;
+  const whyOK=rows().every(r=>!(r.pred&&r.ai&&r.pred!==r.ai)||r.why);
+  const peer=st.card.peer,dc=st.decl;
+  const it=[
+    ['提示改寫對照表',25,!!tidy(d.vague)&&five&&!!tidy(st.cmp.better),[!tidy(d.vague)&&'模糊版',!five&&'CRISP 五個面向',!tidy(st.cmp.better)&&'好在哪']],
+    ['指定格式提示（S 規格）',15,sOK,[!d.S.out&&'選輸出格式',d.S.out&&!sReqOK(d)&&'格式的空格',!sCondItems(d).length&&'至少一個條件']],
+    ['驗收帳（P 驗證）',30,st.t.rounds.length>0&&whyOK,[!predsDone()&&'8 題預測',!aiDone()&&'AI 判定',!whyOK&&'不一致的原因',!st.t.rounds.length&&'按「記下這一輪」']],
+    ['提示卡＋修改紀錄',20,!!tidy(st.card.purpose)&&!!tidy(st.card.verify)&&st.card.versions.length>=2,[!tidy(st.card.purpose)&&'用途',!tidy(st.card.verify)&&'驗收方式',st.card.versions.length<2&&`版本（${st.card.versions.length}/2）`]],
+    ['互評與 AI 使用聲明',10,!!(tidy(peer.good)&&tidy(peer.risk)&&tidy(peer.ask)&&dc.tools.length&&tidy(dc.where)&&tidy(dc.mine)),[!(tidy(peer.good)&&tidy(peer.risk)&&tidy(peer.ask))&&'互評三格',!dc.tools.length&&'用了哪個 AI',!(tidy(dc.where)&&tidy(dc.mine))&&'聲明兩行']]
+  ];
+  return it.map(([n,p,ok,need])=>({n,p,ok,need:need.filter(Boolean)}));
+}
+function renderCard(){
+  const g=groupLines(cur());
+  $('#crispSum').innerHTML=['C','R','I','S','P'].map(k=>{const v=g[k].join('\n');return `<div class="k-${k.toLowerCase()}"><dt>${k}</dt><dd class="${v?'':'none'}">${v?esc(v):'（還沒填）'}</dd></div>`;}).join('');
+  const vs=st.card.versions;
+  $('#verList').innerHTML=vs.length?vs.map(v=>`<details><summary><b>v${v.n}</b>　${esc(v.at)}　${esc(v.note||'（沒寫改了什麼）')}</summary><pre>${esc(v.prompt)}</pre></details>`).join(''):'<p class="empty">還沒有版本。</p>';
+  const vb=$('#verBadge');vb.textContent=`${vs.length}/2 版`;vb.className='pill '+(vs.length>=2?'ok':'todo');
+  renderLines($('#pChecker'),linesChecker());
+  const R=rubricItems();
+  $('#rubric').innerHTML=R.map(r=>`<li><span>${r.n} <span class="pts">${r.p} 分</span></span><span class="pill ${r.ok?'ok':'todo'}">${r.ok?'完成':'還缺'}</span>${!r.ok&&r.need.length?`<span class="need">缺：${esc(r.need.join('、'))}</span>`:''}</li>`).join('');
+  const done=R.filter(r=>r.ok).length;
+  $('#rubricSum').textContent=`${done}/5 項`;
+  $('#ts-card').textContent=`${done}/5`;
+  $('#fname').textContent=(tidy(st.sid)||'學號')+'_提示工程';
+  $('#exportPre').textContent=exportText();
+}
+function renderAnswers(){
+  Object.keys(st.ans).forEach(k=>{
+    const box=$('#ans-'+k);if(!box||box.dataset.busy)return;
+    const t=st.ans[k]||'';box.hidden=!t;
+    if(t){const b=$('#ansb-'+k);b.className='ans-body';b.textContent=t;}
+  });
+  $$('[data-askbtn="test"]').forEach(b=>b.classList.toggle('locked',!predsDone()));
+  const cm=$('#cloudMsg');
+  if(cm){const n=st.submits.length;cm.textContent=n?`已上傳 ${n} 次，最近一次 ${st.submits[n-1]}。改完可以再上傳，老師看最新一筆。`:'還沒上傳。需要學號和班級。';cm.classList.toggle('ok',!!n);}
+}
+function renderAll(){renderWrite();renderHalluc();renderTest();renderCard();renderAnswers();}
+
+/* ---------- export ---------- */
+function exportText(){
+  const d=cur(),w=textOf(linesWrite(d)),g=groupLines(d);
+  const out=[];
+  out.push(`【${tidy(st.sid)||'學號'}_提示工程】`);
+  out.push(`學號：${st.sid}　姓名：${st.name}　日期：${today()}`,'');
+  out.push(`一、提示改寫對照表（任務：${PRESETS[st.cur].name}）`);
+  out.push('模糊版：'+(d.vague||''),'CRISP 版：',w||'（還沒寫）');
+  out.push('模糊版答案的問題：'+st.cmp.issue,'CRISP 版好在哪：'+st.cmp.better,'（兩份 AI 答案截圖貼在下面）','');
+  out.push('二、指定格式提示（S 規格）');
+  out.push(g.S.length?g.S.join('\n'):'（S 還沒選輸出格式）','');
+  out.push('三、幻覺實驗');
+  out.push('主題：'+st.h.topic);
+  st.h.papers.forEach((p,i)=>out.push(`${i+1}. ${p.t||'（未填）'}｜DOI：${p.doi||'—'}｜${p.r||'未查'}`));
+  out.push('加上條件與驗證後的變化：'+st.h.change);
+  out.push(`查核三問：是真的嗎 ${st.h.q.real?'✔':'—'}／做得到嗎 ${st.h.q.doable?'✔':'—'}／誰負責 ${st.h.q.who?'✔':'—'}`,'');
+  out.push('四、驗收帳（CO₂ 門檻 8 題）');
+  const tbl=rs=>['編號｜數值｜類型｜我的預測｜AI 判定｜一致｜不一致的原因',...rs.map((r,i)=>`${i+1}｜${r.v}｜${r.k}｜${r.pred||'—'}｜${r.ai||'—'}｜${r.pred&&r.ai?(r.pred===r.ai?'✔':'✘'):'—'}｜${r.pred&&r.ai&&r.pred!==r.ai?(r.why||'未填'):''}`)].join('\n');
+  if(st.t.rounds.length){
+    st.t.rounds.forEach((rd,n)=>{out.push(`第 ${n+1} 輪　規則 ${rd.rule}　一致 ${rd.agree}/8`,'規則：'+rd.ruleText,tbl(rd.rows),'');});
+  }else{out.push('規則：'+ruleText(),tbl(rows()),'');}
+  out.push('五、提示卡');
+  out.push('用途：'+st.card.purpose);
+  [['C','背景'],['R','角色'],['I','指令'],['S','規格'],['P','驗證']].forEach(([k,n])=>out.push(`${k} ${n}：${g[k].join(' ')}`));
+  out.push('驗收方式：'+st.card.verify);
+  out.push('版本紀錄：');
+  if(st.card.versions.length)st.card.versions.forEach(v=>out.push(`v${v.n}（${v.at}）改了什麼：${v.note||'—'}`,v.prompt,''));
+  else out.push('（還沒有版本）','');
+  out.push('六、互評（同學寫給我的）');
+  out.push('亮點：'+st.card.peer.good,'風險：'+st.card.peer.risk,'提問：'+st.card.peer.ask,'');
+  out.push('七、AI 使用聲明');
+  out.push(`1. 我使用的 AI：${st.decl.tools.join('、')||'—'}（${today()}）`,'2. AI 幫我做了：'+st.decl.where,'3. 我自己判斷與修改的：'+st.decl.mine);
+  return out.join('\n');
+}
+function getText(kind){
+  switch(kind){
+    case 'write':return textOf(linesWrite(cur()));
+    case 'vague':return cur().vague||'';
+    case 'hA':return textOf(linesHA());
+    case 'hB':return textOf(linesHB());
+    case 'test':return textOf(linesTest());
+    case 'checker':return textOf(linesChecker());
+    case 'export':return exportText();
+  }
+  return '';
+}
+
+/* ---------- static builds ---------- */
+function buildStatic(){
+  $('#scenChips').innerHTML=Object.entries(PRESETS).map(([k,p])=>`<button class="chip" data-scen="${k}">${esc(p.name)}${p.tag?`<span class="tagx">${esc(p.tag)}</span>`:''}</button>`).join('');
+  $$('[data-chips]').forEach(box=>{
+    const c=CHIPS[box.dataset.chips];
+    box.innerHTML=c.items.map(v=>`<button class="chip" data-chip="${box.dataset.chips}" data-val="${esc(v)}">${c.mode==='add'?'＋':''}${esc(v)}</button>`).join('');
+  });
+  $('#cFile').innerHTML=Object.entries(FILE).map(([k,v])=>`<option value="${k}">${k==='none'?v:'我上傳了'+v}</option>`).join('');
+  $('#sChecks').innerHTML=SCHECKS.map(c=>c.id==='words'
+    ?`<label class="chk" for="sc-words"><input type="checkbox" id="sc-words" data-sc="words"><span>全部 <input class="blank tiny" id="sWords" data-b="$.S.words" aria-label="字數上限" autocomplete="off"> 字以內</span></label>`
+    :`<label class="chk" for="sc-${c.id}"><input type="checkbox" id="sc-${c.id}" data-sc="${c.id}">${esc(c.t)}</label>`).join('');
+  $('#paperBody').innerHTML=[0,1,2].map(i=>`<tr>
+    <td>${i+1}</td>
+    <td><input id="pt${i}" data-b="h.papers.${i}.t" aria-label="第 ${i+1} 篇標題" placeholder="貼上 AI 給的標題" autocomplete="off"></td>
+    <td><input id="pd${i}" data-b="h.papers.${i}.doi" aria-label="第 ${i+1} 篇 DOI" placeholder="10.xxxx/…" autocomplete="off"></td>
+    <td><span class="links"><a id="sch${i}" target="_blank" rel="noopener">Google 學術</a><a id="doi${i}" target="_blank" rel="noopener">開 DOI</a><span id="nolink${i}" class="muted">先貼標題</span></span></td>
+    <td><select id="pr${i}" data-b="h.papers.${i}.r" aria-label="第 ${i+1} 篇查證結果"><option value="">未查</option>${PAPER_R.map(r=>`<option>${r}</option>`).join('')}</select></td></tr>`).join('');
+  buildTestBody();
+}
+function buildTestBody(){
+  const opt=(arr,ph)=>`<option value="">${ph}</option>`+arr.map(v=>`<option>${v}</option>`).join('');
+  $('#testBody').innerHTML=rows().map((r,i)=>`<tr id="tr${i}">
+    <td>${i+1}</td>
+    <td class="vcell"><input id="tv${i}" data-b="t.rows.${i}.v" aria-label="第 ${i+1} 題數值" autocomplete="off"></td>
+    <td><span class="kind ${KCLS[r.k]||'n'}">${esc(r.k)}</span></td>
+    <td><select id="tp${i}" data-b="t.rows.${i}.pred" aria-label="第 ${i+1} 題我的預測">${opt(LEVELS,'選一個')}</select></td>
+    <td><select id="ta${i}" data-b="t.rows.${i}.ai" aria-label="第 ${i+1} 題 AI 判定">${opt(LEVELS,'—')}</select></td>
+    <td><span class="mark" id="m${i}"></span></td>
+    <td><select id="w${i}" data-b="t.rows.${i}.why" aria-label="第 ${i+1} 題不一致的原因" hidden>${opt(WHY,'選原因')}</select></td></tr>`).join('');
+}
+function fillInputs(){
+  $$('[data-b]').forEach(el=>{
+    let v;try{v=getV(el.dataset.b);}catch(e){return;}
+    if(el.type==='checkbox')el.checked=!!v;else el.value=v??'';
+    autosize(el);
+  });
+  $$('[data-sc]').forEach(el=>{el.checked=cur().S.checks.includes(el.dataset.sc);});
+}
+
+/* ---------- ui helpers ---------- */
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+function fallbackCopy(text){const box=$('#copyBox'),a=$('#copyArea');a.value=text;box.hidden=false;a.focus();a.select();}
+function copyText(text,okMsg){
+  if(!text||!text.trim()){toast('還沒有內容可以複製');return;}
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>toast(okMsg||'已複製，貼到 AI 的對話框就能用'),()=>fallbackCopy(text));
+      return;
+    }
+  }catch(e){}
+  fallbackCopy(text);
+}
+function changed(){save();renderAll();}
+
+/* ---------- identity（與 ai-empower 共用身分小卡同步：學號後 4 碼＋班級） ---------- */
+const sid4=()=>String(st.sid||'').replace(/\s/g,'').slice(-4);
+function syncIdentity(){
+  try{if(window.AEId&&sid4().length===4&&tidy(st.cls))AEId.set({sid:sid4(),cls:tidy(st.cls),col:(AEId.get()||{}).col});}catch(e){}
+}
+function initIdentity(){
+  try{
+    if(!window.AEId)return;
+    const id=AEId.get();
+    if(id){if(!st.sid)st.sid=id.sid||'';if(!st.cls)st.cls=id.cls||'';}
+    const names=[];(AEId.PRESETS||[]).forEach(g=>g.items.forEach(it=>{if(!it.free)names.push(it.name);}));
+    $('#clsList').innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
+  }catch(e){}
+}
+
+/* ---------- Google Apps Script ①：老師代管 Gemini 代理（班級碼） ---------- */
+function askAI(kind,btn){
+  if(kind==='test'&&!predsDone()){toast('先寫完 8 題預測，才能問 AI：先思考，後驗證');return;}
+  const code=tidy(st.aiCode);
+  if(!code){toast('先在最上面填「AI 班級碼」（老師公布）');const c=$('#aicode');c.focus();c.scrollIntoView({block:'center'});return;}
+  if(!AI_PROXY){toast('這一頁沒有設定 AI 代理網址');return;}
+  const text=getText(kind);
+  if(!text.trim()){toast('提示還是空的，先填幾格');return;}
+  const box=$('#ans-'+kind),body=$('#ansb-'+kind),meta=$('#ansm-'+kind);
+  box.hidden=false;box.dataset.busy='1';body.className='ans-body wait';
+  body.textContent='AI 思考中…（約 5–30 秒）';meta.textContent='';
+  const note=(kind==='write'&&cur().C.file&&cur().C.file!=='none')?'代管 AI 只讀得到文字，讀不到附檔。附檔重點請貼進 C 的細節，或改用「複製並開啟」到外部 AI 上傳附檔。\n\n':'';
+  btn.disabled=true;
+  const ctl=typeof AbortController!=='undefined'?new AbortController():null;
+  const timer=setTimeout(()=>{if(ctl)ctl.abort();},70000);
+  fetch(AI_PROXY,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},signal:ctl?ctl.signal:undefined,
+    body:JSON.stringify({action:'ai',code,sid:sid4()||'anon',cls:tidy(st.cls),system:AI_SYSTEM,user:text,max:kind==='write'?3000:1800})})
+    .then(r=>r.json().catch(()=>({ok:false,error:'AI 代理回應不是 JSON'})))
+    .then(j=>{
+      if(!j.ok)throw new Error(j.error||'AI 呼叫失敗');
+      st.ans[kind]=note+String(j.text||'').trim();st.aiCalls++;
+      delete box.dataset.busy;save();renderAll();
+      meta.textContent=(j.model?'· '+j.model+' ':'')+'· '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false});
+      if(kind==='test'){const n=fillAIFromText(st.ans.test,false);toast(n?`已帶入 ${n} 題 AI 判定，請逐題核對`:'AI 回應好了，請把它的判定填進表格');}
+      else toast('AI 回應好了：記得驗證它說的對不對');
+    })
+    .catch(e=>{
+      delete box.dataset.busy;body.className='ans-body err';
+      body.textContent=(e&&e.name==='AbortError'?'等太久了（超過 70 秒）。':'沒問成：'+(e&&e.message||e)+'。')+'\n可以改用「複製提示」或「複製並開啟」，到外部 AI 貼上。';
+    })
+    .finally(()=>{clearTimeout(timer);btn.disabled=false;});
+}
+/* 從 AI 的表格回應抓「編號｜數值｜判定」，只填空白格（HITL：學生核對後才算） */
+function fillAIFromText(text,overwrite){
+  let n=0;
+  String(text||'').split(/\n/).forEach(line=>{
+    const m=line.match(/^\s*\|?\s*(\d{1,2})\s*[|｜]\s*[^|｜]*[|｜]\s*\**\s*(正常|開窗|警示|資料異常)/);
+    if(!m)return;const i=parseInt(m[1],10)-1,r=rows()[i];
+    if(r&&(overwrite||!r.ai)){r.ai=m[2];n++;}
+  });
+  if(n){fillInputs();changed();}
+  return n;
+}
+
+/* ---------- Google Apps Script ②：交件上傳（ai-empower 評量資料庫，kind=prompt） ---------- */
+function submitCloud(btn){
+  if(sid4().length<4||!tidy(st.cls)){toast('交件需要學號和班級，填在最上面');const el=sid4().length<4?$('#sid'):$('#scls');el.focus();el.scrollIntoView({block:'center'});return;}
+  if(!window.AECloud){toast('雲端模組沒載入，請重新整理頁面');return;}
+  const d=cur(),R=rubricItems(),pct=R.filter(r=>r.ok).reduce((a,r)=>a+r.p,0);
+  const rec={app:'crisp',kind:'prompt',sid:sid4(),name:tidy(st.name),cls:tidy(st.cls),score:pct,max:100,
+    detail:{graded:false,unit:'prompt',label:'CRISP 提示工坊交件（繳交完整度）',task:PRESETS[st.cur].name,
+      crisp:statusOf(d),rubric:R.map(r=>({n:r.n,p:r.p,ok:r.ok})),prompt:getText('write'),vague:d.vague||'',cmp:st.cmp,
+      iForm:d.I.form,sOut:d.S.out,proof:Object.keys(d.P).filter(k=>d.P[k]===true),
+      halluc:{topic:st.h.topic,results:st.h.papers.map(p=>p.r||''),change:st.h.change,check:st.h.q},
+      test:{rounds:st.t.rounds.map(r=>({rule:r.rule,agree:r.agree}))},
+      card:{purpose:st.card.purpose,verify:st.card.verify,versions:st.card.versions.map(v=>({n:v.n,note:v.note}))},
+      peer:st.card.peer,decl:st.decl,aiCalls:st.aiCalls}};
+  btn.disabled=true;
+  syncIdentity();
+  AECloud.push(rec).then(r=>{
+    const at=new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+    st.submits.push(at+(r&&r.sent?'':'（排隊補送）'));save();renderAll();
+    toast(r&&r.sent?`已上傳：繳交完整度 ${pct}/100`:'網路忙碌，已先存在瀏覽器，稍後自動補送（不用重按）');
+  }).finally(()=>{btn.disabled=false;});
+}
+
+/* ---------- tabs ---------- */
+const TABS=['write','halluc','test','card'];
+function showTab(name,scroll){
+  if(!TABS.includes(name))name='write';
+  $$('[data-panel]').forEach(p=>{p.hidden=p.dataset.panel!==name;});
+  $$('[data-tab]').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===name)));
+  if(scroll){const top=$('.tabs').getBoundingClientRect().top+window.scrollY;if(window.scrollY>top)window.scrollTo({top});}
+}
+window.addEventListener('hashchange',()=>showTab(location.hash.slice(1),true));
+
+/* ---------- events ---------- */
+function onField(e){
+  const el=e.target;
+  if(el.matches('[data-b]')){
+    setV(el.dataset.b,el.type==='checkbox'?el.checked:el.value);
+    autosize(el);
+    if(el.dataset.b==='$.S.words'&&!cur().S.checks.includes('words')){cur().S.checks.push('words');$('#sc-words').checked=true;}
+    if(e.type==='change'&&(el.dataset.b==='sid'||el.dataset.b==='cls'))syncIdentity();
+    changed();
+  }else if(el.matches('[data-sc]')){
+    const a=cur().S.checks,id=el.dataset.sc,i=a.indexOf(id);
+    if(el.checked&&i<0)a.push(id);if(!el.checked&&i>=0)a.splice(i,1);
+    changed();
+  }
+}
+document.addEventListener('input',onField);
+document.addEventListener('change',onField);
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-scen],[data-iform],[data-sout],[data-chip],[data-copy],[data-askbtn],[data-act]');
+  if(!t)return;
+  if(t.dataset.tab){location.hash=t.dataset.tab;return;}
+  if(t.dataset.scen){st.cur=t.dataset.scen;fillInputs();changed();toast('換成「'+PRESETS[st.cur].name+'」');return;}
+  if(t.dataset.iform){cur().I.form=t.dataset.iform;changed();return;}
+  if(t.dataset.sout){cur().S.out=t.dataset.sout;changed();return;}
+  if(t.dataset.chip){
+    const c=CHIPS[t.dataset.chip],v=t.dataset.val;
+    if(c.mode==='toggle'){const a=getV(c.path),i=a.indexOf(v);if(i<0)a.push(v);else a.splice(i,1);}
+    else if(c.mode==='set'){setV(c.path,v);}
+    else{const old=tidy(getV(c.path));setV(c.path,old?old+'，並'+v:v);}
+    fillInputs();changed();return;
+  }
+  if(t.dataset.copy){
+    const kind=t.dataset.copy;
+    if(kind==='test'&&!predsDone()){e.preventDefault();toast('先寫完 8 題預測，才能複製：先思考，後驗證');return;}
+    if(t.tagName!=='A')e.preventDefault();
+    copyText(getText(kind),kind==='export'?'已複製，貼到 Word 存成「'+(tidy(st.sid)||'學號')+'_提示工程」':(t.tagName==='A'?'已複製，到新分頁貼上就能用':null));
+    return;
+  }
+  if(t.dataset.askbtn){askAI(t.dataset.askbtn,t);return;}
+  const act=t.dataset.act;
+  if(act==='copyAns'){copyText(st.ans[t.dataset.k]||'','已複製 AI 回應');return;}
+  if(act==='fillAI'){const n=fillAIFromText(st.ans.test,true);toast(n?`已帶入 ${n} 題 AI 判定，請逐題核對`:'回應裡找不到「編號｜數值｜判定」的表格，請手動填');return;}
+  if(act==='submitCloud'){submitCloud(t);return;}
+  if(act==='saveVersion'){
+    const p=getText('write');
+    if(!p.trim()){toast('提示還是空的，先填幾格');return;}
+    const vs=st.card.versions;
+    if(vs.length&&vs[vs.length-1].prompt===p){toast('跟上一版一模一樣，先改一點再存');return;}
+    vs.push({n:vs.length+1,at:new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}),prompt:p,note:tidy(st.vnote)});
+    st.vnote='';fillInputs();changed();toast('已存成 v'+vs.length);
+  }else if(act==='saveRound'){
+    if(!predsDone()||!aiDone()){toast('8 題的預測和 AI 判定都要填完');return;}
+    if(rows().some(r=>r.pred!==r.ai&&!r.why)){toast('先替每一題不一致的選原因');return;}
+    st.t.rounds.push({rule:ruleLabel(st.t),ruleText:ruleText(),agree:agreeN(),rows:clone(rows())});
+    changed();toast('已記下第 '+st.t.rounds.length+' 輪');
+  }else if(act==='clearAI'){
+    rows().forEach(r=>{r.ai='';r.why='';});fillInputs();changed();toast('AI 判定清空了，可以改規則再問一次');
+  }else if(act==='fillVerify'){
+    const last=st.t.rounds[st.t.rounds.length-1];
+    const n=last?last.agree:agreeN(),lab=last?last.rule:ruleLabel(st.t);
+    st.card.verify=`用 8 題 CO₂ 測試（一般值 3、剛好卡線 3、怪資料 2），先寫自己的預測再請 AI 判定；${last?'最後一輪':'目前'}規則 ${lab}，一致 ${n}/8。不一致的題目先找原因，修改提示後重跑。`;
+    fillInputs();changed();
+  }else if(act==='askReset'){
+    $('#resetBox').innerHTML='<span>確定清空？這台電腦上的填寫內容會全部刪掉。</span><button class="btn small" data-act="doReset">清空</button><button class="btn small" data-act="cancelReset">取消</button>';
+  }else if(act==='cancelReset'){
+    $('#resetBox').innerHTML='<button class="btn small" data-act="askReset">清空重來</button>';
+  }else if(act==='doReset'){
+    st=fresh();try{localStorage.removeItem(KEY);}catch(e){}
+    buildTestBody();fillInputs();renderAll();
+    $('#resetBox').innerHTML='<button class="btn small" data-act="askReset">清空重來</button>';
+    toast('已清空');
+  }else if(act==='closeCopy'){$('#copyBox').hidden=true;}
+});
+
+initIdentity();
+buildStatic();
+initIdentity();
+fillInputs();
+renderAll();
+showTab(location.hash.slice(1),false);
+})();
+</script>
+</body>
+</html>
