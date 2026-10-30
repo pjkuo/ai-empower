@@ -44,6 +44,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /weekly.html
   Cache-Control: public, max-age=0, must-revalidate
+/crisp.html
+  Cache-Control: public, max-age=0, must-revalidate
 /yt/
   Cache-Control: public, max-age=0, must-revalidate
 /yt/index.html
