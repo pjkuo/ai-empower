@@ -1,6 +1,6 @@
 /**
  * crisp-form.gs — CRISP 提示工坊（Google 表單問卷版）產生器＋送出處理
- * 屏東科技大學．生成式 AI 提示工程｜2026-10-30 v1.0.1（學號後 4 碼保留開頭的 0）
+ * 屏東科技大學．生成式 AI 提示工程｜2026-10-30 v1.1（取件頁：沒填 Email 也能直接複製組好的提示）
  *
  * 一支獨立 Apps Script 專案就夠：
  *   ① buildCrispForm()：建立分段 Google 表單（C 背景、R 角色、I 指令、S 規格、P 驗證），
@@ -18,6 +18,9 @@
  *   3. 上方函式選 buildCrispForm → 執行 → 依提示授權（表單、試算表、外部連線、寄信、觸發器）。
  *   4. 執行紀錄會印出：學生填答網址（含短網址）、表單編輯網址、回覆試算表網址。
  *   5. 只想檢查組提示邏輯、不寫任何資料：執行 selfTest()。
+ *   6. 取件頁（v1.1）：部署 → 新增部署作業 → 網頁應用程式（執行身分：我；存取權：所有人）→ 把 /exec 網址填進
+ *      CFG.PICKUP_URL → 執行 upgradePickup()（表單加「取件碼」題、確認訊息附取件頁網址、工作表加「取件碼」欄）。
+ *      學生送出後到取件頁輸入學號＋取件碼，就能直接複製組好的提示與 AI 回答。
  *
  * 【已部署】2026-10-30：學生填答 https://forms.gle/gE7LyjTX9HMxNqXcA
  *   Apps Script 專案「CRISP 提示工坊_Google表單產生器」（kuo0615@gmail.com），觸發器 onCrispFormSubmit（提交表單時）。
@@ -32,6 +35,7 @@ var CFG = {
   AI_PROXY:  'https://script.google.com/macros/s/AKfycbzeZIdckk825BFGen2C2l9WYG_qYSJUDTTAzLMAmhg6fdvi_HrwZsa518PSAurleMSm/exec',  // 老師代管 Gemini 代理
   AI_CODE:   'MIS2026',
   WEB_URL:   'https://pjkuo.github.io/ai-empower/crisp.html',
+  PICKUP_URL: '',   // 取件頁（本專案部署成網頁應用程式後的 /exec 網址）
   TITLE:     'CRISP 提示工坊（問卷版）',
   APP:       'crisp-form',
   KIND:      'prompt'
@@ -40,7 +44,7 @@ var AI_SYSTEM = '你是大學通識課的 AI 助教。請用繁體中文回答�
 
 // 題目標題（表單與送出處理共用；改字要兩邊一起改，所以集中在這裡）
 var Q = {
-  SID: '學號', NAME: '姓名', CLS: '班級', EMAIL: 'Email（想收到組好的提示就填）',
+  SID: '學號', NAME: '姓名', CLS: '班級', EMAIL: 'Email（想收到組好的提示就填）', PICKUP: '取件碼（自己設 4 位數字）',
   TASK: '任務卡', VAGUE: '模糊版提示（先猜 AI 會回什麼）',
   C_WHO: 'C｜我是＿＿', C_PROJ: 'C｜正在做＿＿', C_DETAIL: 'C｜細節資訊', C_FILE: 'C｜附檔', C_FDESC: 'C｜附檔檔名與內容',
   R_ROLE: 'R｜請你扮演＿＿', R_AUD: 'R｜對象是＿＿', R_TONE: 'R｜用＿＿的語氣說明',
@@ -114,11 +118,7 @@ function buildCrispForm() {
   form.setProgressBar(true);
   form.setAllowResponseEdits(false);
   form.setShowLinkToRespondAgain(true);
-  form.setConfirmationMessage(
-    '收到！你的 CRISP 提示已經組好。\n' +
-    '・有填 Email：約 1 分鐘內寄到信箱（選了「要」的，會附上 Gemini 的回答）。\n' +
-    '・沒填 Email：到網頁版用同樣的內容組一次，就能直接複製或問 AI：' + CFG.WEB_URL + '\n' +
-    '記得：AI 的回答一定要用你寫的 P 驗證方式檢查一遍。');
+  form.setConfirmationMessage(confirmationText_());
   try { form.setCollectEmail(false); } catch (e) {}
 
   // ---- 第 1 段：身分與任務卡 ----
@@ -128,6 +128,7 @@ function buildCrispForm() {
   form.addMultipleChoiceItem().setTitle(Q.CLS).setChoiceValues(OPT.CLS).showOtherOption(true).setRequired(true);
   form.addTextItem().setTitle(Q.EMAIL).setHelpText('選填。填了就會收到組好的提示，方便複製。')
     .setValidation(FormApp.createTextValidation().requireTextIsEmail().build());
+  addPickupItem_(form);
   form.addMultipleChoiceItem().setTitle(Q.TASK).setHelpText('留白的格子會用這張卡的範例補上；「自己的題目」不補。')
     .setChoiceValues(OPT.TASK).setRequired(true);
   form.addTextItem().setTitle(Q.VAGUE).setHelpText('例：幫我做一個自動澆水的程式');
@@ -218,7 +219,7 @@ function buildCrispForm() {
   var ss = SpreadsheetApp.create(CFG.TITLE + '｜回覆');
   form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
   var sh = ss.insertSheet('組好的提示');
-  sh.appendRow(['送出時間', '學號後4碼', '姓名', '班級', '任務卡', 'CRISP 完成度', '用範例補的欄位', '組好的提示', 'AI 回答', '寄信', '推送評量資料庫']);
+  sh.appendRow(['送出時間', '學號後4碼', '姓名', '班級', '任務卡', 'CRISP 完成度', '用範例補的欄位', '組好的提示', 'AI 回答', '寄信', '推送評量資料庫', '取件碼']);
   sh.setFrozenRows(1);
   sh.setColumnWidth(8, 520); sh.setColumnWidth(9, 520);
 
@@ -253,16 +254,33 @@ function setupTrigger() {
 
 // ===================== ② 送出處理 =====================
 function onCrispFormSubmit(e) {
-  var lock = LockService.getScriptLock();
-  try { lock.waitLock(20000); } catch (err) {}
   try {
     var a = answersOf_(e.response);
     var built = buildPrompt_(a);
     var sid4 = String(a.sid || '').replace(/\s/g, '').slice(-4);
     var wantAI = a.askAI === OPT.ASK_AI[0];
+
+    // ① 先把組好的提示寫進工作表——學生馬上就能到取件頁複製，不必等 AI
+    var sh = null, row = 0;
+    var ssId = PropertiesService.getScriptProperties().getProperty('SS_ID');
+    if (ssId) sh = SpreadsheetApp.openById(ssId).getSheetByName('組好的提示');
+    if (sh) {
+      var lock = LockService.getScriptLock();
+      try { lock.waitLock(20000); } catch (err) {}
+      try {
+        sh.appendRow([e.response.getTimestamp(), "'" + sid4, a.name || '', a.cls || '', a.task || '', built.score,
+          built.filled.join('、'), built.text, wantAI ? '（AI 回答中，約 30 秒後再取件一次）' : '', a.email ? '（寄送中）' : '（沒填 Email）', '',
+          a.code ? "'" + a.code : '']);
+        row = sh.getLastRow();
+      } finally { try { lock.releaseLock(); } catch (e2) {} }
+    }
+
+    // ② 需要的話請 AI 回答
     var aiText = '';
     if (wantAI) aiText = askAI_(built.text + (built.hasFile ? '\n\n（系統附註：這次是用文字介面提問，附檔沒有一起傳過去。不要假裝讀過附檔；需要附檔內容就先問我。）' : ''), sid4, a.cls);
+    if (sh && row && wantAI) sh.getRange(row, 9).setValue(aiText);
 
+    // ③ 推送評量資料庫
     var pushed = '';
     try {
       pushed = push_([{
@@ -274,23 +292,17 @@ function onCrispFormSubmit(e) {
           iForm: a.iForm || '', sOut: a.sOut || '', proof: a.pChecks || [], askAI: wantAI, aiOk: !!aiText && aiText.indexOf('（AI 沒回成') !== 0 }
       }]);
     } catch (err2) { pushed = '失敗：' + err2; }
+    if (sh && row) sh.getRange(row, 11).setValue(pushed);
 
-    var mailed = '';
+    // ④ 有 Email 就寄信
     if (a.email) {
+      var mailed = '';
       try { mail_(a, built, aiText); mailed = '已寄 ' + a.email.replace(/^(.).*(@.*)$/, '$1***$2'); }
       catch (err3) { mailed = '寄信失敗：' + err3; }
-    }
-
-    var ssId = PropertiesService.getScriptProperties().getProperty('SS_ID');
-    if (ssId) {
-      var sh = SpreadsheetApp.openById(ssId).getSheetByName('組好的提示');
-      if (sh) sh.appendRow([e.response.getTimestamp(), "'" + sid4, a.name || '', a.cls || '', a.task || '', built.score,
-        built.filled.join('、'), built.text, aiText, mailed || '（沒填 Email）', pushed]);
+      if (sh && row) sh.getRange(row, 10).setValue(mailed);
     }
   } catch (err) {
     Logger.log('onCrispFormSubmit 失敗：' + err + '\n' + (err && err.stack));
-  } finally {
-    try { lock.releaseLock(); } catch (e2) {}
   }
 }
 
@@ -309,7 +321,7 @@ function answersOf_(response) {
     sOut: s(Q.S_OUT), cols: s(Q.S_COLS), example: s(Q.S_EX), chart: s(Q.S_CHART), x: s(Q.S_X), y: s(Q.S_Y),
     web: s(Q.S_WEB), flow: s(Q.S_FLOW), py: s(Q.S_PY), sChecks: arr(Q.S_CHECKS), cond: s(Q.S_COND),
     pChecks: arr(Q.P_CHECKS), data: s(Q.P_DATA), goal: s(Q.P_GOAL), place: s(Q.P_PLACE), where: s(Q.P_WHERE),
-    askAI: s(Q.ASK_AI)
+    askAI: s(Q.ASK_AI), code: s(Q.PICKUP)
   };
 }
 
@@ -385,6 +397,129 @@ function buildPrompt_(a) {
 }
 
 function tidy_(s) { return String(s || '').trim().replace(/[。．.；;，,、？?！!\s]+$/, ''); }
+
+// ===================== ③ 取件頁（網頁應用程式） =====================
+function addPickupItem_(form) {
+  var item = form.addTextItem().setTitle(Q.PICKUP).setRequired(true)
+    .setHelpText('自己設 4 位數字（例：0615），記下來。送出後到「取件頁」輸入學號＋取件碼，就能直接複製組好的提示，不用填 Email。')
+    .setValidation(FormApp.createTextValidation().requireTextMatchesPattern('^\\d{4}$').setHelpText('請填 4 位數字').build());
+  return item;
+}
+
+function confirmationText_() {
+  var url = CFG.PICKUP_URL || PropertiesService.getScriptProperties().getProperty('PICKUP_URL') || '';
+  return '收到！你的 CRISP 提示已經組好。\n' +
+    (url ? '・直接複製：到取件頁輸入學號＋取件碼 → ' + url + '\n' : '') +
+    '・有填 Email：約 1 分鐘內也會寄到信箱。\n' +
+    '・選了「要」讓 Gemini 回答的，約 30 秒後取件頁會出現 AI 的回答。\n' +
+    '記得：AI 的回答一定要用你寫的 P 驗證方式檢查一遍。';
+}
+
+/** v1.1 升級既有表單：加「取件碼」題（放在 Email 後面）、更新確認訊息、工作表加「取件碼」欄 */
+function upgradePickup() {
+  var props = PropertiesService.getScriptProperties();
+  var url = CFG.PICKUP_URL || ScriptApp.getService().getUrl();
+  if (!url) throw new Error('請先「部署 → 新增部署作業 → 網頁應用程式」，再把 /exec 網址填進 CFG.PICKUP_URL');
+  props.setProperty('PICKUP_URL', url);
+  var form = FormApp.openById(props.getProperty('FORM_ID'));
+  var titles = form.getItems().map(function (it) { return it.getTitle(); });
+  if (titles.indexOf(Q.PICKUP) < 0) {
+    var item = addPickupItem_(form);
+    var at = titles.indexOf(Q.EMAIL);
+    if (at >= 0) form.moveItem(item.getIndex(), at + 1);
+  }
+  form.setConfirmationMessage(confirmationText_());
+  form.setDescription(
+    '照 C 背景、R 角色、I 指令、S 規格、P 驗證五個面向填空。看不懂的格子可以留白，系統會用你選的任務卡範例補上。\n' +
+    '送出後自動組好提示：到取件頁輸入學號＋取件碼就能直接複製（填 Email 也會寄給你；可選擇讓老師代管的 Gemini 先回答一次）。\n' +
+    'AI 交回來的成果，由你來驗證：先思考，後驗證。\n取件頁：' + url + '\n網頁版（可即時預覽、直接問 AI）：' + CFG.WEB_URL);
+  var sh = SpreadsheetApp.openById(props.getProperty('SS_ID')).getSheetByName('組好的提示');
+  if (sh && sh.getRange(1, 12).getValue() !== '取件碼') sh.getRange(1, 12).setValue('取件碼');
+  Logger.log('✅ 取件頁已接上：' + url);
+  return url;
+}
+
+function doGet(e) {
+  var sid = String((e && e.parameter && e.parameter.sid) || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 12);
+  return HtmlService.createHtmlOutput(pickupHtml_(sid))
+    .setTitle('CRISP 提示工坊｜取件頁')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+/** 取件：學號（完整或後 4 碼）＋取件碼 → 最新一筆組好的提示與 AI 回答 */
+function pickup(sid, code) {
+  sid = String(sid || '').replace(/\s/g, '').slice(-4);
+  code = String(code || '').trim();
+  if (!/^[A-Za-z0-9]{4}$/.test(sid) || !/^\d{4}$/.test(code)) return { ok: false, error: '請填學號和 4 位數字的取件碼。' };
+  var cache = CacheService.getScriptCache(), key = 'pk_' + sid, tries = Number(cache.get(key) || 0);
+  if (tries >= 20) return { ok: false, error: '嘗試太多次了，請 10 分鐘後再試。' };
+  var ssId = PropertiesService.getScriptProperties().getProperty('SS_ID');
+  var sh = ssId && SpreadsheetApp.openById(ssId).getSheetByName('組好的提示');
+  if (!sh) return { ok: false, error: '老師還沒設定好回覆試算表。' };
+  var vals = sh.getDataRange().getDisplayValues();
+  for (var i = vals.length - 1; i >= 1; i--) {
+    var r = vals[i];
+    if (String(r[1]).slice(-4) === sid && String(r[11]) === code) {
+      return { ok: true, ts: r[0], task: r[4], score: r[5], filled: r[6], prompt: r[7], ai: r[8], web: CFG.WEB_URL };
+    }
+  }
+  cache.put(key, String(tries + 1), 600);
+  return { ok: false, error: '找不到這組學號＋取件碼。請確認輸入；剛送出的話，等 10 秒再按一次。' };
+}
+
+function pickupHtml_(sid) {
+  var esc = function (s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  return '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><base target="_blank">' +
+  '<style>' +
+  ':root{--ink:#172033;--muted:#5A6476;--line:#D2D9E2;--sunk:#F5F7FA;--band:#18233A;--c:#0E7F83;--r:#6B4BC0;--i:#2152D4;--s:#9A5B00;--p:#BE3655}' +
+  '*{box-sizing:border-box}body{margin:0;background:#ECEFF3;color:var(--ink);font:16px/1.65 "Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif}' +
+  '.band{background:var(--band);color:#F2F5FA;padding:22px 18px 18px}.band h1{margin:0;font:700 26px/1.3 "DFKai-SB","BiauKai","標楷體",serif}' +
+  '.band h1 b{font-family:Consolas,monospace;letter-spacing:.04em}.band p{margin:6px 0 0;color:#B3C2D8;font-size:14px}' +
+  '.wrap{max-width:860px;margin:0 auto;padding:18px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}' +
+  '.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}label{display:grid;gap:4px;font-size:14px;font-weight:700}' +
+  'input{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);width:200px;max-width:100%}' +
+  'button,.btn{font:inherit;font-weight:700;font-size:15px;border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;display:inline-block}' +
+  '.pri{background:var(--ink);color:#fff;border-color:var(--ink)}.muted{color:var(--muted);font-size:14px}.err{color:var(--p);font-weight:700}' +
+  'textarea{width:100%;min-height:260px;font:15px/1.7 "Microsoft JhengHei","PingFang TC",sans-serif;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);resize:vertical}' +
+  '.ai{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:420px;overflow:auto;font-size:15px}' +
+  '.dots span{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;font:700 13px Consolas,monospace;margin-right:4px}' +
+  '[hidden]{display:none!important}h2{margin:0 0 8px;font:700 19px "DFKai-SB","標楷體",serif}' +
+  '</style></head><body>' +
+  '<div class="band"><h1><b>CRISP</b> 提示工坊｜取件頁</h1><p>輸入學號＋你在表單設的取件碼，直接複製組好的提示。先思考，後驗證。</p></div>' +
+  '<div class="wrap">' +
+  '<div class="card"><div class="row">' +
+  '<label>學號（完整或後 4 碼）<input id="sid" value="' + esc(sid) + '" autocomplete="off"></label>' +
+  '<label>取件碼（4 位數字）<input id="code" inputmode="numeric" maxlength="4" autocomplete="off"></label>' +
+  '<button class="pri" id="go" type="button" target="_self">取件</button></div>' +
+  '<p class="muted" id="msg" style="margin:10px 0 0">剛送出表單的話，等 10 秒再取件；有勾 AI 回答的，約 30 秒後再取一次。</p></div>' +
+  '<div id="res" hidden>' +
+  '<div class="card"><h2>組好的提示 <span class="muted" id="meta"></span></h2>' +
+  '<p class="muted" id="filled" hidden></p>' +
+  '<textarea id="prompt" readonly></textarea>' +
+  '<div class="row" style="margin-top:10px"><button class="pri" id="copy" type="button">複製提示</button>' +
+  '<a class="btn" href="https://claude.ai/new" data-cp="1">複製並開啟 Claude</a><a class="btn" href="https://chatgpt.com/" data-cp="1">ChatGPT</a><a class="btn" href="https://gemini.google.com/app" data-cp="1">Gemini</a></div></div>' +
+  '<div class="card" id="aiBox" hidden><h2>老師代管 Gemini 的回答</h2><div class="ai" id="ai"></div>' +
+  '<div class="row" style="margin-top:10px"><button id="copyAi" type="button">複製 AI 回答</button></div>' +
+  '<p class="muted">用你寫的 P 驗證方式逐筆檢查：預期和實際一致嗎？卡在門檻的值判對了嗎？</p></div>' +
+  '</div>' +
+  '<p class="muted">想即時預覽、改了馬上再問：<a href="' + CFG.WEB_URL + '">CRISP 提示工坊網頁版</a></p>' +
+  '</div>' +
+  '<script>' +
+  'var $=function(i){return document.getElementById(i)};' +
+  'function copy(t){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);' +
+  'if(!ok&&navigator.clipboard){navigator.clipboard.writeText(t).then(function(){say("已複製")},function(){say("請手動選取上面的文字複製")});return}say(ok?"已複製，貼到 AI 對話框就能用":"請手動選取上面的文字複製")}' +
+  'function say(m){$("msg").textContent=m;$("msg").className="muted"}' +
+  '$("go").onclick=function(){var b=this;b.disabled=true;$("msg").className="muted";$("msg").textContent="取件中…";' +
+  'google.script.run.withSuccessHandler(function(r){b.disabled=false;if(!r.ok){$("msg").textContent=r.error;$("msg").className="err";$("res").hidden=true;return}' +
+  '$("res").hidden=false;$("prompt").value=r.prompt;$("meta").textContent="｜"+r.task+"｜完成度 "+r.score+"/100";' +
+  'if(r.filled){$("filled").hidden=false;$("filled").textContent="這些格子用任務卡範例補上了："+r.filled+"。改成自己的版本會更準。"}else{$("filled").hidden=true}' +
+  'if(r.ai){$("aiBox").hidden=false;$("ai").textContent=r.ai}else{$("aiBox").hidden=true}' +
+  'say("取件成功：按「複製提示」，貼到 AI 對話框。")}).withFailureHandler(function(e){b.disabled=false;$("msg").textContent="取件失敗："+e.message;$("msg").className="err"}).pickup($("sid").value,$("code").value)};' +
+  '$("copy").onclick=function(){copy($("prompt").value)};$("copyAi").onclick=function(){copy($("ai").textContent)};' +
+  'Array.prototype.forEach.call(document.querySelectorAll("[data-cp]"),function(a){a.addEventListener("click",function(){copy($("prompt").value)})});' +
+  '$("code").addEventListener("keydown",function(e){if(e.key==="Enter")$("go").click()});' +
+  '</script></body></html>';
+}
 
 // ===================== 外部連線 =====================
 function askAI_(text, sid4, cls) {
