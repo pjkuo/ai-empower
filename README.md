@@ -103,3 +103,8 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - Google Apps Script 互動版：班級碼（同 AI-empower-platform，例 MIS2026）→ 老師代管 Gemini 代理直接回答；交件以 `kind=prompt` 寫入「ai-empower 評量資料庫」，後端不需改版（每個 kind 自動一張工作表）。
 - 入口 `index.html`「🎨 AI 賦能專題創作」新增卡片；`_headers` 加 `crisp.html` 不快取規則。
 
+## 2026-10-30 更新（CRISP 提示工坊 Google 表單問卷版）
+- 新增 `gas/crisp-form.gs`：獨立 Apps Script 專案「CRISP 提示工坊_Google表單產生器」——`buildCrispForm()` 一次建立 15 頁分段表單（「I 提問形式」「S 輸出成」依答案跳段）、回覆試算表（含「組好的提示」工作表）與 `onCrispFormSubmit` 觸發器。
+- 學生送出後：依填空組好 CRISP 提示（留白欄位用任務卡範例補上並標示）→ 選「要」時由老師代管 Gemini 先回答 → 推送 `kind=prompt`（`app=crisp-form`、`score`＝五面向完成度、`graded=false`）到「ai-empower 評量資料庫」→ 有填 Email 就寄給學生。
+- 已部署：學生填答 https://forms.gle/gE7LyjTX9HMxNqXcA；`crisp.html` 頁首與入口卡片加上「表單版」連結。
+
