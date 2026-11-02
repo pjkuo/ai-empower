@@ -30,7 +30,7 @@
 | `stats.html` | 統計分析：匯入 4C 評量 JSON／運算思維 JSON／CSV → 配對 t、Cohen's dz（Hedges gz）、95% CI、Cronbach's α、前後測比較圖、CSV 匯出 |
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
 | `crisp.html` | CRISP 提示工坊（2026-10-30，獨立版面）：生成式 AI 提示工程 100 分鐘課的學生工具。① 寫提示：C 背景（含附檔）／R 角色／I 指令（IPO、分步驟、先問我、比較方案）／S 規格（表格、圖表、網頁、流程圖、Python、條列＋條件）／P 驗證（程式模擬、邊界自查、迭代、影音驗證、驗收清單）五張填空卡，5 張任務卡範例；② 抓幻覺；③ CO₂ 驗收帳 8 題（先寫預測才能問 AI）；④ 提示卡與交件檢查。**Google Apps Script 互動**：`<meta name="ae-ai-proxy">` 接老師代管 Gemini 代理（AI-empower-platform `gas/ai-proxy.gs`，班級碼）在頁內直接問 AI、驗收帳自動帶入 AI 判定；「☁ 交件上傳」以 `AECloud.push` 送 `kind=prompt`（`score`＝繳交完整度、`detail.graded=false`、`detail.unit=prompt`）。身分與 `identity.js` 同步（學號後 4 碼＋班級）；資料存 `localStorage`（`crisp-workshop-v1`）；零 CDN |
-| `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標），並與論文成效基線（M1–M9）對照；教師工作台「🎯 AI-empower-KPI」分頁 |
+| `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標，屬過程治理指標），加上能力 KPI（TG = AG + CR 增益分解、IR、SY、CAL、AG×CR 象限）、協作配置（組成資料 ilr 座標、探索性 M1 與等協作替代）與 KAF-7 適切性檢核，並與論文成效基線（M1–M9）對照；教師工作台「🎯 AI-empower-KPI」分頁 |
 
 ## 設計原則
 
@@ -108,4 +108,9 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 學生送出後：依填空組好 CRISP 提示（留白欄位用任務卡範例補上並標示）→ 選「要」時由老師代管 Gemini 先回答 → 推送 `kind=prompt`（`app=crisp-form`、`score`＝五面向完成度、`graded=false`）到「ai-empower 評量資料庫」→ 有填 Email 就寄給學生。
 - 已部署：學生填答 https://forms.gle/gE7LyjTX9HMxNqXcA；`crisp.html` 頁首與入口卡片加上「表單版」連結。
 - v1.1 取件頁（沒填 Email 也能直接複製）：表單加必填「取件碼（自己設 4 位數字）」；同一專案部署為網頁應用程式（`doGet`，存取權＝所有人）https://script.google.com/macros/s/AKfycbxsKFJwD9sTM4eVyaRWiz6Zot0YwQLVGZ4qVcGJJtfX3QwELPL1jdp94O8J5GDXDKDH/exec ——輸入學號＋取件碼即顯示組好的提示（與 AI 回答），一鍵複製並開啟 Claude／ChatGPT／Gemini；送出後的確認訊息與表單說明都附此網址。取件比對最新一筆、每學號 10 分鐘最多 20 次嘗試。範例：TEST0000／2468。
+
+## 2026-11-02 更新（AI-empower-KPI v2：能力 KPI＋KAF-7）
+- `kpi.html` 新增三張卡片：**能力 KPI**（TG = Yᴴᴬ − Yᴴ₀ = AG + CR；AG＝撤除 AI 就消失的外借增益、CR＝撤除 AI 仍保留的能力內化增益；IR＝CR ÷ TG；SY＝Yᴴᴬ − max(Yᴴ₁, Yᴬ)；CAL＝錯誤注入題判斷正確率；AG×CR 象限圖與依賴型優先名單；個人增益 CSV）、**協作配置**（各生 AI 呼叫層級比例→ilr 座標 z₁、z₂，班級中心配置，探索性 M1：Y = β₀ + β₁z₁ + β₂z₂，HOOTL→HITL 10 個百分點的等協作替代 Δ）、**KPI 適切性檢核 KAF-7**（能力歸屬、抗解耦代理 r、敏感度 SRM 自動判定，其餘待研究一施測）。
+- 三層 KPI 表加「性質」欄（過程／有 AI 產出／監督／過程合規／配置）；H4、X3 標為配置變項。AEK 計算不變。
+- 新資料約定：AI-off 檢核 `kind=aioff`（`detail.phase`＝`pre`／`post`，`score`／`max`，前後測用平行題本）；錯誤注入題 `detail.seeded=true`、`detail.correct`（布林）；Yᴬ（AI 單獨作答基準）於側欄選填。有 AI 分數沿用最新一筆 `kind=ipo`。
 

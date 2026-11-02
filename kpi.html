@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>AI-empower-KPI｜AI 賦能教學 Hub</title>
-<meta name="description" content="由作而管三層人機協作評量 KPI：以 HITL、HOTL、HOOTL 為參數計算綜合指標，並與論文成效基線對照。">
+<meta name="description" content="由作而管三層人機協作評量 KPI：以 HITL、HOTL、HOOTL 為參數計算綜合指標，加上能力 KPI（TG = AG + CR 增益分解）、協作配置（組成資料）與 KAF-7 適切性檢核，並與論文成效基線對照。">
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/kpi.html">
 <meta name="theme-color" content="#1E3A8A">
 <meta name="robots" content="noindex">
@@ -53,6 +53,17 @@ table.data td.sm{font-size:11px;color:var(--muted)}
 .todo li{padding:7px 10px;border-radius:9px;background:var(--soft)}
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .demo{background:var(--warn-bg);color:#92400E;border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:10px;display:none}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+@media(max-width:700px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.tile span{display:block;font-size:12px;font-weight:800;color:var(--ink)}
+.tile b{display:block;font-size:24px;line-height:1.2;color:var(--primary);font-variant-numeric:tabular-nums}
+.tile small{display:block;font-size:11px;color:var(--muted);line-height:1.5}
+.qwrap{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:16px;align-items:start;margin-top:12px}
+@media(max-width:820px){.qwrap{grid-template-columns:1fr}}
+.qwrap svg{width:100%;height:auto;display:block}
+.qlist{font-size:12.5px;line-height:1.7}
+.qlist b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -74,7 +85,7 @@ table.data td.sm{font-size:11px;color:var(--muted)}
     <div class="side">
       <div class="card">
         <h2>🎯 AI-empower-KPI <span class="en">由作而管評量指標</span></h2>
-        <p class="sub">以 HITL、HOTL、HOOTL 為參數的綜合指標，並與論文《由操作而監管，先思考後驗證》之成效基線對照。</p>
+        <p class="sub">以 HITL、HOTL、HOOTL 為參數的綜合指標，並與論文《由操作而監管，先思考後驗證》之成效基線對照；另含能力 KPI（增益分解）、協作配置與 KAF-7 適切性檢核。</p>
         <label class="fld" for="tcode" style="margin-top:0">教師碼</label>
         <input type="password" id="tcode" placeholder="已從工作台登入者可留空" autocomplete="off">
         <div class="toolbar">
@@ -94,6 +105,7 @@ table.data td.sm{font-size:11px;color:var(--muted)}
           <label for="t1">τ₁ 監管閘門</label><input id="t1" type="number" step="5" min="0" max="100">
           <label for="t2">τ₂ 治理閘門</label><input id="t2" type="number" step="5" min="0" max="100">
           <label for="rho">ρ* 人類投入目標</label><input id="rho" type="number" step="0.05" min="0" max="1">
+          <label for="ya">Yᴬ AI 單獨基準</label><input id="ya" type="number" step="1" min="0" max="100" placeholder="選填">
         </div>
         <div class="toolbar">
           <button class="btn btn-ghost" id="btnReset" type="button">↺ 預設參數</button>
@@ -121,13 +133,30 @@ table.data td.sm{font-size:11px;color:var(--muted)}
         <div class="card">
           <h2>三層 KPI <span class="en">HITL・HOTL・HOOTL</span></h2>
           <div style="overflow-x:auto"><table class="data" id="kpiTable"></table></div>
-          <p class="hint">得分 s：達門檻為 100；未達者依實測／門檻比例計（愈低愈好者反向）。≥ 90 達標、60–89 接近、&lt; 60 未達；「待資料」不計入層級指數。</p>
+          <p class="hint">得分 s：達門檻為 100；未達者依實測／門檻比例計（愈低愈好者反向）。≥ 90 達標、60–89 接近、&lt; 60 未達；「待資料」不計入層級指數。「性質」為配置者（H4、X3）屬輸入變項，論文分析時移出成效指標，改作協作配置 π。</p>
         </div>
         <div class="card">
           <h2>AI 呼叫層級分布 <span class="en" id="aiN"></span></h2>
           <div class="dist" id="dist"></div>
           <div class="legend" id="distLegend"></div>
           <p class="hint">依 AI 代理呼叫的系統提示角色詞歸類（不讀學生提問內容）；平台寫入 detail.layer 後以該欄為準。</p>
+        </div>
+        <div class="card">
+          <h2>能力 KPI <span class="en">TG = AG + CR 增益分解</span></h2>
+          <p class="sub">把「有 AI 時的進步」拆成撤除 AI 就消失的 AG，與撤除 AI 仍保留的 CR。需要 AI-off 前測（kind=aioff, phase=pre）、有 AI 的 IPO 分數、AI-off 後測（phase=post）。</p>
+          <div class="tiles" id="capTiles"></div>
+          <div class="qwrap"><div id="capScatter"></div><div><div class="dist" id="qDist"></div><div class="legend" id="qLegend"></div><div class="qlist" id="qList"></div></div></div>
+          <div class="toolbar"><button class="btn btn-ghost" id="btnCapCsv" type="button">⬇️ 個人增益 CSV</button></div>
+          <p class="hint">TG = Yᴴᴬ − Yᴴ₀；AG = Yᴴᴬ − Yᴴ₁；CR = Yᴴ₁ − Yᴴ₀；IR = CR ÷ TG（TG &gt; 0）；SY = Yᴴᴬ − max(Yᴴ₁, Yᴬ)。前後測須為等化的平行題本，分數相減才有意義。</p>
+        </div>
+        <div class="card">
+          <h2>協作配置 <span class="en">組成資料・ilr 座標</span></h2>
+          <div id="compBody"></div>
+        </div>
+        <div class="card">
+          <h2>KPI 適切性檢核 <span class="en">KAF-7</span></h2>
+          <div style="overflow-x:auto"><table class="data" id="kafTable"></table></div>
+          <p class="hint">門檻為論文規劃的建議值，待研究一（專家共識＋心理計量）驗證；準則 1、2、5、7 需另行施測，本頁無法自動判定。</p>
         </div>
       </div>
       <div class="card">
@@ -157,6 +186,11 @@ function msg(t,c){var m=$("cloudMsg");m.textContent=t;m.className="msg show "+c;
 function loadP(){var p={};try{p=JSON.parse(localStorage.getItem(PKEY)||"{}")||{};}catch(e){}Object.keys(DEF).forEach(function(k){$(k).value=(p[k]!=null?p[k]:DEF[k]);});}
 function saveP(){var p={};Object.keys(DEF).forEach(function(k){p[k]=Number($(k).value);});try{localStorage.setItem(PKEY,JSON.stringify(p));}catch(e){}}
 function P(){var p={};Object.keys(DEF).forEach(function(k){var v=Number($(k).value);p[k]=isFinite(v)?v:DEF[k];});var s=p.w1+p.w2+p.w3;if(!(s>0)){p.w1=DEF.w1;p.w2=DEF.w2;p.w3=DEF.w3;s=1;}p.w1/=s;p.w2/=s;p.w3/=s;return p;}
+var YKEY="ae.kpi.ya.v1";
+function yA(){var v=String($("ya").value).trim();if(v==="")return null;v=Number(v);return isFinite(v)?Math.max(0,Math.min(100,v)):null;}
+function dl(name,rows){var q=function(s){s=String(s==null?"":s);return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  var blob=new Blob(["﻿"+rows.map(function(r){return r.map(q).join(",");}).join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
 
 /* ---------- 資料前處理 ---------- */
 function det(r){var d=r.detail;if(typeof d==="string"){try{d=JSON.parse(d);}catch(e){d={};}}return d||{};}
@@ -206,16 +240,16 @@ function compute(){
   var cnt={HITL:0,HOTL:0,HOOTL:0,"?":0};ai.forEach(function(x){var l=aiLayer(x.d);if(l!=="x")cnt[l]++;});
   var cls=cnt.HITL+cnt.HOTL+cnt.HOOTL, x3=cls?cnt.HOOTL/cls:null;
   var K=[
-   {L:"HITL",c:"H1",n:"四站完成率",v:h1,T:0.8,dir:"high",f:"pct",note:part.length+" 人參與"},
-   {L:"HITL",c:"H2",n:"IPO 驗收品質",v:h2,T:70,dir:"high",f:"n1",note:ipo.length+" 份已評分"},
-   {L:"HITL",c:"H3",n:"判斷門檻具備率",v:h3,T:0.5,dir:"high",f:"pct",note:"運算思維面向 ≥ 18／25"},
-   {L:"HITL",c:"H4",n:"人類投入比 ρ",v:h4,T:p.rho,dir:"high",f:"r2",note:rhos.length+" 人中位數"},
-   {L:"HOTL",c:"O1",n:"轉換核可紀錄率",v:o1,T:0.9,dir:"high",f:"pct",note:tr.length?tr.length+" 次轉換":"待儀器化"},
-   {L:"HOTL",c:"O2",n:"AI 產出未檢核率",v:o2,T:0.05,dir:"low",f:"pct",note:"愈低愈好"},
-   {L:"HOTL",c:"O3",n:"AI 修正介入率",v:o3,T:[0.1,0.4],dir:"band",f:"pct",note:dec.length?dec.length+" 次決策":"待儀器化"},
-   {L:"HOOTL",c:"X1",n:"專題完成率",v:x1,T:0.75,dir:"high",f:"pct",note:ns+" 人啟動專題"},
-   {L:"HOOTL",c:"X2",n:"治理決策紀錄率",v:x2,T:0.9,dir:"high",f:"pct",note:finals.length?finals.length+" 份期末專題":"待期末評分登錄"},
-   {L:"HOOTL",c:"X3",n:"AI 自主產出集中度",v:x3,T:0.4,dir:"high",f:"pct",note:"暫定門檻；"+cls+" 次已歸類"}];
+   {L:"HITL",c:"H1",n:"四站完成率",r:"過程",v:h1,T:0.8,dir:"high",f:"pct",note:part.length+" 人參與"},
+   {L:"HITL",c:"H2",n:"IPO 驗收品質",r:"有 AI 產出",v:h2,T:70,dir:"high",f:"n1",note:ipo.length+" 份已評分"},
+   {L:"HITL",c:"H3",n:"判斷門檻具備率",r:"有 AI 產出",v:h3,T:0.5,dir:"high",f:"pct",note:"運算思維面向 ≥ 18／25"},
+   {L:"HITL",c:"H4",n:"人類投入比 ρ",r:"配置",v:h4,T:p.rho,dir:"high",f:"r2",note:rhos.length+" 人中位數"},
+   {L:"HOTL",c:"O1",n:"轉換核可紀錄率",r:"過程合規",v:o1,T:0.9,dir:"high",f:"pct",note:tr.length?tr.length+" 次轉換":"待儀器化"},
+   {L:"HOTL",c:"O2",n:"AI 產出未檢核率",r:"監督",v:o2,T:0.05,dir:"low",f:"pct",note:"愈低愈好"},
+   {L:"HOTL",c:"O3",n:"AI 修正介入率",r:"監督",v:o3,T:[0.1,0.4],dir:"band",f:"pct",note:dec.length?dec.length+" 次決策":"待儀器化"},
+   {L:"HOOTL",c:"X1",n:"專題完成率",r:"有 AI 產出",v:x1,T:0.75,dir:"high",f:"pct",note:ns+" 人啟動專題"},
+   {L:"HOOTL",c:"X2",n:"治理決策紀錄率",r:"過程合規",v:x2,T:0.9,dir:"high",f:"pct",note:finals.length?finals.length+" 份期末專題":"待期末評分登錄"},
+   {L:"HOOTL",c:"X3",n:"AI 自主產出集中度",r:"配置",v:x3,T:0.4,dir:"high",f:"pct",note:"暫定門檻；"+cls+" 次已歸類"}];
   K.forEach(function(k){k.s=score(k.v,k.T,k.dir);});
   var th={};["HITL","HOTL","HOOTL"].forEach(function(L){var ks=K.filter(function(k){return k.L===L;}),av=ks.filter(function(k){return k.s!=null;});
     th[L]={v:av.length?av.reduce(function(a,k){return a+k.s;},0)/av.length:null,cov:av.length+"／"+ks.length};});
@@ -223,7 +257,56 @@ function compute(){
   var g2=hotS==null?null:Math.min(1,hotS/p.t2), hootS=th.HOOTL.v==null||g2==null?null:th.HOOTL.v*g2;
   var parts=[[p.w1,th.HITL.v],[p.w2,hotS],[p.w3,hootS]].filter(function(x){return x[1]!=null;}), ws=parts.reduce(function(a,x){return a+x[0];},0);
   var aek=parts.length?parts.reduce(function(a,x){return a+x[0]*x[1];},0)/ws:null;
-  return{tagged:ai.filter(function(x){return !!x.d.layer;}).length,K:K,th:th,g1:g1,g2:g2,hotS:hotS,hootS:hootS,aek:aek,full:parts.length===3,cnt:cnt,nAI:ai.length,nR:R.length,p:p};
+  return{tagged:ai.filter(function(x){return !!x.d.layer;}).length,K:K,th:th,g1:g1,g2:g2,hotS:hotS,hootS:hootS,aek:aek,full:parts.length===3,cnt:cnt,nAI:ai.length,nR:R.length,p:p,cap:capCompute(D)};
+}
+
+/* ---------- 能力 KPI：增益分解＋協作配置（組成資料） ---------- */
+function pct(r){var m=Number(r.max)||100,s=Number(r.score);return r.score!==""&&r.score!=null&&isFinite(s)?Math.max(0,Math.min(100,s/m*100)):null;}
+function mean(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
+function sdev(a){if(a.length<2)return null;var m=mean(a);return Math.sqrt(a.reduce(function(s,x){return s+(x-m)*(x-m);},0)/(a.length-1));}
+function corr(x,y){var n=x.length;if(n<3)return null;var mx=mean(x),my=mean(y),sxy=0,sxx=0,syy=0;
+  for(var i=0;i<n;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)*(x[i]-mx);syy+=(y[i]-my)*(y[i]-my);}return sxx>0&&syy>0?sxy/Math.sqrt(sxx*syy):null;}
+var Q={G:["真賦能","#059669"],D:["依賴型","#D97706"],A:["自主型","#2563EB"],F:["失效型","#DC2626"]}, QK=["G","D","A","F"];
+function quad(ag,cr){return ag>0?(cr>0?"G":"D"):(cr>0?"A":"F");}
+function ilr(p){return[Math.sqrt(2/3)*Math.log(p[0]/Math.sqrt(p[1]*p[2])),Math.sqrt(0.5)*Math.log(p[1]/p[2])];}
+function ols(X,y){var A=[[0,0,0],[0,0,0],[0,0,0]],b=[0,0,0],i,j,r,t;
+  for(var n=0;n<y.length;n++)for(i=0;i<3;i++){b[i]+=X[n][i]*y[n];for(j=0;j<3;j++)A[i][j]+=X[n][i]*X[n][j];}
+  for(i=0;i<3;i++){var pv=i;for(r=i+1;r<3;r++)if(Math.abs(A[r][i])>Math.abs(A[pv][i]))pv=r;if(Math.abs(A[pv][i])<1e-9)return null;
+    t=A[i];A[i]=A[pv];A[pv]=t;t=b[i];b[i]=b[pv];b[pv]=t;
+    for(r=0;r<3;r++)if(r!==i){var f=A[r][i]/A[i][i];for(j=i;j<3;j++)A[r][j]-=f*A[i][j];b[r]-=f*b[i];}}
+  var be=[b[0]/A[0][0],b[1]/A[1][1],b[2]/A[2][2]],my=mean(y),sst=0,sse=0;
+  for(n=0;n<y.length;n++){var yh=be[0]+be[1]*X[n][1]+be[2]*X[n][2];sse+=(y[n]-yh)*(y[n]-yh);sst+=(y[n]-my)*(y[n]-my);}
+  return{b:be,r2:sst>0?1-sse/sst:null,n:y.length};}
+function capCompute(D){
+  var by={},S=function(s){return by[s]=by[s]||{pre:null,post:null,yha:null,c:[0,0,0],cal:[]};};
+  D.forEach(function(x){var r=x.r,d=x.d,s=String(r.sid||""),ts=String(r.ts||""),o,v;if(!s)return;
+    if(r.kind==="aioff"){v=pct(r);if(v==null)return;o=S(s);
+      if(String(d.phase||"post")==="pre"){if(o.preTs==null||ts<o.preTs){o.pre=v;o.preTs=ts;}}
+      else if(o.postTs==null||ts>o.postTs){o.post=v;o.postTs=ts;}}
+    else if(r.kind==="ipo"&&!d.missing){v=pct(r);if(v!=null){o=S(s);if(o.haTs==null||ts>o.haTs){o.yha=v;o.haTs=ts;}}}
+    if(isAI(r,d)){var ix={HITL:0,HOTL:1,HOOTL:2}[aiLayer(d)];if(ix!=null)S(s).c[ix]++;}
+    if(d.seeded===true||d.seeded==="true")S(s).cal.push(d.correct===true||d.correct==="true"||d.correct===1?1:0);});
+  var ya=yA(),rows=Object.keys(by).sort().map(function(s){var o=by[s],w={sid:s,yha:o.yha,y0:o.pre,y1:o.post,cal:o.cal.length?mean(o.cal):null,n:o.c[0]+o.c[1]+o.c[2]};
+    if(w.n>0){w.p=o.c.map(function(c){return(c+0.5)/(w.n+1.5);});w.z=ilr(w.p);}
+    if(o.yha!=null&&o.post!=null)w.ag=o.yha-o.post;
+    if(o.pre!=null&&o.post!=null)w.cr=o.post-o.pre;
+    if(o.yha!=null&&o.pre!=null)w.tg=o.yha-o.pre;
+    if(w.ag!=null&&w.cr!=null){w.q=quad(w.ag,w.cr);if(w.tg>0)w.ir=w.cr/w.tg;}
+    if(ya!=null&&o.yha!=null&&o.post!=null)w.sy=o.yha-Math.max(o.post,ya);
+    return w;});
+  var pick=function(k){return rows.filter(function(w){return w[k]!=null;}).map(function(w){return w[k];});};
+  var full=rows.filter(function(w){return w.q;}),cnt={G:0,D:0,A:0,F:0};full.forEach(function(w){cnt[w.q]++;});
+  var pair=rows.filter(function(w){return w.yha!=null&&w.y1!=null;}),crs=pick("cr"),sd=sdev(crs);
+  var comp=rows.filter(function(w){return w.p;}),center=null,zc=null;
+  if(comp.length){var g=[0,1,2].map(function(i){return Math.exp(mean(comp.map(function(w){return Math.log(w.p[i]);})));}),sg=g[0]+g[1]+g[2];center=g.map(function(v){return v/sg;});zc=ilr(center);}
+  var fit=function(k){var rs=comp.filter(function(w){return w[k]!=null;});if(rs.length<8)return{n:rs.length};
+    var m=ols(rs.map(function(w){return[1,w.z[0],w.z[1]];}),rs.map(function(w){return w[k];}));if(!m)return{n:rs.length};
+    var d=Math.min(0.10,center[2]/2),z2=ilr([center[0]+d,center[1],center[2]-d]);m.delta=d;m.dy=m.b[1]*(z2[0]-zc[0])+m.b[2]*(z2[1]-zc[1]);return m;};
+  return{rows:rows,full:full,cnt:cnt,haN:pick("yha").length,cov:pair.length,
+    m:{tg:mean(pick("tg")),ag:mean(pick("ag")),cr:mean(crs),ir:median(pick("ir")),sy:mean(pick("sy")),cal:mean(pick("cal"))},
+    n:{tg:pick("tg").length,ag:pick("ag").length,cr:crs.length,ir:pick("ir").length,sy:pick("sy").length,cal:pick("cal").length},
+    srm:crs.length>=3&&sd>0?mean(crs)/sd:null,rHA:corr(pair.map(function(w){return w.yha;}),pair.map(function(w){return w.y1;})),
+    center:center,zc:zc,nComp:comp.length,fitCR:fit("cr"),fitAG:fit("ag"),ya:ya};
 }
 
 /* ---------- 呈現 ---------- */
@@ -242,20 +325,75 @@ function render(){
   $("layers").innerHTML=["HITL","HOTL","HOOTL"].map(function(L){var v=o.th[L].v,e=eff[L];
     return'<div class="ly" style="--c:'+LC[L]+'"><h3>'+LN[L]+'</h3><div class="v">'+(v==null?"—":v.toFixed(1))+'</div><div class="bar"><i style="width:'+(v==null?0:Math.max(0,Math.min(100,v)))+'%"></i></div>'+
     '<div class="s">權重 '+w[L].toFixed(2)+'・覆蓋 '+o.th[L].cov+(gate[L]!=null?'<br>閘門係數 '+gate[L].toFixed(2)+' → 計入 '+(e==null?"—":e.toFixed(1)):'')+'</div></div>';}).join("");
-  $("aekNote").textContent=(o.full?"":"部分層級尚無資料，綜合指標以有資料的層級重新加權。")+(o.g1!=null&&o.g1<1?"HITL 未達監管閘門，HOTL 得分已打折（先操作、後監管）。":"")+"綜合指標為教學管理指標，不作研究成效宣稱。";
-  var rows="<tr><th>代號</th><th>KPI</th><th>實測</th><th>門檻</th><th>得分 s</th><th>狀態</th><th>說明</th></tr>";
-  ["HITL","HOTL","HOOTL"].forEach(function(L){rows+='<tr class="grp"><td colspan="7">'+LN[L]+'</td></tr>';
-    o.K.filter(function(k){return k.L===L;}).forEach(function(k){rows+="<tr><td>"+k.c+"</td><td>"+esc(k.n)+'</td><td class="num">'+fmt(k.v,k.f)+'</td><td class="num">'+tfmt(k)+'</td><td class="num">'+(k.s==null?"—":k.s.toFixed(0))+"</td><td>"+pill(k.s)+'</td><td class="sm">'+esc(k.note)+"</td></tr>";});});
+  $("aekNote").textContent=(o.full?"":"部分層級尚無資料，綜合指標以有資料的層級重新加權。")+(o.g1!=null&&o.g1<1?"HITL 未達監管閘門，HOTL 得分已打折（先操作、後監管）。":"")+"綜合指標為教學管理（過程治理）指標，不作研究成效宣稱；學習成效請看下方「能力 KPI」。";
+  var rows="<tr><th>代號</th><th>KPI</th><th>性質</th><th>實測</th><th>門檻</th><th>得分 s</th><th>狀態</th><th>說明</th></tr>";
+  ["HITL","HOTL","HOOTL"].forEach(function(L){rows+='<tr class="grp"><td colspan="8">'+LN[L]+'</td></tr>';
+    o.K.filter(function(k){return k.L===L;}).forEach(function(k){rows+="<tr><td>"+k.c+"</td><td>"+esc(k.n)+'</td><td>'+(k.r==="配置"?'<span class="pill p">配置</span>':'<span class="sm">'+esc(k.r)+"</span>")+'</td><td class="num">'+fmt(k.v,k.f)+'</td><td class="num">'+tfmt(k)+'</td><td class="num">'+(k.s==null?"—":k.s.toFixed(0))+"</td><td>"+pill(k.s)+'</td><td class="sm">'+esc(k.note)+"</td></tr>";});});
   $("kpiTable").innerHTML=rows;
   var tot=o.cnt.HITL+o.cnt.HOTL+o.cnt.HOOTL+o.cnt["?"], seg=[["HITL",LC.HITL,"HITL 審查型"],["HOTL",LC.HOTL,"HOTL 轉換型"],["HOOTL",LC.HOOTL,"HOOTL 彙整型"],["?","#94A3B8","未歸類"]];
   $("aiN").textContent=o.nAI+" 次 AI 呼叫";
   $("dist").innerHTML=tot?seg.map(function(s){return'<i title="'+s[2]+" "+o.cnt[s[0]]+'" style="width:'+(o.cnt[s[0]]/tot*100)+'%;background:'+s[1]+'"></i>';}).join(""):"";
   $("distLegend").innerHTML=seg.map(function(s){return'<span style="--c:'+s[1]+'">'+s[2]+" "+o.cnt[s[0]]+(tot?"（"+Math.round(o.cnt[s[0]]/tot*100)+"%）":"")+"</span>";}).join("");
+  renderCap(o.cap);renderComp(o.cap);renderKaf(o.cap);
   renderTodo(o);
 }
-function renderTodo(o){var k=function(c){return o?o.K.filter(function(x){return x.c===c;})[0]:null;};
+function sgn(v,d){return v==null?"—":(v>0?"+":"")+v.toFixed(d==null?1:d);}
+function renderCap(c){
+  var tile=function(lab,v,n,sub){return'<div class="tile"><span>'+lab+"</span><b>"+v+"</b><small>"+sub+(n?"・n = "+n:"")+"</small></div>";};
+  $("capTiles").innerHTML=tile("TG 總賦能增益",sgn(c.m.tg),c.n.tg,"有 AI 分數 − AI-off 前測")+tile("AG AI 外借增益",sgn(c.m.ag),c.n.ag,"撤除 AI 就消失")+tile("CR 能力內化增益",sgn(c.m.cr),c.n.cr,"撤除 AI 仍保留")+
+    tile("IR 內化比",c.m.ir==null?"—":c.m.ir.toFixed(2),c.n.ir,"中位數，TG &gt; 0 者")+tile("SY 人機綜效",sgn(c.m.sy),c.n.sy,c.ya==null?"需在左側填 Yᴬ":"Yᴴᴬ − max(Yᴴ₁, "+c.ya+")")+
+    tile("CAL 適當依賴",c.m.cal==null?"—":(c.m.cal*100).toFixed(1)+"%",c.n.cal,"錯誤注入題判斷正確率");
+  var nq=c.full.length;
+  if(!nq){$("capScatter").innerHTML='<p class="sub" style="padding:24px 4px">尚無同時具備有 AI 分數與 AI-off 後測的學生，無法畫象限圖。</p>';$("qDist").innerHTML="";$("qLegend").innerHTML="";$("qList").innerHTML="";return;}
+  var W=380,H=280,px=34,py=22,lim=10;c.full.forEach(function(w){lim=Math.max(lim,Math.abs(w.ag),Math.abs(w.cr));});lim=Math.ceil(lim/5)*5;
+  var X=function(v){return px+(v+lim)/(2*lim)*(W-px-12);},Y=function(v){return py+(lim-v)/(2*lim)*(H-py-30);},x0=X(0),y0=Y(0);
+  var s='<svg viewBox="0 0 '+W+" "+H+'" role="img" aria-label="AG 對 CR 象限圖">'+
+    '<rect x="'+x0+'" y="'+py+'" width="'+(X(lim)-x0)+'" height="'+(y0-py)+'" fill="#059669" fill-opacity=".07"/>'+
+    '<line x1="'+X(-lim)+'" x2="'+X(lim)+'" y1="'+y0+'" y2="'+y0+'" stroke="#9CA3AF"/><line x1="'+x0+'" x2="'+x0+'" y1="'+Y(lim)+'" y2="'+Y(-lim)+'" stroke="#9CA3AF"/>'+
+    '<g font-size="11" font-weight="700"><text x="'+(X(lim)-4)+'" y="'+(py+12)+'" text-anchor="end" fill="#059669">真賦能 '+c.cnt.G+'</text><text x="'+(X(lim)-4)+'" y="'+(Y(-lim)-4)+'" text-anchor="end" fill="#D97706">依賴型 '+c.cnt.D+'</text>'+
+    '<text x="'+(X(-lim)+4)+'" y="'+(py+12)+'" fill="#2563EB">自主型 '+c.cnt.A+'</text><text x="'+(X(-lim)+4)+'" y="'+(Y(-lim)-4)+'" fill="#DC2626">失效型 '+c.cnt.F+"</text></g>"+
+    '<g font-size="10.5" fill="#6B7280"><text x="'+X(lim)+'" y="'+(H-12)+'" text-anchor="end">AG →（'+lim+'）</text><text x="'+X(-lim)+'" y="'+(H-12)+'">−'+lim+'</text>'+
+    '<text x="'+(x0-6)+'" y="'+(Y(lim)+4)+'" text-anchor="end">CR '+lim+'</text><text x="'+(x0-6)+'" y="'+(Y(-lim))+'" text-anchor="end">−'+lim+"</text></g>"+
+    c.full.map(function(w){return'<circle cx="'+X(w.ag).toFixed(1)+'" cy="'+Y(w.cr).toFixed(1)+'" r="4.5" fill="'+Q[w.q][1]+'" fill-opacity=".8"><title>'+esc(w.sid)+"：AG "+sgn(w.ag)+"、CR "+sgn(w.cr)+"</title></circle>";}).join("")+"</svg>";
+  $("capScatter").innerHTML=s;
+  $("qDist").innerHTML=QK.map(function(k){return'<i title="'+Q[k][0]+" "+c.cnt[k]+'" style="width:'+(c.cnt[k]/nq*100)+"%;background:"+Q[k][1]+'"></i>';}).join("");
+  $("qLegend").innerHTML=QK.map(function(k){return'<span style="--c:'+Q[k][1]+'">'+Q[k][0]+" "+c.cnt[k]+"（"+Math.round(c.cnt[k]/nq*100)+"%）</span>";}).join("");
+  var dep=c.full.filter(function(w){return w.q==="D";}).sort(function(a,b){return a.cr-b.cr;}).slice(0,12).map(function(w){return w.sid;});
+  var tips={G:"維持配置，校準達標後逐步放權；以錯誤注入演練維持監督力。",D:"提高 HITL、降低 HOOTL：先思考後驗證閘門＋定期 AI-off 檢核。",A:"邊界內任務適度釋權至 HOTL；加強提示工程與 AI 協作示範。",F:"先補基礎能力，再重設計任務（拆解、鷹架、同儕配對）。"};
+  $("qList").innerHTML='<p style="margin:10px 0 4px"><b>依賴型優先處理</b>（CR 最低者在前）：'+(dep.length?dep.map(esc).join("、"):"無")+"</p>"+
+    QK.map(function(k){return'<div><b style="color:'+Q[k][1]+'">'+Q[k][0]+"</b>　"+tips[k]+"</div>";}).join("");
+}
+function renderComp(c){
+  if(!c.center){$("compBody").innerHTML='<p class="sub">尚無可歸類的 AI 呼叫，無法計算協作配置。</p>';return;}
+  var cc=c.center,seg=[["HITL",LC.HITL],["HOTL",LC.HOTL],["HOOTL",LC.HOOTL]];
+  var h='<div class="dist">'+seg.map(function(s,i){return'<i style="width:'+(cc[i]*100)+"%;background:"+s[1]+'"></i>';}).join("")+'</div><div class="legend">'+
+    seg.map(function(s,i){return'<span style="--c:'+s[1]+'">'+s[0]+" "+(cc[i]*100).toFixed(1)+"%</span>";}).join("")+"</div>"+
+    '<p class="hint">班級中心配置（各生比例取幾何平均後閉合）・'+c.nComp+" 人・ilr 座標 z₁ = "+c.zc[0].toFixed(2)+"、z₂ = "+c.zc[1].toFixed(2)+"</p>";
+  var row=function(lab,m){if(!m||!m.b)return"<tr><td>"+lab+'</td><td colspan="5" class="sm">樣本不足：需 ≥ 8 人同時有配置與增益資料（目前 '+(m?m.n:0)+" 人）</td></tr>";
+    return"<tr><td>"+lab+'</td><td class="num">'+sgn(m.b[1],2)+'</td><td class="num">'+sgn(m.b[2],2)+'</td><td class="num">'+(m.r2==null?"—":m.r2.toFixed(3))+'</td><td class="num">'+m.n+'</td><td class="num">'+sgn(m.dy,2)+"</td></tr>";};
+  var d=(c.fitCR&&c.fitCR.delta)||(c.fitAG&&c.fitAG.delta)||0.1;
+  h+='<div style="overflow-x:auto"><table class="data"><tr><th>結果</th><th>β₁ z₁（HITL 相對比重）</th><th>β₂ z₂（HOTL 對 HOOTL）</th><th>R²</th><th>n</th><th>等協作替代 Δ</th></tr>'+row("CR 能力內化",c.fitCR)+row("AG AI 外借",c.fitAG)+"</table></div>"+
+    '<p class="hint">M1：Y = β₀ + β₁z₁ + β₂z₂ + ε（探索性，未控制共變量、未做顯著性檢定）。Δ＝在中心配置下把 '+(d*100).toFixed(1)+" 個百分點從 HOOTL 移到 HITL 的預期變化；CR 上升且 AG 不降，即為正向調整。比例以「次數 + 0.5」做零值替代。</p>";
+  $("compBody").innerHTML=h;
+}
+function renderKaf(c){
+  var st=function(s){return s==null?'<span class="pill n">待施測</span>':s==="g"?'<span class="pill g">通過</span>':s==="o"?'<span class="pill o">接近</span>':'<span class="pill r">未通過</span>';};
+  var cov=c.haN?c.cov/c.haN:null,s3=cov==null?null:cov>=0.8?"g":cov>=0.5?"o":"r",s4=c.rHA==null?null:c.rHA>=0.6?"g":c.rHA>=0.3?"o":"r",s6=c.srm==null?null:c.srm>=0.5?"g":c.srm>=0.2?"o":"r";
+  var R=[["1","構念對準","專家內容效度 I-CVI ≥ .78、S-CVI/Ave ≥ .90",null,"研究一"],
+    ["2","信度","McDonald's ω ≥ .70；評分者 ICC ≥ .75",null,"研究一"],
+    ["3","能力歸屬","有 AI 分數者中，同時有 AI-off 後測的比例 ≥ 80%",s3,cov==null?"尚無有 AI 分數":c.cov+"／"+c.haN+" 人（"+Math.round(cov*100)+"%）"],
+    ["4","抗解耦","r（有 AI 分數, AI-off 後測）≥ .60（代理值）",s4,c.rHA==null?"需 ≥ 3 人配對":"r = "+c.rHA.toFixed(2)+"；正式 DI 待獨立效標"],
+    ["5","跨模式恆等","多群組 CFA：ΔCFI ≥ −.01、ΔRMSEA ≤ .015",null,"研究一"],
+    ["6","敏感度","CR 的標準化反應平均數 SRM ≥ .50",s6,c.srm==null?"需 ≥ 3 人有 CR":"SRM = "+c.srm.toFixed(2)],
+    ["7","可行與公平","各科系無中度以上 DIF",null,"研究一"]];
+  $("kafTable").innerHTML="<tr><th>#</th><th>準則</th><th>判準</th><th>本頁狀態</th><th>目前數值</th></tr>"+R.map(function(r){return"<tr><td>"+r[0]+"</td><td>"+esc(r[1])+'</td><td class="sm">'+esc(r[2])+"</td><td>"+st(r[3])+'</td><td class="sm">'+esc(r[4])+"</td></tr>";}).join("");
+}
+function renderTodo(o){var k=function(c){return o?o.K.filter(function(x){return x.c===c;})[0]:null;},c=o&&o.cap;
   var items=[["AI-empower-platform 的 AI 呼叫帶入 detail.layer",o&&o.tagged>0],["站間轉換寫入 detail.approve 與 detail.decision（O1、O3）",o&&k("O1").v!=null],
-    ["期末專題評分登錄治理決策紀錄 detail.governance（X2）",o&&k("X2").v!=null],["HOTL AI 監管素養量表正式施測（O4）",false]];
+    ["期末專題評分登錄治理決策紀錄 detail.governance（X2）",o&&k("X2").v!=null],["HOTL AI 監管素養量表正式施測（O4）",false],
+    ["AI-off 前測寫入 kind=aioff、detail.phase=pre（Yᴴ₀）",c&&c.rows.some(function(w){return w.y0!=null;})],
+    ["AI-off 後測寫入 kind=aioff、detail.phase=post（Yᴴ₁，平行題本）",c&&c.rows.some(function(w){return w.y1!=null;})],
+    ["錯誤注入題寫入 detail.seeded=true 與 detail.correct（CAL）",c&&c.n.cal>0]];
   $("todo").innerHTML=items.map(function(i){return"<li>"+(i[1]?"✅ ":"⬜ ")+esc(i[0])+"</li>";}).join("");}
 
 /* ---------- 成效面板 ---------- */
@@ -302,7 +440,12 @@ function makeDemo(){var out=[],t0=Date.parse("2026-09-21T02:00:00Z"),sys=["你�
     if(steps>=4)out.push({id:"d-r-"+i,ts:new Date(t0+i*9e6).toISOString(),kind:"project-run",sid:sid,cls:cls,score:1,max:1,detail:{}});
     if(steps>=5&&i%3)out.push({id:"d-f-"+i,ts:new Date(t0+i*9e6).toISOString(),kind:"project-final",sid:sid,cls:cls,score:5,max:5,detail:{}});
     var ct=10+(i*5)%15;out.push({id:"d-i-"+i,ts:new Date(t0+i*8e6).toISOString(),kind:"ipo",sid:sid,cls:cls,score:55+(i*7)%40,max:100,detail:{dims:{ct:ct},tags:i%9===0?["AI 內容未檢核"]:[]}});
-    for(var a=0;a<i%6;a++)out.push({id:"d-a-"+i+"-"+a,ts:new Date(t0+(i+a)*7e6).toISOString(),kind:"ai",sid:sid,cls:cls,score:"",max:2000,detail:{action:"ai",system:sys[(i+a)%sys.length]}});}
+    var nc=2+i%5,hit=0;for(var a=0;a<nc;a++){var si=(i+a)%sys.length;if(si===0||si>=4)hit++;
+      out.push({id:"d-a-"+i+"-"+a,ts:new Date(t0+(i+a)*7e6).toISOString(),kind:"ai",sid:sid,cls:cls,score:"",max:2000,detail:{action:"ai",system:sys[si]}});}
+    var pre=38+(i*11)%22,post=Math.max(0,Math.min(100,pre-9+Math.round(16*hit/nc)+(i*13)%9));
+    out.push({id:"d-o0-"+i,ts:new Date(t0-3*864e5+i*6e5).toISOString(),kind:"aioff",sid:sid,cls:cls,score:pre,max:100,detail:{phase:"pre",skill:"ipo"}});
+    if(i%10)out.push({id:"d-o1-"+i,ts:new Date(t0+30*864e5+i*6e5).toISOString(),kind:"aioff",sid:sid,cls:cls,score:post,max:100,detail:{phase:"post",skill:"ipo"}});
+    for(var e=0;e<4;e++)out.push({id:"d-c-"+i+"-"+e,ts:new Date(t0+(i+e)*5e6).toISOString(),kind:"calcheck",sid:sid,cls:cls,score:(i+e)%3?1:0,max:1,detail:{seeded:true,correct:!!((i+e)%3)}});}
   return out;}
 $("btnPull").addEventListener("click",pull);
 $("btnDemo").addEventListener("click",function(){demo=true;all=makeDemo();fillCls();render();msg("已載入示範資料（30 位虛擬學生）。","ok");});
@@ -310,10 +453,19 @@ $("btnDemo").addEventListener("click",function(){demo=true;all=makeDemo();fillCl
 Object.keys(DEF).forEach(function(k){$(k).addEventListener("change",function(){saveP();render();});});
 $("btnReset").addEventListener("click",function(){try{localStorage.removeItem(PKEY);}catch(e){}loadP();render();});
 $("btnCsv").addEventListener("click",function(){if(!last){msg("請先載入資料。","warn");return;}
-  var q=function(s){s=String(s==null?"":s);return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
-  var lines=[["層級","代號","KPI","實測","門檻","得分","說明"].join(",")].concat(last.K.map(function(k){return[k.L,k.c,k.n,fmt(k.v,k.f),tfmt(k),k.s==null?"":k.s.toFixed(1),k.note].map(q).join(",");}));
-  lines.push(["綜合","AEK","AI-empower-KPI",last.aek==null?"":last.aek.toFixed(1),"","",""].map(q).join(","));
-  var blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="AI-empower-KPI_"+new Date().toISOString().slice(0,10)+".csv";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);});
+  var lines=[["層級","代號","KPI","性質","實測","門檻","得分","說明"]].concat(last.K.map(function(k){return[k.L,k.c,k.n,k.r,fmt(k.v,k.f),tfmt(k),k.s==null?"":k.s.toFixed(1),k.note];}));
+  lines.push(["綜合","AEK","AI-empower-KPI","過程治理",last.aek==null?"":last.aek.toFixed(1),"","",""]);
+  var c=last.cap,f2=function(v,d){return v==null?"":v.toFixed(d==null?2:d);};
+  [["TG","總賦能增益",c.m.tg,c.n.tg],["AG","AI 外借增益",c.m.ag,c.n.ag],["CR","能力內化增益",c.m.cr,c.n.cr],["IR","內化比（中位數）",c.m.ir,c.n.ir],["SY","人機綜效",c.m.sy,c.n.sy],["CAL","適當依賴",c.m.cal,c.n.cal]]
+    .forEach(function(r){lines.push(["能力",r[0],r[1],"能力",f2(r[2]),"","","n = "+r[3]]);});
+  dl("AI-empower-KPI_"+new Date().toISOString().slice(0,10)+".csv",lines);});
+$("btnCapCsv").addEventListener("click",function(){if(!last){msg("請先載入資料。","warn");return;}
+  var f2=function(v,d){return v==null?"":v.toFixed(d==null?2:d);};
+  var lines=[["學號","Y_H0 AI-off 前測","Y_HA 有 AI","Y_H1 AI-off 後測","TG","AG","CR","IR","SY","CAL","象限","AI 呼叫數","pi_HITL","pi_HOTL","pi_HOOTL","z1","z2"]].concat(last.cap.rows.map(function(w){
+    return[w.sid,f2(w.y0,1),f2(w.yha,1),f2(w.y1,1),f2(w.tg,1),f2(w.ag,1),f2(w.cr,1),f2(w.ir),f2(w.sy,1),f2(w.cal,3),w.q?Q[w.q][0]:"",w.n,w.p?f2(w.p[0],3):"",w.p?f2(w.p[1],3):"",w.p?f2(w.p[2],3):"",w.z?f2(w.z[0],3):"",w.z?f2(w.z[1],3):""];}));
+  dl("AI-empower-gain_"+new Date().toISOString().slice(0,10)+".csv",lines);});
+try{$("ya").value=localStorage.getItem(YKEY)||"";}catch(e){}
+$("ya").addEventListener("change",function(){try{localStorage.setItem(YKEY,String($("ya").value).trim());}catch(e){}render();});
 loadP();renderM();renderTodo(null);
 if(AECloud.teacherCode())pull();
 })();
