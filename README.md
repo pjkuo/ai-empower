@@ -30,7 +30,7 @@
 | `stats.html` | 統計分析：匯入 4C 評量 JSON／運算思維 JSON／CSV → 配對 t、Cohen's dz（Hedges gz）、95% CI、Cronbach's α、前後測比較圖、CSV 匯出 |
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
 | `crisp.html` | CRISP 提示工坊（2026-10-30，獨立版面）：生成式 AI 提示工程 100 分鐘課的學生工具。① 寫提示：C 背景（含附檔）／R 角色／I 指令（IPO、分步驟、先問我、比較方案）／S 規格（表格、圖表、網頁、流程圖、Python、條列＋條件）／P 驗證（程式模擬、邊界自查、迭代、影音驗證、驗收清單）五張填空卡，5 張任務卡範例；② 抓幻覺；③ CO₂ 驗收帳 8 題（先寫預測才能問 AI）；④ 提示卡與交件檢查。**Google Apps Script 互動**：`<meta name="ae-ai-proxy">` 接老師代管 Gemini 代理（AI-empower-platform `gas/ai-proxy.gs`，班級碼）在頁內直接問 AI、驗收帳自動帶入 AI 判定；「☁ 交件上傳」以 `AECloud.push` 送 `kind=prompt`（`score`＝繳交完整度、`detail.graded=false`、`detail.unit=prompt`）。身分與 `identity.js` 同步（學號後 4 碼＋班級）；資料存 `localStorage`（`crisp-workshop-v1`）；零 CDN |
-| `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標，屬過程治理指標），加上能力 KPI（TG = AG + CR 增益分解、IR、SY、CAL、AG×CR 象限）、協作配置（組成資料 ilr 座標、探索性 M1 與等協作替代）與 KAF-7 適切性檢核，並與論文成效基線（M1–M9）對照；教師工作台「🎯 AI-empower-KPI」分頁 |
+| `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標，屬過程治理指標），加上能力 KPI（TG = AG + CR 增益分解、IR、SY、CAL、AG×CR 象限）、協作配置（組成資料 ilr 座標、探索性 M1 與等協作替代）與 KAF-7 適切性檢核，並與論文成效基線（M1–M9）對照；另有「📝 HOOTL 教師評分」分頁（`kpi.html#grade`）替規格單 R1–R4、驗證報告 V1–V4 打分並算出 θ_HOOTL；教師工作台「🎯 AI-empower-KPI」分頁 |
 | `hootl.html` | HOOTL 治理任務（2026-11-04，W15–W16）：AEE 指標 HOOTL 層的學生端。① 📐 規格單（前測簡版限時 10 分鐘＋正式版；範圍、禁止事項、驗收條件、判斷門檻、異常處理五欄＋自我檢查，`kind=hootl-spec`，教師以 R1–R4 評 s_R）；② 🔍 錯誤注入驗證任務（題本 A 宿舍待機耗電／B 教室 CO₂，各 8 檢核點＝5 錯 3 對，依學號自動輪換 A/B；採納／退回＋錯誤位置＋修正＋信心，自動計 T、CAL、過度自信，`kind=hootl-verify`＋8 筆 `kind=calcheck`（`detail.seeded=true`，`kpi.html` 直接讀 CAL）；前測不公布解答）；③ 🧾 驗證報告（逐條核對＋證據、修正重測、責任聲明，`kind=hootl-report`，教師以 V1–V4 評）；④ 📝 問卷（Google 表單前測／後測，`<meta name="ae-hootl-form-pre|post">`）。`?embed=1` 供 Moodle SCORM 內嵌。θ_HOOTL = √(s_R × s_E)，s_E = (T + V)/2 |
 
 ## 設計原則
@@ -121,3 +121,10 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 新增 `gas/hootl-form.gs`：獨立 Apps Script 專案「HOOTL 治理素養問卷_Google表單產生器」——`buildHootlForm()` 建立 13 題李克特＋2 題開放題表單（完整學號、班級、施測階段）、回覆試算表與「計分」工作表、`onHootlFormSubmit` 觸發器，並印出前測／後測預填網址。送出後反向題換算、R／E 兩分量表 0–100、注意力檢核與直線作答標記，推送 `kind=hootl-survey`（`app=hootl-form`、`graded=false`；只存學號後 4 碼＋完整學號 SHA-256 雜湊）。問卷不計入 AEE，只作聚合效度與教學回饋。
 - 已部署（2026-11-04）：Apps Script 專案「HOOTL 治理素養問卷_Google表單產生器」；學生填答 https://forms.gle/4CLiKdKZZLWG4GZB7，前測預填 https://forms.gle/M1QHAThgNYTQP8Bt8，後測預填 https://forms.gle/NoQzb5RXw8jCJJxp8（已填入 `hootl.html` 的 meta）。
 - Moodle SCORM 1.2：`assets/scorm/HOOTL_W15_SCORM.zip`（問卷前測→驗證任務前測→規格單簡版→驗證報告簡版→正式規格單）、`HOOTL_W16_SCORM.zip`（正式驗證報告→驗證任務後測→問卷後測），由 `tools/hootl_scorm_build.py` 產生。SCORM 以 iframe 嵌入 `hootl.html?embed=1`，頁面以 `postMessage` 回報完成步驟與驗證任務分數 T（`cmi.core.score.raw`，記入成績簿）；外框把 `cmi.core.student_id` 後 4 碼傳進頁面（只接受 `https://moodle.npust.edu.tw`）。`hootl.html` 自 2026-12-21（Moodle 第 16 週）起預設後測，`?phase=`、`?ver=` 可覆寫。
+
+## 2026-11-04 更新（HOOTL 教師評分）
+- `kpi.html` 新增分頁「📝 HOOTL 教師評分」（`kpi.html#grade`）：讀取 `hootl-spec`／`hootl-report`，以 0–4 分評 R1–R4、V1–V4（附 0／2／4 分描述與學生自我檢查提示；報告會對照正式版規格單的驗收條件，並顯示同階段驗證任務 T、CAL）。
+- 每次儲存寫入一筆 `kind=hootl-grade`（`app=kpi`，`score` = s_R 或 V，`detail.part` = R／V、`phase` = pre／post、`target` = 被評作業 id、`items` = 四項分數、`comment`）；重評會新增一筆，取最近一次。雲端暫時無法寫入時先存在教師瀏覽器，下次載入確認已上雲後自動清除。
+- 計算：s_R = 25 × R 平均；V = 25 × V 平均；s_E = (T + V) ÷ 2（T：前測取第一次、後測取最近一次 `hootl-verify`）；θ_HOOTL = √(s_R × s_E)。逐生前後測表、班級平均與正規化增益 g（配對學生；n ≥ 5 附 2,000 次 bootstrap 95% CI），可匯出 `HOOTL-theta_日期.csv`（含 R1–R4、V1–V4 原始分數）。
+- 快速鍵：數字 0–4 依序給分、Ctrl＋Enter 儲存並下一份。`hootl-grade` 不計入人類投入比 ρ。
+- `weekly.html` 補上 HOOTL 各 kind 的中文名稱與連結。

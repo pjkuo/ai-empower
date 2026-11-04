@@ -64,6 +64,62 @@ table.data td.sm{font-size:11px;color:var(--muted)}
 .qwrap svg{width:100%;height:auto;display:block}
 .qlist{font-size:12.5px;line-height:1.7}
 .qlist b{color:var(--ink)}
+.ktabs{display:flex;gap:4px;margin:0 0 var(--gap);border-bottom:1px solid var(--line);overflow-x:auto}
+.ktabs button{border:0;background:none;font:inherit;font-size:13.5px;font-weight:800;color:var(--muted);padding:9px 14px;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap}
+.ktabs button[aria-selected=true]{color:var(--primary);border-bottom-color:var(--primary)}
+.ktabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ktabs .cnt{display:inline-block;min-width:18px;font-size:11px;line-height:16px;background:var(--err);color:#fff;border-radius:999px;padding:0 6px;margin-left:4px;text-align:center}
+.ktabs .cnt:empty{display:none}
+.gfilter{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;font-size:12.5px;margin-top:10px}
+.gfilter label{white-space:nowrap;flex-shrink:0;display:flex;gap:6px;align-items:center;font-weight:700;color:var(--ink)}
+.gfilter select,.gfilter input{padding:5px 8px;font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.gfilter input{width:130px}
+.gprog{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.gprog b{color:var(--ink);font-variant-numeric:tabular-nums}
+.gwrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:12px;margin-top:10px;align-items:start}
+@media(max-width:860px){.gwrap{grid-template-columns:1fr}}
+.glist{max-height:640px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+@media(max-width:860px){.glist{max-height:260px}}
+.glist .gh{position:sticky;top:0;background:var(--soft);font-size:11px;font-weight:800;color:var(--primary);padding:5px 10px;border-bottom:1px solid var(--line)}
+.glist button{display:flex;justify-content:space-between;gap:8px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:7px 10px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.glist button:hover{background:var(--soft)}
+.glist button[aria-current=true]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--primary)}
+.glist small{display:block;color:var(--muted);font-size:11px}
+.glist .none{padding:18px 12px;font-size:12.5px;color:var(--muted);line-height:1.7}
+.gedit{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:240px;background:var(--card)}
+.ghead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ghead b{font-size:15px;color:var(--ink)}
+.gmeta{font-size:11.5px;color:var(--muted);margin:4px 0 8px}
+.subm{background:var(--soft);border-radius:10px;padding:8px 12px;font-size:12.5px;line-height:1.7;margin:0}
+.subm dt{font-weight:800;color:var(--primary);margin-top:6px}
+.subm dt:first-child{margin-top:0}
+.subm dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.subm ol,.subm ul{margin:0;padding-left:20px}
+.subm .miss{color:var(--err);font-weight:700}
+.subm table.data{margin-top:4px;background:var(--card)}
+.ctx{font-size:12px;color:var(--ink);background:var(--accent-soft);border-radius:8px;padding:6px 10px;margin-top:8px;line-height:1.6}
+.grub{margin-top:10px}
+.rrow{display:grid;grid-template-columns:150px auto;gap:4px 12px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);justify-content:start}
+.rrow>div:first-child{font-size:13px;color:var(--ink)}
+@media(max-width:520px){.rrow{grid-template-columns:1fr}}
+.rdesc{grid-column:1/-1;font-size:11px;color:var(--muted);line-height:1.55}
+.rdesc .self{display:block;color:#92400E}
+.seg{justify-self:start;display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--card)}
+.seg label{position:relative;display:block}
+.seg input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.seg span{display:block;min-width:38px;text-align:center;padding:5px 0;font-weight:800;font-size:13px;border-left:1px solid var(--line);color:var(--ink)}
+.seg label:first-child span{border-left:0}
+.seg input:checked+span{background:var(--primary);color:#fff}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:-2px}
+.gedit textarea{width:100%;min-height:52px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:12.5px;resize:vertical}
+.gcalc{margin-top:8px;font-size:12.5px;line-height:1.7;background:var(--soft);border-radius:9px;padding:7px 10px}
+.gcalc b{color:var(--primary);font-variant-numeric:tabular-nums}
+.lnk{border:0;background:none;padding:0;font:inherit;color:var(--accent);font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.lnk.need{color:var(--err)}
+.tile .pill{display:inline-block;font-size:11px}
+table.data td.th{font-weight:800;color:var(--primary)}
+table.data th.ph{text-align:center;border-left:2px solid var(--line)}
+table.data td.bl,table.data th.bl{border-left:2px solid var(--line)}
 </style>
 </head>
 <body>
@@ -116,6 +172,11 @@ table.data td.sm{font-size:11px;color:var(--muted)}
     </div>
 
     <div>
+      <div class="ktabs" role="tablist" aria-label="頁面分頁">
+        <button type="button" role="tab" id="tabKpi" aria-selected="true" aria-controls="paneKpi">📊 指標總覽</button>
+        <button type="button" role="tab" id="tabGrade" aria-selected="false" aria-controls="paneGrade" tabindex="-1">📝 HOOTL 教師評分<span class="cnt" id="gBadge" title="未評或需重評的作業"></span></button>
+      </div>
+      <div id="paneKpi" role="tabpanel" aria-labelledby="tabKpi">
       <div class="card empty" id="emptyCard">
         <h2 style="justify-content:center">還沒有資料</h2>
         <p class="sub">輸入教師碼從雲端載入，或按「示範資料」先看看計算方式。論文成效基線不需載入即可在下方查看。</p>
@@ -169,6 +230,39 @@ table.data td.sm{font-size:11px;color:var(--muted)}
         <h2>待補儀器化</h2>
         <ul class="todo" id="todo"></ul>
       </div>
+      </div>
+      <div id="paneGrade" role="tabpanel" aria-labelledby="tabGrade" hidden>
+        <div class="card empty" id="gEmpty">
+          <h2 style="justify-content:center">還沒有資料</h2>
+          <p class="sub">輸入教師碼從雲端載入學生在 hootl.html 送出的規格單與驗證報告，或按「示範資料」先試著評分。</p>
+        </div>
+        <div id="gDash" style="display:none">
+          <div class="demo" id="gDemoNote">目前是示範資料：評分只存在這個分頁，不會上傳雲端。</div>
+          <div class="card">
+            <h2>📝 HOOTL 教師評分 <span class="en">規格單 R1–R4・驗證報告 V1–V4</span></h2>
+            <p class="sub">每項 0–4 分（1、3 分介於相鄰兩級之間）。s<sub>R</sub> = 25 × R 平均；V = 25 × V 平均；s<sub>E</sub> = (T + V) ÷ 2，T 為驗證任務自動計分；θ<sub>HOOTL</sub> = √(s<sub>R</sub> × s<sub>E</sub>)。</p>
+            <div class="gfilter">
+              <label>階段<select id="gPhase"><option value="">全部</option><option value="pre">前測 W15</option><option value="post">後測 W16</option></select></label>
+              <label>類型<select id="gType"><option value="">全部</option><option value="R">規格單</option><option value="V">驗證報告</option></select></label>
+              <label>狀態<select id="gStat"><option value="todo">未評／需重評</option><option value="">全部</option><option value="done">已評</option></select></label>
+              <input id="gFind" type="search" placeholder="學號或姓名" aria-label="搜尋學號或姓名">
+            </div>
+            <div class="gprog" id="gProg"></div>
+            <div class="msg" id="gStatus"></div>
+            <div class="gwrap">
+              <div class="glist" id="gList" aria-label="作業清單"></div>
+              <div class="gedit" id="gEdit"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>θ<sub>HOOTL</sub> 計算結果 <span class="en" id="gScope"></span></h2>
+            <div class="tiles" id="gTiles"></div>
+            <div style="overflow-x:auto"><table class="data" id="gTable"></table></div>
+            <div class="toolbar"><button class="btn btn-ghost" id="btnGCsv" type="button">⬇️ θ_HOOTL CSV</button></div>
+            <p class="hint">點表格中的分數或「待評」可直接開啟該份作業。T 前測取第一次作答、後測取最近一次；s<sub>R</sub>、V 取最近一次評分，標 ＊ 表示學生評分後又重交。θ<sub>HOOTL</sub> 是原始層級分數，併入 AEE 時再乘治理閘門 min(1, θ*<sub>HOTL</sub> ÷ τ₂)。班級 g = (θ̄<sub>後</sub> − θ̄<sub>前</sub>) ÷ (100 − θ̄<sub>前</sub>)，只用前後測都有 θ 的學生；&lt; .30 低增益、.30–.70 中增益、≥ .70 高增益；95% CI 為 2,000 次 bootstrap 百分位區間（配對 n ≥ 5 才顯示）。</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -210,7 +304,7 @@ function score(v,T,dir){if(v==null||isNaN(v))return null;if(dir==="band"){var lo
   if(dir==="low"){if(v<=0)return 100;return Math.min(100,100*T/v);}return Math.min(100,100*v/T);}
 function compute(){
   var R=scope(), p=P(), D=R.map(function(r){return{r:r,d:det(r)};});
-  var ai=D.filter(function(x){return isAI(x.r,x.d);}), hum=D.filter(function(x){return !isAI(x.r,x.d);});
+  var ai=D.filter(function(x){return isAI(x.r,x.d);}), hum=D.filter(function(x){return !isAI(x.r,x.d)&&x.r.app!=="kpi";});
   var bySid={};hum.forEach(function(x){var s=String(x.r.sid||"");if(!s)return;(bySid[s]=bySid[s]||{h:0,a:0}).h++;});
   ai.forEach(function(x){var s=String(x.r.sid||"");if(!s)return;(bySid[s]=bySid[s]||{h:0,a:0}).a++;});
   var proj=hum.filter(function(x){return x.r.kind==="project";}), run=hum.filter(function(x){return x.r.kind==="project-run";}),
@@ -334,7 +428,7 @@ function render(){
   $("aiN").textContent=o.nAI+" 次 AI 呼叫";
   $("dist").innerHTML=tot?seg.map(function(s){return'<i title="'+s[2]+" "+o.cnt[s[0]]+'" style="width:'+(o.cnt[s[0]]/tot*100)+'%;background:'+s[1]+'"></i>';}).join(""):"";
   $("distLegend").innerHTML=seg.map(function(s){return'<span style="--c:'+s[1]+'">'+s[2]+" "+o.cnt[s[0]]+(tot?"（"+Math.round(o.cnt[s[0]]/tot*100)+"%）":"")+"</span>";}).join("");
-  renderCap(o.cap);renderComp(o.cap);renderKaf(o.cap);
+  renderCap(o.cap);renderComp(o.cap);renderKaf(o.cap);renderGrade();
   renderTodo(o);
 }
 function sgn(v,d){return v==null?"—":(v>0?"+":"")+v.toFixed(d==null?1:d);}
@@ -393,7 +487,8 @@ function renderTodo(o){var k=function(c){return o?o.K.filter(function(x){return 
     ["期末專題評分登錄治理決策紀錄 detail.governance（X2）",o&&k("X2").v!=null],["HOTL AI 監管素養量表正式施測（O4）",false],
     ["AI-off 前測寫入 kind=aioff、detail.phase=pre（Yᴴ₀）",c&&c.rows.some(function(w){return w.y0!=null;})],
     ["AI-off 後測寫入 kind=aioff、detail.phase=post（Yᴴ₁，平行題本）",c&&c.rows.some(function(w){return w.y1!=null;})],
-    ["錯誤注入題寫入 detail.seeded=true 與 detail.correct（CAL）",c&&c.n.cal>0]];
+    ["錯誤注入題寫入 detail.seeded=true 與 detail.correct（CAL）",c&&c.n.cal>0],
+    ["HOOTL 規格單／驗證報告教師評分（R1–R4、V1–V4 → θ_HOOTL，見「HOOTL 教師評分」分頁）",!!(lastH&&lastH.items.some(function(x){return x.st==="done";}))]];
   $("todo").innerHTML=items.map(function(i){return"<li>"+(i[1]?"✅ ":"⬜ ")+esc(i[0])+"</li>";}).join("");}
 
 /* ---------- 成效面板 ---------- */
@@ -428,14 +523,234 @@ function renderM(){var a=cur(),C={};
   $("mTable").innerHTML="<tr><th>代號</th><th>KPI</th><th>論文鎖定基線</th><th>本學期</th><th>門檻</th><th>狀態</th></tr>"+BASE.map(function(b){var c=C[b[0]];
     return"<tr><td>"+b[0]+"</td><td>"+esc(b[1])+'</td><td class="sm">'+esc(b[2])+'</td><td class="sm">'+(c?esc(c[0]):"待後測")+'</td><td class="sm">'+esc(b[3])+"</td><td>"+(c?(c[1]?'<span class="pill g">達標</span>':'<span class="pill r">未達</span>'):'<span class="pill n">待資料</span>')+"</td></tr>";}).join("");}
 
+/* ---------- HOOTL 教師評分：R1–R4（規格單）、V1–V4（驗證報告）→ θ_HOOTL ---------- */
+var GKEY="ae.kpi.hootl.grades.v1", gLocal=[], gSel=null, lastH=null, gSig="";
+var RUB={
+ R:[["R1","範圍與禁止事項","未寫","寫出 AI 要做什麼，但沒有禁止事項","明列範圍，並寫出至少 2 項禁止事項",[0,1]],
+    ["R2","驗收條件","未寫，或只寫「正確、完整」","有條件，但部分無法檢查","每項產出都有可檢查的條件",[2,3]],
+    ["R3","判斷門檻","沒有數值或明確標準","有門檻但未說明依據","至少一項明確門檻並說明依據",[4]],
+    ["R4","異常處理","未寫","只寫「重做」","寫明退回、修正與人工接手的條件和步驟",[5]]],
+ V:[["V1","逐項核對","未對照規格單","部分條件有核對紀錄","每一條條件都有通過或未通過的紀錄"],
+    ["V2","證據","沒有證據","有證據，但未對應到條件","每項判定都附執行結果、截圖或重算數據"],
+    ["V3","修正與重測","發現錯誤但未處理","已修正但未重測","修正後重測並記錄結果"],
+    ["V4","責任聲明","未說明","籠統說明 AI 有協助","逐項標明 AI 產生、人工確認與人工修改的部分"]]};
+var SELF=["範圍","2 項禁止","3 條驗收","條件可檢查","門檻有依據","退回／修正／接手"];
+var PH={pre:"前測 W15",post:"後測 W16"}, PT={R:"規格單",V:"驗證報告"};
+function gLoad(){try{gLocal=JSON.parse(localStorage.getItem(GKEY)||"[]")||[];}catch(e){gLocal=[];}}
+function gStore(){try{localStorage.setItem(GKEY,JSON.stringify(gLocal.slice(-500)));}catch(e){}}
+function nval(v){if(v===""||v==null)return null;v=Number(v);return isFinite(v)?v:null;}
+function skey(r){return clsKey(r.cls)+"|"+String(r.sid||"");}
+function inScope(r){var c=$("clsSel").value;return !isTest(r.cls)&&(!c||clsKey(r.cls)===c);}
+function imean(it){if(!it||it.length!==4)return null;for(var i=0;i<4;i++){var v=nval(it[i]);if(v==null||v<0||v>4)return null;}return mean(it.map(Number));}
+function ts16(t){return String(t||"").slice(0,16).replace("T"," ");}
+function hootlData(){
+  var R=scope(), ids={}, S={}, subs={}, grades={};
+  R.forEach(function(r){ids[r.id]=1;});
+  var extra=demo?[]:gLocal.filter(function(g){return !ids[g.id]&&inScope(g);});
+  var stu=function(r){var k=skey(r),s=S[k]||(S[k]={key:k,sid:String(r.sid||""),name:"",cls:clsKey(r.cls),pre:{},post:{}});if(!s.name&&r.name)s.name=String(r.name);return s;};
+  R.concat(extra).forEach(function(r){var d=det(r),k,ph,o,sid=String(r.sid||"");if(!sid)return;
+    if(r.kind==="hootl-spec"||r.kind==="hootl-report"){var part=r.kind==="hootl-spec"?"R":"V";
+      ph=(d.phase==="pre"||d.phase==="post")?d.phase:(d.ver==="brief"?"pre":"post");stu(r);
+      k=skey(r)+"|"+part+"|"+ph;o=subs[k]||(subs[k]={k:k,key:skey(r),part:part,phase:ph,list:[]});o.list.push({r:r,d:d});}
+    else if(r.kind==="hootl-verify"){ph=d.phase==="pre"?"pre":"post";var T=nval(d.T!=null?d.T:r.score);if(T==null)return;
+      o=stu(r)[ph];var t=String(r.ts||"");if(o.Tts==null||(ph==="pre"?t<o.Tts:t>o.Tts)){o.T=T;o.Tts=t;o.cal=nval(d.cal);}}
+    else if(r.kind==="hootl-grade"){if(!/^[RV]$/.test(d.part)||!PH[d.phase])return;k=skey(r)+"|"+d.part+"|"+d.phase;
+      if(!grades[k]||String(r.ts)>String(grades[k].r.ts))grades[k]={r:r,d:d};}});
+  var byK={}, items=Object.keys(subs).map(function(k){var o=subs[k];
+    o.list.sort(function(a,b){return String(a.r.ts)<String(b.r.ts)?-1:String(a.r.ts)>String(b.r.ts)?1:0;});
+    o.cur=o.list[o.list.length-1];o.g=grades[k]||null;o.s=S[o.key];
+    o.st=!o.g?"todo":(o.g.d.target===o.cur.r.id?"done":"redo");byK[k]=o;return o;});
+  var cmp=function(a,b){return a<b?-1:a>b?1:0;};
+  items.sort(function(a,b){return cmp(a.phase==="pre"?0:1,b.phase==="pre"?0:1)||cmp(a.part,b.part)||cmp(a.s.cls,b.s.cls)||cmp(a.s.sid,b.s.sid);});
+  var rows=Object.keys(S).map(function(k){var s=S[k];
+    ["pre","post"].forEach(function(ph){var o=s[ph];
+      ["R","V"].forEach(function(p){var g=grades[k+"|"+p+"|"+ph],m=g?imean(g.d.items):null;o[p+"i"]=g?g.d.items:null;o[p==="R"?"sR":"V"]=m==null?null:25*m;
+        o["it"+p]=byK[k+"|"+p+"|"+ph]||null;});
+      o.sE=o.T!=null&&o.V!=null?(o.T+o.V)/2:null;o.th=o.sR!=null&&o.sE!=null?Math.sqrt(o.sR*o.sE):null;});
+    s.g=s.pre.th!=null&&s.post.th!=null&&s.pre.th<100?(s.post.th-s.pre.th)/(100-s.pre.th):null;return s;})
+    .sort(function(a,b){return cmp(a.cls,b.cls)||cmp(a.sid,b.sid);});
+  var pair=rows.filter(function(s){return s.pre.th!=null&&s.post.th!=null;}),
+      a0=pair.map(function(s){return s.pre.th;}),a1=pair.map(function(s){return s.post.th;}),m0=mean(a0),m1=mean(a1),
+      g=m0!=null&&m0<100?(m1-m0)/(100-m0):null,ci=null;
+  if(pair.length>=5&&g!=null){var seed=20261104,rnd=function(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;},bs=[],n=pair.length;
+    for(var b=0;b<2000;b++){var x=0,y=0;for(var j=0;j<n;j++){var q=Math.floor(rnd()*n);x+=a0[q];y+=a1[q];}x/=n;y/=n;if(x<100)bs.push((y-x)/(100-x));}
+    bs.sort(function(u,v){return u-v;});if(bs.length>100)ci=[bs[Math.floor(bs.length*0.025)],bs[Math.ceil(bs.length*0.975)-1]];}
+  return{items:items,byK:byK,subs:subs,rows:rows,pair:pair.length,m0:m0,m1:m1,g:g,ci:ci};
+}
+function gBand(g){if(g==null)return["n","—"];if(g>=0.7)return["g","高增益"];if(g>=0.3)return["o","中增益"];return["r","低增益"];}
+function stPill(st){return st==="done"?'<span class="pill g">已評</span>':st==="redo"?'<span class="pill o">需重評</span>':'<span class="pill r">未評</span>';}
+function gFiltered(H){var ph=$("gPhase").value,ty=$("gType").value,st=$("gStat").value,q=$("gFind").value.trim().toLowerCase();
+  return H.items.filter(function(o){return(!ph||o.phase===ph)&&(!ty||o.part===ty)&&(!st||(st==="todo"?o.st!=="done":o.st==="done"))&&
+    (!q||(o.s.sid+" "+o.s.name).toLowerCase().indexOf(q)>=0);});}
+function renderGrade(){
+  var has=all.length>0;$("gEmpty").style.display=has?"none":"";$("gDash").style.display=has?"":"none";$("gDemoNote").style.display=demo?"block":"none";
+  if(!has){$("gBadge").textContent="";return;}
+  var H=hootlData();lastH=H;
+  var todo=H.items.filter(function(o){return o.st!=="done";}).length;$("gBadge").textContent=todo||"";
+  var pr=function(p){var it=H.items.filter(function(o){return o.part===p;}),d=it.filter(function(o){return o.st==="done";}).length,r=it.filter(function(o){return o.st==="redo";}).length;
+    return PT[p]+" 已評 <b>"+d+"／"+it.length+"</b>"+(r?"（需重評 "+r+"）":"");};
+  $("gProg").innerHTML="<span>"+pr("R")+"</span><span>"+pr("V")+"</span><span>"+H.rows.length+" 位學生</span>";
+  var F=gFiltered(H),grp="",h="";
+  F.forEach(function(o){var g=PH[o.phase]+"・"+PT[o.part];if(g!==grp){grp=g;h+='<div class="gh">'+g+"</div>";}
+    h+='<button type="button" data-k="'+esc(o.k)+'"'+(o.k===gSel?' aria-current="true"':"")+"><span>"+esc(o.s.sid)+" "+esc(o.s.name)+"<small>"+esc(o.s.cls)+"・"+esc(ts16(o.cur.r.ts))+"</small></span>"+stPill(o.st)+"</button>";});
+  if(!F.length)h='<div class="none">'+(H.items.length?"這個篩選條件下沒有作業。"+($("gStat").value==="todo"?"全部評完了 🎉":""):"目前範圍內還沒有學生送出規格單或驗證報告（hootl-spec／hootl-report）。學生在 hootl.html 送出後，按「從雲端載入」即可看到。")+"</div>";
+  $("gList").innerHTML=h;
+  gEditor(H);gTable(H);
+}
+function tx(v){v=String(v==null?"":v).trim();return v?esc(v):'<span class="miss">（未填）</span>';}
+function lst(a,tag){a=(a||[]).map(function(x){return String(x||"").trim();}).filter(Boolean);
+  return a.length?"<"+tag+">"+a.map(function(x){return"<li>"+esc(x)+"</li>";}).join("")+"</"+tag+">":'<span class="miss">（未填）</span>';}
+function specView(d){var ban=(d.ban||[]).filter(Boolean),acc=(d.accept||[]).filter(Boolean);
+  return'<dl class="subm">'+(d.project?"<dt>專題名稱</dt><dd>"+tx(d.project)+"</dd>":"")+"<dt>① 彙整範圍</dt><dd>"+tx(d.scope)+"</dd>"+
+    "<dt>② 禁止事項（"+ban.length+" 項）</dt><dd>"+lst(ban,"ul")+"</dd><dt>③ 驗收條件（"+acc.length+" 條）</dt><dd>"+lst(acc,"ol")+"</dd>"+
+    "<dt>④ 判斷門檻</dt><dd>"+tx(d.threshold)+"</dd><dt>⑤ 異常處理</dt><dd>"+tx(d.anomaly)+"</dd></dl>";}
+function reportView(d,o,H){var rows=(d.rows||[]).filter(function(r){return r&&r.cond;}),ph=o.s[o.phase],ctx=[];
+  if(o.phase==="post"){var sp=H.subs[o.key+"|R|post"];
+    if(sp){var acc=(sp.cur.d.accept||[]).map(function(x){return String(x||"").trim();}).filter(Boolean),hit=rows.filter(function(r){return acc.indexOf(String(r.cond).trim())>=0;}).length;
+      ctx.push("對照正式版規格單：驗收條件 "+acc.length+" 條，報告核對 "+rows.length+" 條，其中 "+hit+" 條與規格單一致");}
+    else ctx.push("尚未送出正式版規格單，無法對照驗收條件");}
+  else ctx.push("前測題本"+(d.form?" "+esc(d.form):"")+"：核對標準驗收條件 "+rows.length+" 條");
+  ctx.push(ph.T!=null?"驗證任務 T = "+ph.T.toFixed(1)+(ph.cal!=null?"、CAL = "+ph.cal.toFixed(2):"")+"（自動計分）":"尚無本階段驗證任務成績，s<sub>E</sub> 暫無法計算");
+  var t='<table class="data"><tr><th>驗收條件</th><th>判定</th><th>證據</th></tr>'+(rows.length?rows.map(function(r){
+    return"<tr><td>"+esc(r.cond)+"</td><td>"+(r.result==="pass"?'<span class="pill g">通過</span>':r.result==="fail"?'<span class="pill r">未通過</span>':'<span class="pill n">未判定</span>')+"</td><td>"+tx(r.evidence)+"</td></tr>";}).join(""):'<tr><td colspan="3"><span class="miss">（沒有核對紀錄）</span></td></tr>')+"</table>";
+  return'<dl class="subm">'+(d.project?"<dt>專題名稱</dt><dd>"+tx(d.project)+"</dd>":"")+"<dt>V1、V2｜逐項核對與證據</dt><dd>"+t+"</dd>"+
+    "<dt>V3｜發現的錯誤與修正方式</dt><dd>"+tx(d.fix)+"</dd><dt>重測</dt><dd>"+(d.retest?"✓ 已重測":"✗ 未勾選重測")+(d.retestNote?"：":"")+esc(d.retestNote||"")+"</dd>"+
+    "<dt>V4｜責任聲明</dt><dd><b>AI 產生：</b>"+tx(d.ai)+"<br><b>我確認過：</b>"+tx(d.human)+"<br><b>我修改過：</b>"+tx(d.edited)+"</dd></dl>"+
+    '<div class="ctx">'+ctx.join("<br>")+"</div>";}
+function rubricHTML(o){var cur=o.g&&o.g.d.items||[],sc=o.part==="R"?(o.cur.d.selfcheck||[]):null;
+  return'<div class="grub">'+RUB[o.part].map(function(c,i){var v=nval(cur[i]);
+    var self=sc&&c[5]?'<span class="self">學生自我檢查：'+c[5].map(function(j){return(Number(sc[j])?"✓ ":"△ ")+SELF[j];}).join("　")+"</span>":"";
+    return'<div class="rrow"><div><b>'+c[0]+"</b> "+esc(c[1])+'</div><div class="seg" role="radiogroup" aria-label="'+c[0]+" "+esc(c[1])+'">'+[0,1,2,3,4].map(function(n){
+      return'<label><input type="radio" name="gr'+i+'" value="'+n+'"'+(v===n?" checked":"")+' aria-label="'+n+' 分"><span>'+n+"</span></label>";}).join("")+"</div>"+
+      '<div class="rdesc">0｜'+esc(c[2])+"　2｜"+esc(c[3])+"　4｜"+esc(c[4])+self+"</div></div>";}).join("")+"</div>";}
+function gCur(){return lastH&&gSel?lastH.byK[gSel]||null:null;}
+function gEditor(H){var o=gCur(),sig=o?o.k+"|"+o.cur.r.id+"|"+(o.g?o.g.r.id:""):"none|"+H.items.length;
+  if(sig===gSig&&$("gEdit").firstChild){gCalc();return;}gSig=sig;
+  if(!o){$("gEdit").innerHTML='<p class="sub" style="padding:40px 8px;text-align:center">'+(H.items.length?"從左側選一份作業開始評分。":"還沒有可評分的作業。")+"</p>";return;}
+  var r=o.cur.r,d=o.cur.d,s=o.s;
+  var h='<div class="ghead"><b>'+esc(s.sid)+" "+esc(s.name)+"</b>"+stPill(o.st)+'<span class="pill p">'+PH[o.phase]+"・"+PT[o.part]+"</span></div>"+
+    '<div class="gmeta">'+esc(s.cls)+(o.part==="R"?"・"+(d.ver==="brief"?"簡版":"正式版"):"")+"・繳交 "+esc(ts16(r.ts))+(o.list.length>1?"・共 "+o.list.length+" 份，顯示最新一份":"")+
+    (o.g?"・上次評分 "+esc(ts16(o.g.r.ts))+(o.st==="redo"?"（評分後學生重交）":""):"")+"</div>";
+  h+=(o.part==="R"?specView(d):reportView(d,o,H))+rubricHTML(o);
+  h+='<label class="fld" for="gCmt">評語（選填，存於評分紀錄）</label><textarea id="gCmt" maxlength="300">'+esc(o.g&&o.g.d.comment||"")+"</textarea>";
+  h+='<div class="gcalc" id="gCalc"></div><div class="toolbar"><button class="btn btn-primary" id="gSaveNext" type="button">💾 儲存並下一份 →</button><button class="btn btn-ghost" id="gSave" type="button">只儲存</button></div>'+
+    '<p class="hint">快速鍵：按數字 0–4 依序填入下一個未評項目；Ctrl＋Enter 儲存並下一份。</p>';
+  $("gEdit").innerHTML=h;
+  $("gSaveNext").addEventListener("click",function(){gSaveIt(true);});$("gSave").addEventListener("click",function(){gSaveIt(false);});
+  gCalc();}
+function gVals(){var v=[];for(var i=0;i<4;i++){var c=document.querySelector('#gEdit input[name="gr'+i+'"]:checked');v.push(c?Number(c.value):null);}return v;}
+function gCalc(){var o=gCur(),el=$("gCalc");if(!o||!el)return;var v=gVals(),ok=v.every(function(x){return x!=null;}),ph=o.s[o.phase],f=function(x){return x==null?"—":x.toFixed(1);};
+  var s=ok?25*mean(v):null,sR=o.part==="R"?s:ph.sR,V=o.part==="V"?s:ph.V,sE=ph.T!=null&&V!=null?(ph.T+V)/2:null,th=sR!=null&&sE!=null?Math.sqrt(sR*sE):null;
+  var h=(o.part==="R"?"s<sub>R</sub>":"V")+" = 25 × "+(ok?mean(v).toFixed(2):"（四項給分後計算）")+" = <b>"+f(s)+"</b>";
+  h+="<br>"+PH[o.phase]+"：s<sub>R</sub> "+f(sR)+"・T "+f(ph.T)+"・V "+f(V)+"・s<sub>E</sub> "+f(sE)+"　→　θ<sub>HOOTL</sub> = <b>"+f(th)+"</b>";
+  if(th==null)h+='　<span class="sm">（尚缺'+[sR==null?"規格單評分":"",ph.T==null?"驗證任務 T":"",V==null?"驗證報告評分":""].filter(Boolean).join("、")+"）</span>";
+  el.innerHTML=h;}
+function gSay(t,c){var m=$("gStatus");m.textContent=t;m.className="msg show "+c;}
+function gSaveIt(next){var o=gCur();if(!o)return;var v=gVals();
+  if(v.some(function(x){return x==null;})){gSay("四個項目都要給分（0–4）才能儲存。","warn");return;}
+  var F=gFiltered(lastH),ix=-1;F.forEach(function(x,i){if(x.k===o.k)ix=i;});
+  var nextK=next?(ix>=0?(F[ix+1]||null):(F[0]||null)):null;if(nextK&&nextK.k===o.k)nextK=null;
+  var r=o.cur.r,s=25*mean(v),now=new Date().toISOString();
+  var rec={v:2,id:"hg-"+o.part+"-"+o.phase+"-"+String(r.sid)+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ts:now,app:"kpi",kind:"hootl-grade",
+    sid:String(r.sid||""),name:r.name||"",cls:r.cls||"",score:Math.round(s*10)/10,max:100,
+    detail:{unit:"hootl",layer:"HOOTL",part:o.part,phase:o.phase,target:r.id,ver:o.cur.d.ver||"",items:v,comment:($("gCmt").value||"").trim(),graded:true,by:"teacher",tool:"kpi hootl-grade v1"}};
+  all.push(rec);var who=o.s.sid+" "+PH[o.phase]+PT[o.part]+"（"+(o.part==="R"?"s_R":"V")+" = "+s.toFixed(1)+"）";
+  if(next)gSel=nextK?nextK.k:null;
+  renderGrade();
+  if(demo){gSay("已記錄 "+who+"。示範模式不會上傳。","ok");return;}
+  gLocal.push(rec);gStore();gSay("已儲存 "+who+"，上傳雲端中…","warn");
+  AECloud.push(rec,{spread:0}).then(function(res){
+    if(res.error||res.offline)gSay("⚠ "+who+" 已存在這台電腦，雲端暫時無法寫入，保持本頁開啟會自動補送。","warn");
+    else gSay("✅ 已上傳 "+who+"。","ok");});}
+function gTable(H){var f=function(x){return x==null?"—":x.toFixed(1);},cell=function(s,ph,p){var o=s[ph],it=o["it"+p],v=o[p==="R"?"sR":"V"];
+    if(!it)return'<td class="num sm'+(p==="R"?" bl":"")+'">未交</td>';
+    return'<td class="num'+(p==="R"?" bl":"")+'"><button type="button" class="lnk'+(v==null?" need":"")+'" data-go="'+esc(it.k)+'">'+(v==null?"待評":f(v)+(it.st==="redo"?"＊":""))+"</button></td>";};
+  var h='<tr><th rowspan="2">學號</th><th rowspan="2">姓名</th><th rowspan="2">班級</th><th class="ph" colspan="5">前測 W15</th><th class="ph" colspan="5">後測 W16</th><th rowspan="2" class="num bl">g</th></tr><tr>';
+  ["pre","post"].forEach(function(){h+='<th class="num bl">s<sub>R</sub></th><th class="num">T</th><th class="num">V</th><th class="num">s<sub>E</sub></th><th class="num">θ</th>';});
+  h+="</tr>";
+  H.rows.forEach(function(s){h+="<tr><td>"+esc(s.sid)+"</td><td>"+esc(s.name)+'</td><td class="sm">'+esc(s.cls)+"</td>";
+    ["pre","post"].forEach(function(ph){var o=s[ph];h+=cell(s,ph,"R")+'<td class="num">'+f(o.T)+"</td>"+cell(s,ph,"V")+'<td class="num">'+f(o.sE)+'</td><td class="num th">'+f(o.th)+"</td>";});
+    h+='<td class="num bl">'+(s.g==null?"—":s.g.toFixed(2))+"</td></tr>";});
+  var avg=function(ph,k){var a=H.rows.map(function(s){return s[ph][k];}).filter(function(x){return x!=null;});return a.length?mean(a).toFixed(1)+'<br><span class="sm">n '+a.length+"</span>":"—";};
+  h+='<tr class="grp"><td colspan="3">班級平均</td>';
+  ["pre","post"].forEach(function(ph){["sR","T","V","sE","th"].forEach(function(k,i){h+='<td class="num'+(i===0?" bl":"")+'">'+avg(ph,k)+"</td>";});});
+  h+='<td class="num bl">'+(H.g==null?"—":H.g.toFixed(2))+"</td></tr>";
+  $("gTable").innerHTML=H.rows.length?h:'<tr><td class="sm">目前範圍內沒有 HOOTL 資料。</td></tr>';
+  var mn=function(ph,k){var a=H.rows.map(function(s){return s[ph][k];}).filter(function(x){return x!=null;});return{m:mean(a),n:a.length};},
+      t0=mn("pre","th"),t1=mn("post","th"),r0=mn("pre","sR"),r1=mn("post","sR"),e0=mn("pre","sE"),e1=mn("post","sE"),b=gBand(H.g);
+  var done=H.items.filter(function(o){return o.st==="done";}).length;
+  var tile=function(lab,v,sub){return'<div class="tile"><span>'+lab+"</span><b>"+v+"</b><small>"+sub+"</small></div>";};
+  $("gTiles").innerHTML=tile("前測平均 θ<sub>HOOTL</sub>",f(t0.m),"n = "+t0.n)+tile("後測平均 θ<sub>HOOTL</sub>",f(t1.m),"n = "+t1.n)+
+    tile("班級正規化增益 g",H.g==null?"—":H.g.toFixed(2),(H.g==null?"需前後測都有 θ 的學生":'<span class="pill '+b[0]+'">'+b[1]+"</span>　配對 n = "+H.pair)+(H.ci?"<br>95% CI ["+H.ci[0].toFixed(2)+", "+H.ci[1].toFixed(2)+"]":""))+
+    tile("s<sub>R</sub> 事前規則",f(r0.m)+" → "+f(r1.m),"前測 n = "+r0.n+"・後測 n = "+r1.n)+tile("s<sub>E</sub> 事後評量",f(e0.m)+" → "+f(e1.m),"前測 n = "+e0.n+"・後測 n = "+e1.n)+
+    tile("評分進度",done+"／"+H.items.length,"份作業已評");
+  $("gScope").textContent=($("clsSel").value||"全部班級")+"・"+H.rows.length+" 位學生";}
+function gCsv(){if(!lastH||!lastH.rows.length){gSay("目前沒有可匯出的資料。","warn");return;}
+  var f=function(x,d){return x==null?"":x.toFixed(d==null?1:d);},hd=["學號","姓名","班級"];
+  ["pre","post"].forEach(function(ph){hd=hd.concat([ph+"_R1",ph+"_R2",ph+"_R3",ph+"_R4",ph+"_sR",ph+"_T",ph+"_CAL",ph+"_V1",ph+"_V2",ph+"_V3",ph+"_V4",ph+"_V",ph+"_sE",ph+"_theta"]);});
+  hd.push("g");
+  var lines=[hd].concat(lastH.rows.map(function(s){var row=[s.sid,s.name,s.cls];
+    ["pre","post"].forEach(function(ph){var o=s[ph],ri=o.Ri||[],vi=o.Vi||[];
+      row=row.concat([0,1,2,3].map(function(i){return ri[i]==null?"":ri[i];})).concat([f(o.sR),f(o.T),f(o.cal,3)]).concat([0,1,2,3].map(function(i){return vi[i]==null?"":vi[i];})).concat([f(o.V),f(o.sE),f(o.th)]);});
+    row.push(f(s.g,3));return row;}));
+  dl("HOOTL-theta_"+new Date().toISOString().slice(0,10)+".csv",lines);}
+function showTab(t,focus){var g=t==="grade";$("tabKpi").setAttribute("aria-selected",String(!g));$("tabGrade").setAttribute("aria-selected",String(g));
+  $("tabKpi").tabIndex=g?-1:0;$("tabGrade").tabIndex=g?0:-1;$("paneKpi").hidden=g;$("paneGrade").hidden=!g;
+  try{history.replaceState(null,"",location.pathname+location.search+(g?"#grade":""));}catch(e){}
+  if(focus)$(g?"tabGrade":"tabKpi").focus();if(g)renderGrade();}
+$("tabKpi").addEventListener("click",function(){showTab("kpi");});$("tabGrade").addEventListener("click",function(){showTab("grade");});
+[$("tabKpi"),$("tabGrade")].forEach(function(b){b.addEventListener("keydown",function(e){if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();showTab(b.id==="tabKpi"?"grade":"kpi",true);}});});
+["gPhase","gType","gStat"].forEach(function(id){$(id).addEventListener("change",renderGrade);});
+$("gFind").addEventListener("input",renderGrade);
+$("gList").addEventListener("click",function(e){var b=e.target.closest("button[data-k]");if(!b)return;gSel=b.getAttribute("data-k");renderGrade();
+  if(window.matchMedia&&matchMedia("(max-width:860px)").matches)$("gEdit").scrollIntoView({behavior:"smooth",block:"start"});});
+$("gTable").addEventListener("click",function(e){var b=e.target.closest("button[data-go]");if(!b)return;gSel=b.getAttribute("data-go");renderGrade();$("gEdit").scrollIntoView({behavior:"smooth",block:"start"});});
+$("gEdit").addEventListener("change",function(e){if(e.target.name&&/^gr\d$/.test(e.target.name))gCalc();});
+document.addEventListener("keydown",function(e){if($("paneGrade").hidden||!gCur())return;
+  if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();gSaveIt(true);return;}
+  var t=e.target,tag=t&&t.tagName;if(tag==="TEXTAREA"||tag==="SELECT"||(tag==="INPUT"&&t.type!=="radio")||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(!/^[0-4]$/.test(e.key))return;var rows=$("gEdit").querySelectorAll(".rrow"),row=null;
+  for(var i=0;i<rows.length;i++){if(!rows[i].querySelector("input:checked")){row=rows[i];break;}}
+  if(!row&&t&&t.closest)row=t.closest(".rrow");if(!row)return;e.preventDefault();
+  var inp=row.querySelector('input[value="'+e.key+'"]');inp.checked=true;inp.focus();gCalc();});
+$("btnGCsv").addEventListener("click",gCsv);
+function demoHootl(out,i,sid,cls){var W15=Date.parse("2026-12-15T02:00:00Z"),W16=Date.parse("2026-12-22T02:00:00Z"),at=function(b,h){return new Date(b+i*6e5+h*36e5).toISOString();};
+  var BANS=[["不可改動程式輸出的數字","不可自行補上沒有的資料"],["不可刪掉組員寫的段落"],["不可改動原始數據","不可加入未查證的引用","不可改變結論方向"]],
+      ACCS=[["簡報中的每個數字與程式輸出一致","每張圖都有標題、單位與資料來源","結論對應三項發現"],["內容正確","完整"],["報告耗電量與試算表誤差 ≤ 1%","每張圖都有標題與單位","摘要不超過 200 字","引用的數據都附來源"]];
+  var spec=function(ph,k){var b=(i+k)%3,thr=b===1?"":(b===0?"數字誤差超過 1% 視為不合格（電表精度約 ±1%）":"CO₂ 超過 1000 ppm 標為通風不足"),ano=b===1?"重做":"不符條件先退回 AI 重做一次；第二次仍錯，由負責程式的組員手動修正並重測。";
+    return{unit:"hootl",layer:"HOOTL",part:"R",phase:ph,ver:ph==="pre"?"brief":"formal",project:ph==="pre"?"":(i%2?"宿舍待機耗電分析":"教室 CO₂ 與通風"),
+      scope:"整合 IPO 表、Python 程式輸出與心智圖，產出 5 頁簡報與 1 頁摘要。",ban:BANS[b],accept:ACCS[b],threshold:thr,anomaly:ano,
+      selfcheck:[1,BANS[b].length>=2?1:0,ACCS[b].length>=3?1:0,b===1?0:1,thr?1:0,b===1?0:1],graded:false};};
+  var rep=function(ph,k){var b=(i+k)%3,acc=ACCS[(i+(ph==="pre"?0:1))%3];
+    return{unit:"hootl",layer:"HOOTL",part:"E",phase:ph,form:ph==="pre"?(i%2?"A":"B"):"",project:ph==="pre"?"":(i%2?"宿舍待機耗電分析":"教室 CO₂ 與通風"),
+      rows:acc.map(function(c,j){return{cond:c,result:(i+j)%4?"pass":"fail",evidence:b===1&&j>0?"":"重跑程式輸出截圖第 "+(j+1)+" 張"};}),
+      fix:b===2?"":"簡報第 4 頁數字是程式輸出的 10 倍，已改為 2.16 度。",retest:b===0,retestNote:b===0?"重跑後全部條件通過":"",
+      ai:"簡報初稿與摘要",human:b===1?"":"所有數字與圖表",edited:b===1?"":"第 4 頁數字、結論第二段",graded:false};};
+  var gi=function(ph){var base=[1+i%3,(i+1)%4,i%5>2?3:1,(i%2)*2+1];return base.map(function(x){return Math.min(4,x+(ph==="post"?1:0));});};
+  var T0=25+(i*7)%40,T1=Math.min(100,T0+8+(i*5)%28),push=function(id,ts,kind,score,max,d){out.push({id:id,ts:ts,app:"hootl",kind:kind,sid:sid,cls:cls,score:score,max:max,detail:d});};
+  if(i%7)push("d-hv0-"+i,at(W15,1),"hootl-verify",T0,100,{part:"E",phase:"pre",form:i%2?"A":"B",T:T0,cal:0.5+(i%4)/8,graded:true,auto:true});
+  if(i%10)push("d-hv1-"+i,at(W16,1),"hootl-verify",T1,100,{part:"E",phase:"post",form:i%2?"B":"A",T:T1,cal:0.62+(i%3)/8,graded:true,auto:true});
+  var sub={};
+  if(i%6){push("d-hs0-"+i,at(W15,2),"hootl-spec","","",spec("pre",0));sub["R|pre"]="d-hs0-"+i;}
+  if(i%5){push("d-hr0-"+i,at(W15,3),"hootl-report","","",rep("pre",0));sub["V|pre"]="d-hr0-"+i;}
+  if(i%9){push("d-hs1-"+i,at(W15,30),"hootl-spec","","",spec("post",1));sub["R|post"]="d-hs1-"+i;}
+  if(i%8){push("d-hr1-"+i,at(W16,3),"hootl-report","","",rep("post",1));sub["V|post"]="d-hr1-"+i;}
+  [["pre",22],["post",14]].forEach(function(x){if(i>x[1])return;["R","V"].forEach(function(p){var tg=sub[p+"|"+x[0]];if(!tg)return;var it=gi(x[0]);
+    out.push({id:"d-hg-"+p+x[0]+"-"+i,ts:new Date(Date.now()-2*864e5-(x[0]==="pre"?864e5:0)+i*6e4).toISOString(),app:"kpi",kind:"hootl-grade",sid:sid,cls:cls,score:25*mean(it),max:100,
+      detail:{unit:"hootl",layer:"HOOTL",part:p,phase:x[0],target:tg,items:it,graded:true,by:"teacher"}});});});
+  if(i===3)push("d-hs0b-"+i,at(W15,96),"hootl-spec","","",spec("pre",2));
+}
+
 /* ---------- 載入 ---------- */
 function fillCls(){var cur0=$("clsSel").value,set={};all.forEach(function(r){if(r.cls&&!isTest(r.cls))set[clsKey(r.cls)]=1;});
   $("clsSel").innerHTML='<option value="">全部班級</option>'+Object.keys(set).sort().map(function(c){return"<option"+(c===cur0?" selected":"")+">"+esc(c)+"</option>";}).join("");}
 function pull(){var code=$("tcode").value.trim()||AECloud.teacherCode();if(!code){msg("請輸入教師碼。","warn");return;}
-  msg("讀取中…","warn");AECloud.pull("",code,{incremental:true}).then(function(list){AECloud.teacherCode(code);demo=false;all=list.slice();fillCls();render();msg("已載入 "+list.length+" 筆紀錄。","ok");})
+  msg("讀取中…","warn");AECloud.pull("",code,{incremental:true}).then(function(list){AECloud.teacherCode(code);demo=false;all=list.slice();
+    var seen={};all.forEach(function(r){seen[r.id]=1;});var n0=gLocal.length;gLocal=gLocal.filter(function(g){return !seen[g.id];});if(gLocal.length!==n0)gStore();
+    fillCls();render();msg("已載入 "+list.length+" 筆紀錄。","ok");})
   .catch(function(e){msg("讀取失敗："+e.message,"err");});}
 function makeDemo(){var out=[],t0=Date.parse("2026-09-21T02:00:00Z"),sys=["你是嚴格但建設性的審稿專家","你是專題系統分析師","你是專業中文影片編劇","你是專業中文旁白撰寫者","你是嚴謹的程式碼審查者","你是專題教學助手"];
-  for(var i=1;i<=30;i++){var sid="9"+String(100+i).slice(1),cls="機械一A 數位科技與AI應用",steps=1+(i*7)%5;
+  for(var i=1;i<=30;i++){var sid="9"+String(100+i).slice(1),cls="機械一A 數位科技與AI應用",steps=1+(i*7)%5;demoHootl(out,i,sid,cls);
     for(var s=1;s<=steps;s++)out.push({id:"d-p-"+i+"-"+s,ts:new Date(t0+(i+s)*36e5*20).toISOString(),kind:"project",sid:sid,cls:cls,score:s,max:5,detail:{step:s}});
     if(steps>=4)out.push({id:"d-r-"+i,ts:new Date(t0+i*9e6).toISOString(),kind:"project-run",sid:sid,cls:cls,score:1,max:1,detail:{}});
     if(steps>=5&&i%3)out.push({id:"d-f-"+i,ts:new Date(t0+i*9e6).toISOString(),kind:"project-final",sid:sid,cls:cls,score:5,max:5,detail:{}});
@@ -466,7 +781,8 @@ $("btnCapCsv").addEventListener("click",function(){if(!last){msg("請先載入�
   dl("AI-empower-gain_"+new Date().toISOString().slice(0,10)+".csv",lines);});
 try{$("ya").value=localStorage.getItem(YKEY)||"";}catch(e){}
 $("ya").addEventListener("change",function(){try{localStorage.setItem(YKEY,String($("ya").value).trim());}catch(e){}render();});
-loadP();renderM();renderTodo(null);
+gLoad();loadP();renderM();renderTodo(null);
+if(location.hash==="#grade")showTab("grade");
 if(AECloud.teacherCode())pull();
 })();
 </script>
