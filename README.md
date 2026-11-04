@@ -119,3 +119,5 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 ## 2026-11-04 更新（HOOTL 治理任務＋問卷）
 - 新增 `hootl.html`（AEE 指標 HOOTL 層；第 15 週前測＋規格單、第 16 週驗證報告＋後測）。答案以 base64 輕度編碼，僅供教學評量，正式高風險測驗請改用 Moodle 測驗卷。
 - 新增 `gas/hootl-form.gs`：獨立 Apps Script 專案「HOOTL 治理素養問卷_Google表單產生器」——`buildHootlForm()` 建立 13 題李克特＋2 題開放題表單（完整學號、班級、施測階段）、回覆試算表與「計分」工作表、`onHootlFormSubmit` 觸發器，並印出前測／後測預填網址。送出後反向題換算、R／E 兩分量表 0–100、注意力檢核與直線作答標記，推送 `kind=hootl-survey`（`app=hootl-form`、`graded=false`；只存學號後 4 碼＋完整學號 SHA-256 雜湊）。問卷不計入 AEE，只作聚合效度與教學回饋。
+- 已部署（2026-11-04）：Apps Script 專案「HOOTL 治理素養問卷_Google表單產生器」；學生填答 https://forms.gle/4CLiKdKZZLWG4GZB7，前測預填 https://forms.gle/M1QHAThgNYTQP8Bt8，後測預填 https://forms.gle/NoQzb5RXw8jCJJxp8（已填入 `hootl.html` 的 meta）。
+- Moodle SCORM 1.2：`assets/scorm/HOOTL_W15_SCORM.zip`（問卷前測→驗證任務前測→規格單簡版→驗證報告簡版→正式規格單）、`HOOTL_W16_SCORM.zip`（正式驗證報告→驗證任務後測→問卷後測），由 `tools/hootl_scorm_build.py` 產生。SCORM 以 iframe 嵌入 `hootl.html?embed=1`，頁面以 `postMessage` 回報完成步驟與驗證任務分數 T（`cmi.core.score.raw`，記入成績簿）；外框把 `cmi.core.student_id` 後 4 碼傳進頁面（只接受 `https://moodle.npust.edu.tw`）。`hootl.html` 自 2026-12-21（Moodle 第 16 週）起預設後測，`?phase=`、`?ver=` 可覆寫。

@@ -13,8 +13,8 @@
 <link rel="canonical" href="https://pjkuo.github.io/ai-empower/hootl.html">
 <meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
 <!-- Google 表單（gas/hootl-form.gs 執行後填入；留空時頁面顯示「表單建立中」） -->
-<meta name="ae-hootl-form-pre" content="">
-<meta name="ae-hootl-form-post" content="">
+<meta name="ae-hootl-form-pre" content="https://forms.gle/M1QHAThgNYTQP8Bt8">
+<meta name="ae-hootl-form-post" content="https://forms.gle/NoQzb5RXw8jCJJxp8">
 <link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/ae.css">
 <link rel="stylesheet" href="assets/learn.css">
@@ -212,7 +212,15 @@ details.rubd summary{cursor:pointer;font-weight:800;color:var(--primary)}
 (function(){
 "use strict";
 var L=window.AELearn, $=function(id){return document.getElementById(id);}, esc=L.esc;
-if(/[?&]embed=1/.test(location.search)) document.documentElement.classList.add("embed");
+var QS=new URLSearchParams(location.search), EMB=QS.get("embed")==="1", INFRAME=window.parent!==window;
+if(EMB) document.documentElement.classList.add("embed");
+/* 嵌在 Moodle SCORM 內：完成步驟、分數與頁高回報給外框；外框可傳入學號後 4 碼（只接受 moodle.npust.edu.tw） */
+function notify(msg){ if(!INFRAME)return; try{ msg.src="hootl"; parent.postMessage(msg,"*"); }catch(e){} }
+window.addEventListener("message",function(e){
+  var d=e.data||{}; if(e.origin!=="https://moodle.npust.edu.tw"||d.type!=="hootl-id")return;
+  if(/^[0-9A-Za-z]{4}$/.test(String(d.sid||""))&&window.AEId&&!AEId.get()) AEId.set({sid:String(d.sid),cls:""});
+});
+if(INFRAME){ var lastH=0; setInterval(function(){ var h=document.documentElement.scrollHeight; if(Math.abs(h-lastH)>4){ lastH=h; notify({type:"hootl-h",h:h}); } },700); }
 L.tabs();
 function say(el,txt,kind){ el.className="msg show "+(kind||"ok"); el.textContent=txt; }
 function ident(msgEl,why){
@@ -221,7 +229,7 @@ function ident(msgEl,why){
   return id;
 }
 var DONE_KEY="ae.hootl.done";
-function done(k){ var d=L.local(DONE_KEY)||{}; if(k){ d[k]=new Date().toISOString(); L.local(DONE_KEY,d); renderPlan(); } return d; }
+function done(k,extra){ var d=L.local(DONE_KEY)||{}; if(k){ d[k]=new Date().toISOString(); L.local(DONE_KEY,d); renderPlan(); var m={type:"hootl-step",step:k}; for(var x in (extra||{})) m[x]=extra[x]; notify(m); } return d; }
 
 /* ---------- 題本：A＝宿舍待機耗電、B＝教室 CO₂ 換氣；兩本結構相同（5 錯 3 對，位置相同） ---------- */
 var FORMS={
@@ -267,7 +275,8 @@ function formOf(phase){
   var first=(sum%2===0)?"A":"B";
   return phase==="pre"?first:(first==="A"?"B":"A");
 }
-function defPhase(){ return L.week()>=16?"post":"pre"; }
+var POST_FROM=new Date("2026-12-21T00:00:00+08:00").getTime();   /* Moodle 第 16 週（12/21）起預設後測 */
+function defPhase(){ var q=QS.get("phase"); if(q==="pre"||q==="post")return q; return Date.now()>=POST_FROM?"post":"pre"; }
 
 /* ---------- 本週任務 ---------- */
 var FORMURL={pre:"",post:""};
@@ -403,7 +412,7 @@ $("vfForm").addEventListener("submit",function(e){
     detail:{unit:"hootl",layer:"HOOTL",part:"E",phase:ph,form:fk,T:T,cal:CAL,overconf:over,items:items,graded:true,auto:true}});
   var f=this; f.querySelector("button[type=submit]").disabled=true;
   L.send(recs).then(function(r){
-    done("verify-"+ph);
+    done("verify-"+ph,{T:T,cal:CAL});
     say(m,"✅ "+r.msg,r.queued?"warn":"ok");
     $("vfRes").innerHTML="驗證任務得分 <b>T = "+T+"</b>（滿分 100）；判斷正確 <b>"+right+"／8</b>（CAL = "+CAL.toFixed(2)+"）。"+
       (over>0.15?"<br>⚠ 你的信心比實際判斷力高（過度自信 "+over.toFixed(2)+"）：遇到 AI 看起來很合理的地方，多找一個證據再採納。":over<-0.15?"<br>你其實比自己以為的更會判斷，可以更有自信一點。":"<br>你的信心和判斷力大致相符。")+
@@ -448,8 +457,9 @@ function renderForms(){
 
 /* ---------- 啟動 ---------- */
 $("vfPhase").value=defPhase(); $("rpPhase").value=defPhase();
-if(defPhase()==="post") $("spVer").value="formal";
+if(QS.get("ver")==="brief"||QS.get("ver")==="formal") $("spVer").value=QS.get("ver"); else if(defPhase()==="post") $("spVer").value="formal";
 renderScene(); renderVerify(); renderReport(); renderForms(); renderPlan();
+notify({type:"hootl-ready"});
 document.addEventListener("ae:identity",function(){ renderPlan(); renderVerify(); renderReport(); });
 })();
 </script>
