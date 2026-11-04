@@ -31,6 +31,7 @@
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
 | `crisp.html` | CRISP 提示工坊（2026-10-30，獨立版面）：生成式 AI 提示工程 100 分鐘課的學生工具。① 寫提示：C 背景（含附檔）／R 角色／I 指令（IPO、分步驟、先問我、比較方案）／S 規格（表格、圖表、網頁、流程圖、Python、條列＋條件）／P 驗證（程式模擬、邊界自查、迭代、影音驗證、驗收清單）五張填空卡，5 張任務卡範例；② 抓幻覺；③ CO₂ 驗收帳 8 題（先寫預測才能問 AI）；④ 提示卡與交件檢查。**Google Apps Script 互動**：`<meta name="ae-ai-proxy">` 接老師代管 Gemini 代理（AI-empower-platform `gas/ai-proxy.gs`，班級碼）在頁內直接問 AI、驗收帳自動帶入 AI 判定；「☁ 交件上傳」以 `AECloud.push` 送 `kind=prompt`（`score`＝繳交完整度、`detail.graded=false`、`detail.unit=prompt`）。身分與 `identity.js` 同步（學號後 4 碼＋班級）；資料存 `localStorage`（`crisp-workshop-v1`）；零 CDN |
 | `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標，屬過程治理指標），加上能力 KPI（TG = AG + CR 增益分解、IR、SY、CAL、AG×CR 象限）、協作配置（組成資料 ilr 座標、探索性 M1 與等協作替代）與 KAF-7 適切性檢核，並與論文成效基線（M1–M9）對照；教師工作台「🎯 AI-empower-KPI」分頁 |
+| `hootl.html` | HOOTL 治理任務（2026-11-04，W15–W16）：AEE 指標 HOOTL 層的學生端。① 📐 規格單（前測簡版限時 10 分鐘＋正式版；範圍、禁止事項、驗收條件、判斷門檻、異常處理五欄＋自我檢查，`kind=hootl-spec`，教師以 R1–R4 評 s_R）；② 🔍 錯誤注入驗證任務（題本 A 宿舍待機耗電／B 教室 CO₂，各 8 檢核點＝5 錯 3 對，依學號自動輪換 A/B；採納／退回＋錯誤位置＋修正＋信心，自動計 T、CAL、過度自信，`kind=hootl-verify`＋8 筆 `kind=calcheck`（`detail.seeded=true`，`kpi.html` 直接讀 CAL）；前測不公布解答）；③ 🧾 驗證報告（逐條核對＋證據、修正重測、責任聲明，`kind=hootl-report`，教師以 V1–V4 評）；④ 📝 問卷（Google 表單前測／後測，`<meta name="ae-hootl-form-pre|post">`）。`?embed=1` 供 Moodle SCORM 內嵌。θ_HOOTL = √(s_R × s_E)，s_E = (T + V)/2 |
 
 ## 設計原則
 
@@ -114,3 +115,7 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 三層 KPI 表加「性質」欄（過程／有 AI 產出／監督／過程合規／配置）；H4、X3 標為配置變項。AEK 計算不變。
 - 新資料約定：AI-off 檢核 `kind=aioff`（`detail.phase`＝`pre`／`post`，`score`／`max`，前後測用平行題本）；錯誤注入題 `detail.seeded=true`、`detail.correct`（布林）；Yᴬ（AI 單獨作答基準）於側欄選填。有 AI 分數沿用最新一筆 `kind=ipo`。
 
+
+## 2026-11-04 更新（HOOTL 治理任務＋問卷）
+- 新增 `hootl.html`（AEE 指標 HOOTL 層；第 15 週前測＋規格單、第 16 週驗證報告＋後測）。答案以 base64 輕度編碼，僅供教學評量，正式高風險測驗請改用 Moodle 測驗卷。
+- 新增 `gas/hootl-form.gs`：獨立 Apps Script 專案「HOOTL 治理素養問卷_Google表單產生器」——`buildHootlForm()` 建立 13 題李克特＋2 題開放題表單（完整學號、班級、施測階段）、回覆試算表與「計分」工作表、`onHootlFormSubmit` 觸發器，並印出前測／後測預填網址。送出後反向題換算、R／E 兩分量表 0–100、注意力檢核與直線作答標記，推送 `kind=hootl-survey`（`app=hootl-form`、`graded=false`；只存學號後 4 碼＋完整學號 SHA-256 雜湊）。問卷不計入 AEE，只作聚合效度與教學回饋。

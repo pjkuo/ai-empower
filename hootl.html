@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HOOTL 治理任務｜ai-empower</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學平台">
+<meta property="og:title" content="HOOTL 治理任務｜ai-empower">
+<meta property="og:description" content="第 15、16 週：AI 彙整專題前寫規格單（事前規則），彙整後做錯誤注入驗證與驗證報告（事後評量），前後各填一次治理素養問卷。">
+<meta name="description" content="第 15、16 週：AI 彙整專題前寫規格單（事前規則），彙整後做錯誤注入驗證與驗證報告（事後評量），前後各填一次治理素養問卷。">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/hootl.html">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<!-- Google 表單（gas/hootl-form.gs 執行後填入；留空時頁面顯示「表單建立中」） -->
+<meta name="ae-hootl-form-pre" content="">
+<meta name="ae-hootl-form-post" content="">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/ae.css">
+<link rel="stylesheet" href="assets/learn.css">
+<script src="assets/theme.js"></script>
+<script src="assets/identity.js"></script>
+<script src="assets/cloud.js"></script>
+<script src="assets/learn.js"></script>
+<style>
+.embed .topnav{display:none}
+.embed .phead{margin-top:8px}
+.phead.gov{background:linear-gradient(120deg,#7C2D12,#C2410C 55%,#F59E0B)}
+.weeks{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.weeks{grid-template-columns:1fr}}
+.wk h2 small{font-size:12px;color:var(--muted);font-weight:700;margin-left:6px}
+.steps{list-style:none;display:grid;gap:8px;margin-top:8px}
+.steps li{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--soft);font-size:13.5px;line-height:1.55}
+.steps li .no{flex:0 0 26px;height:26px;border-radius:50%;background:#fff;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--muted);font-size:12.5px}
+.steps li.done .no{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li a{color:var(--primary);font-weight:800}
+.steps li .tag{font-size:11.5px;color:var(--muted)}
+.specbox{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.7}
+.specbox h3{font-size:14px;color:#92400E;margin-bottom:4px}
+.specbox ul{margin:0 0 0 18px}
+.cp{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:#fff}
+.cp .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:800;color:var(--primary);font-size:14px}
+.cp .st{font-size:11.5px;font-weight:800;background:var(--accent-soft);color:var(--primary);border-radius:999px;padding:2px 9px}
+.cp .ai{margin:8px 0;background:var(--soft);border-left:4px solid #94A3B8;border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.7;white-space:pre-wrap}
+.cp .ai code,.cp pre{font-family:Consolas,"Courier New",monospace;font-size:13px}
+.cp pre{background:#0F172A;color:#E2E8F0;border-radius:8px;padding:10px 12px;overflow:auto;margin:6px 0 0;white-space:pre}
+.cp .why{display:none;margin-top:8px}
+.cp.rej .why{display:block}
+.cp .key{margin-top:8px;font-size:12.5px;border-radius:8px;padding:8px 10px}
+.cp .key.ok{background:var(--ok-bg);color:#065F46}
+.cp .key.bad{background:var(--err-bg);color:#991B1B}
+.listed{display:grid;gap:8px}
+.listed .ln{display:grid;grid-template-columns:1fr auto;gap:8px}
+.listed .ln button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:0 10px;cursor:pointer;color:var(--muted)}
+.selfchk{list-style:none;display:grid;gap:4px;font-size:13px;margin-top:6px}
+.selfchk li::before{content:"△ ";color:#B45309;font-weight:800}
+.selfchk li.ok::before{content:"✓ ";color:var(--ok)}
+.rub{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.rub th,.rub td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.rub th{background:var(--soft)}
+details.rubd{margin-top:10px;font-size:13px}
+details.rubd summary{cursor:pointer;font-weight:800;color:var(--primary)}
+.rtab{width:100%;border-collapse:collapse;font-size:13px}
+.rtab th,.rtab td{border-bottom:1px solid var(--line);padding:6px;vertical-align:top}
+.rtab th{background:var(--soft);text-align:left}
+.rtab input[type=text],.rtab select{width:100%;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.timer{display:inline-block;font-weight:800;font-variant-numeric:tabular-nums;background:#FEF3C7;color:#92400E;border-radius:999px;padding:3px 10px;font-size:12.5px}
+.result{display:none;margin-top:12px;border-radius:12px;padding:12px 14px;background:var(--accent-soft);font-size:13.5px;line-height:1.7}
+.result.show{display:block}
+.result b{color:var(--primary)}
+.formcards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.formcards{grid-template-columns:1fr}}
+.formcards a,.formcards .off{display:block;border:1.5px solid var(--line);border-radius:14px;padding:14px;text-decoration:none;background:#fff;color:var(--primary);font-weight:800}
+.formcards a:hover{border-color:var(--primary);background:var(--accent-soft)}
+.formcards .off{color:var(--muted);background:var(--soft)}
+.formcards small{display:block;font-weight:600;color:var(--muted);margin-top:4px;font-size:12px}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="主導覽">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">AI</span><span>AI 賦能教學 Hub<small>NPUST · INFORMATION MANAGEMENT</small></span></a>
+    <div class="navlinks">
+      <a href="./">入口</a><a href="project.html">專題工作流</a><a href="hootl.html" aria-current="page">HOOTL 治理</a>
+      <a href="reflect.html">回饋站</a><a href="final.html">期末繳交</a><a href="manual.html">手冊</a>
+    </div>
+  </div>
+</nav>
+<main class="wrap" style="max-width:920px;padding-bottom:40px">
+  <header class="phead gov">
+    <h1>🛡 HOOTL 治理任務<span class="en">Human-out-of-the-Loop · Rules before, Evaluation after</span></h1>
+    <p>專題最後由 AI 彙整，但<b>責任還是在你</b>。AI 動手前，你先寫好規則（規格單）；AI 做完後，你要能抓出它的錯（驗證任務、驗證報告）。第 15 週做前測與規格單，第 16 週做驗證報告與後測。</p>
+    <div class="idrow" data-aeid></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="plan">🗺 本週任務</button>
+    <button type="button" role="tab" data-tab="spec">📐 規格單</button>
+    <button type="button" role="tab" data-tab="verify">🔍 驗證任務</button>
+    <button type="button" role="tab" data-tab="report">🧾 驗證報告</button>
+    <button type="button" role="tab" data-tab="survey">📝 問卷</button>
+  </div>
+
+  <!-- ===== 本週任務 ===== -->
+  <section class="pane lw" id="plan">
+    <div class="weeks">
+      <div class="fcard wk">
+        <h2>第 15 週<small>前測＋事前規則</small></h2>
+        <ol class="steps" id="w15"></ol>
+      </div>
+      <div class="fcard wk">
+        <h2>第 16 週<small>事後評量＋後測</small></h2>
+        <ol class="steps" id="w16"></ol>
+      </div>
+    </div>
+    <div class="fcard">
+      <h2>為什麼要做這些？</h2>
+      <p class="sub" style="margin:0">人愈退出迴路，控制點就愈從「過程中」移到「事前」與「事後」。你在這兩週的表現會換算成兩個分數：<b>s<sub>R</sub></b>（事前規則，看規格單）與 <b>s<sub>E</sub></b>（事後評量，驗證任務與驗證報告各占一半），合起來就是 HOOTL 治理分數 θ = √(s<sub>R</sub> × s<sub>E</sub>)——兩者缺一不可。問卷只用來了解你的想法，<b>不計分</b>。</p>
+      <p class="note" id="formNote"></p>
+    </div>
+  </section>
+
+  <!-- ===== 規格單 ===== -->
+  <section class="pane lw" id="spec">
+    <form class="fcard" id="specForm" autocomplete="off">
+      <h2>📐 AI 彙整規格單 <span class="named">記名・教師評分</span></h2>
+      <p class="sub">在把專題交給 AI 彙整<b>之前</b>，先寫下 AI 可以做什麼、不可以做什麼、怎樣才算合格、不合格時怎麼辦。</p>
+      <div class="row2">
+        <div class="fq"><label for="spVer">版本</label>
+          <select id="spVer"><option value="brief">前測簡版（第 15 週，限時 10 分鐘）</option><option value="formal">正式版（我們小組的專題）</option></select></div>
+        <div class="fq"><label for="spProj">專題名稱<span class="hint">正式版必填</span></label><input type="text" id="spProj" maxlength="80" placeholder="例如：宿舍智慧插座省電小幫手"></div>
+      </div>
+      <div class="specbox" id="spScene"></div>
+      <div class="fq"><label for="spScope">① 彙整範圍：AI 要整合哪些成果、產出什麼？</label><textarea id="spScope" maxlength="500" placeholder="例如：整合心智圖、IPO 表與程式執行結果，產出 5 頁簡報與 3 分鐘講稿。"></textarea></div>
+      <div class="fq"><span class="lb">② 禁止事項：AI 不可以做的事<span class="hint">至少 2 項</span></span><div class="listed" id="spBan"></div></div>
+      <div class="fq"><span class="lb">③ 驗收條件：每項產出怎樣才算合格？<span class="hint">至少 3 項，要能檢查</span></span><div class="listed" id="spAcc"></div></div>
+      <div class="fq"><label for="spThr">④ 判斷門檻：至少一項明確的數值或判定標準，並說明依據</label><textarea id="spThr" maxlength="400" placeholder="例如：功率低於 5 W（不含 5 W）且持續至少 30 分鐘才判定為待機；依據是插座說明書的待機功率範圍。"></textarea></div>
+      <div class="fq"><label for="spAno">⑤ 異常處理：不符合條件時，退回、修正或由人接手的方式</label><textarea id="spAno" maxlength="400" placeholder="例如：數字與程式輸出不一致就退回 AI 重做一次；第二次仍錯，由負責程式的組員手動改，並在驗證報告記錄。"></textarea></div>
+      <div class="fq"><span class="lb">自我檢查<span class="hint">只是提醒，不代表分數</span></span><ul class="selfchk" id="spChk"></ul></div>
+      <details class="rubd"><summary>老師怎麼評分？（R1–R4，每項 0–4 分）</summary>
+        <table class="rub"><tr><th>規準</th><th>0 分</th><th>2 分</th><th>4 分</th></tr>
+          <tr><td>R1 範圍與禁止事項</td><td>未寫</td><td>寫出 AI 要做什麼，但沒有禁止事項</td><td>明列範圍，並寫出至少 2 項禁止事項</td></tr>
+          <tr><td>R2 驗收條件</td><td>未寫，或只寫「正確、完整」</td><td>有條件，但部分無法檢查</td><td>每項產出都有可檢查的條件</td></tr>
+          <tr><td>R3 判斷門檻</td><td>沒有數值或明確標準</td><td>有門檻但未說明依據</td><td>至少一項明確門檻並說明依據</td></tr>
+          <tr><td>R4 異常處理</td><td>未寫</td><td>只寫「重做」</td><td>寫明退回、修正與人工接手的條件和步驟</td></tr></table>
+        <p class="note">1 分與 3 分介於相鄰兩級之間；s<sub>R</sub> = 25 × 四項平均。</p></details>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出規格單</button><span id="spTimer"></span></div>
+      <div class="msg" id="spMsg"></div>
+    </form>
+  </section>
+
+  <!-- ===== 驗證任務 ===== -->
+  <section class="pane lw" id="verify">
+    <form class="fcard" id="vfForm" autocomplete="off">
+      <h2>🔍 錯誤注入驗證任務 <span class="named">記名・自動計分</span></h2>
+      <p class="sub">下面是一份由 AI 彙整好的專題成果。對照上方的專題規格，逐一判斷 8 個檢核點：<b>對的就採納、錯的就退回</b>，退回時要指出錯在哪裡並寫出修正。每題再選一下你有多確定。裡面<b>有對也有錯</b>，全部退回不會拿高分。</p>
+      <div class="row2">
+        <div class="fq"><label for="vfPhase">施測階段</label><select id="vfPhase"><option value="pre">前測（第 15 週）</option><option value="post">後測（第 16 週）</option></select></div>
+        <div class="fq"><span class="lb">你的題本</span><div id="vfForm2" style="font-weight:800;color:var(--primary);padding-top:8px"></div></div>
+      </div>
+      <div class="specbox" id="vfSpec"></div>
+      <div id="vfItems"></div>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出驗證結果</button></div>
+      <div class="msg" id="vfMsg"></div>
+      <div class="result" id="vfRes"></div>
+    </form>
+  </section>
+
+  <!-- ===== 驗證報告 ===== -->
+  <section class="pane lw" id="report">
+    <form class="fcard" id="rpForm" autocomplete="off">
+      <h2>🧾 驗證報告 <span class="named">記名・教師評分</span></h2>
+      <p class="sub">AI 彙整完成後，照著規格單的驗收條件一條一條檢查，並附上證據。前測簡版只檢查題本的 3 條條件；後測正式版檢查你們小組規格單的條件。</p>
+      <div class="row2">
+        <div class="fq"><label for="rpPhase">版本</label><select id="rpPhase"><option value="pre">前測簡版（題本的 3 條條件）</option><option value="post">後測正式版（我們小組的條件）</option></select></div>
+        <div class="fq"><label for="rpProj">專題名稱</label><input type="text" id="rpProj" maxlength="80"></div>
+      </div>
+      <div class="fq"><span class="lb">V1、V2｜逐項核對與證據</span>
+        <table class="rtab"><thead><tr><th style="width:38%">驗收條件</th><th style="width:16%">結果</th><th>證據（執行結果、截圖連結或重算數據）</th></tr></thead><tbody id="rpRows"></tbody></table>
+        <div class="actions" style="margin-top:8px"><button class="btn btn-ghost" type="button" id="rpAdd">＋ 新增一條</button></div></div>
+      <div class="fq"><label for="rpFix">V3｜發現的錯誤與修正方式</label><textarea id="rpFix" maxlength="600" placeholder="例如：簡報第 4 頁數字是程式輸出的 10 倍，已改為 2.16 度。"></textarea></div>
+      <label class="consent"><input type="checkbox" id="rpRetest"><span>修正後我已<b>重新執行或重算</b>一次，結果記錄如下。</span></label>
+      <div class="fq"><label for="rpRetestNote">重測結果</label><input type="text" id="rpRetestNote" maxlength="200" placeholder="例如：重跑程式，total_kwh = 2.16，與簡報一致。"></div>
+      <div class="fq"><span class="lb">V4｜責任聲明</span>
+        <div class="row2"><div class="fq" style="margin:0"><label for="rpAI">AI 產生的部分</label><textarea id="rpAI" maxlength="300"></textarea></div>
+        <div class="fq" style="margin:0"><label for="rpHuman">我確認過的部分</label><textarea id="rpHuman" maxlength="300"></textarea></div></div>
+        <div class="fq"><label for="rpEdit">我修改過的部分</label><textarea id="rpEdit" maxlength="300"></textarea></div></div>
+      <details class="rubd"><summary>老師怎麼評分？（V1–V4，每項 0–4 分）</summary>
+        <table class="rub"><tr><th>規準</th><th>0 分</th><th>2 分</th><th>4 分</th></tr>
+          <tr><td>V1 逐項核對</td><td>未對照規格單</td><td>部分條件有核對紀錄</td><td>每一條條件都有通過或未通過的紀錄</td></tr>
+          <tr><td>V2 證據</td><td>沒有證據</td><td>有證據，但未對應到條件</td><td>每項判定都附執行結果、截圖或重算數據</td></tr>
+          <tr><td>V3 修正與重測</td><td>發現錯誤但未處理</td><td>已修正但未重測</td><td>修正後重測並記錄結果</td></tr>
+          <tr><td>V4 責任聲明</td><td>未說明</td><td>籠統說明 AI 有協助</td><td>逐項標明 AI 產生、人工確認與人工修改的部分</td></tr></table>
+        <p class="note">V = 25 × 四項平均；s<sub>E</sub> = （驗證任務 T + V）÷ 2。</p></details>
+      <div class="actions"><button class="btn btn-primary" type="submit">送出驗證報告</button></div>
+      <div class="msg" id="rpMsg"></div>
+    </form>
+  </section>
+
+  <!-- ===== 問卷 ===== -->
+  <section class="pane lw" id="survey">
+    <div class="fcard">
+      <h2>📝 HOOTL 治理素養問卷 <span class="anon">不計分</span></h2>
+      <p class="sub">12 題，約 5 分鐘。第 15 週填前測、第 16 週填後測，題目一樣，用來看你兩週的變化。請依真實情況作答，沒有標準答案；問卷結果不影響成績。</p>
+      <div class="formcards" id="formCards"></div>
+      <p class="note">填答時請輸入<b>完整學號</b>（前後測靠它配對）。</p>
+    </div>
+  </section>
+  <p class="note" style="text-align:center">資料流向：本頁 → 課程雲端試算表（ai-empower 評量資料庫，kind＝hootl-spec／hootl-verify／calcheck／hootl-report）→ 老師評分與 AEE 指標計算。</p>
+</main>
+<script>
+(function(){
+"use strict";
+var L=window.AELearn, $=function(id){return document.getElementById(id);}, esc=L.esc;
+if(/[?&]embed=1/.test(location.search)) document.documentElement.classList.add("embed");
+L.tabs();
+function say(el,txt,kind){ el.className="msg show "+(kind||"ok"); el.textContent=txt; }
+function ident(msgEl,why){
+  var id=(window.AEId&&AEId.get())||null;
+  if(!id||!id.sid||!id.cls){ say(msgEl,why||"請先在上方身分小卡填學號後 4 碼與班級。","warn"); if(window.AEId&&AEId.prompt)AEId.prompt("填好身分，才能存成你的紀錄。"); return null; }
+  return id;
+}
+var DONE_KEY="ae.hootl.done";
+function done(k){ var d=L.local(DONE_KEY)||{}; if(k){ d[k]=new Date().toISOString(); L.local(DONE_KEY,d); renderPlan(); } return d; }
+
+/* ---------- 題本：A＝宿舍待機耗電、B＝教室 CO₂ 換氣；兩本結構相同（5 錯 3 對，位置相同） ---------- */
+var FORMS={
+ A:{title:"題本 A｜宿舍待機耗電提醒",
+  spec:["量測：智慧插座每 1 分鐘回傳一次功率（W）。",
+        "待機定義：功率<b>低於 5 W（不含 5 W）</b>，且持續<b>至少 30 分鐘</b>。",
+        "提醒：符合待機定義時傳 LINE 訊息提醒，由使用者決定是否關閉。",
+        "實測資料：3 間寢室連續 7 天、每分鐘一筆；平均每間每天待機 6 小時、待機功率 4 W。",
+        "驗收條件：心智圖須涵蓋問題、量測、提醒、效益四個分支；IPO 的輸入是量測值、輸出是提醒；簡報數字須與程式輸出一致。"],
+  accept:["心智圖涵蓋問題、量測、提醒、效益四個分支","IPO 的輸入是量測值、輸出是提醒","簡報數字與程式輸出一致"],
+  items:[
+   {st:"心智圖",t:"中心主題「宿舍待機耗電」\n├ ① 問題：待機默默耗電\n├ ② 提醒方式：LINE 訊息\n└ ③ 預期效益：每月省電",loc:["提醒方式寫錯","缺少「量測」分支","中心主題寫錯"]},
+   {st:"IPO 表",t:"Input：LINE 提醒訊息\nProcess：判斷是否待機\nOutput：插座功率讀值（W）",loc:["缺少 Process","Process 應寫成「量測功率」","Input 與 Output 對調"]},
+   {st:"IPO 表",t:"判斷規則：功率高於 50 W 且持續 30 分鐘，判定為待機。",loc:["功率門檻應為低於 5 W","時間門檻應為 60 分鐘","應改成「不含 30 分鐘」"]},
+   {st:"程式",code:"if watt <= 5 and minutes >= 30:\n    send_line(\"插座待機中，要關閉嗎？\")",loc:["minutes >= 30 應為 minutes > 30","send_line 應放在判斷外面","watt <= 5 應為 watt < 5（不含 5 W）"]},
+   {st:"程式",t:"每間每月可省電 = 4 W × 6 小時 × 30 天 ÷ 1000 = 0.72 度",loc:["應乘以 7 天","應除以 100","單位應為瓦"]},
+   {st:"簡報",t:"簡報第 4 頁：「3 間寢室每月共可省 21.6 度電。」\n（程式輸出：total_kwh = 2.16）",loc:["應為每週而非每月","數字放大 10 倍，應為 2.16 度","寢室數應為 7 間"]},
+   {st:"說明",t:"資料來源：本組 3 間寢室連續 7 天、每分鐘一筆的實測紀錄。",loc:["應為 30 天","應為每小時一筆","來源不明"]},
+   {st:"結論",t:"符合待機條件時傳 LINE 提醒，由使用者決定是否關閉插座。",loc:["應由系統自動斷電","應改用 Email 提醒","不應提醒使用者"]}]},
+ B:{title:"題本 B｜教室 CO₂ 換氣提醒",
+  spec:["量測：CO₂ 感測器每 1 分鐘回傳一次濃度（ppm）。",
+        "異常定義：濃度<b>高於 1000 ppm（不含 1000 ppm）</b>，且持續<b>至少 10 分鐘</b>。",
+        "提醒：符合異常定義時，教室看板亮紅燈並顯示「請開窗」，由老師決定是否開窗。",
+        "實測資料：2 間教室連續 5 天、每分鐘一筆；平均每間每天異常 90 分鐘。",
+        "驗收條件：心智圖須涵蓋問題、量測、提醒、效益四個分支；IPO 的輸入是量測值、輸出是提醒；簡報數字須與程式輸出一致。"],
+  accept:["心智圖涵蓋問題、量測、提醒、效益四個分支","IPO 的輸入是量測值、輸出是提醒","簡報數字與程式輸出一致"],
+  items:[
+   {st:"心智圖",t:"中心主題「教室空氣不流通」\n├ ① 問題：上課昏沉\n├ ② 提醒方式：看板紅燈\n└ ③ 預期效益：專注度提升",loc:["提醒方式寫錯","缺少「量測」分支","中心主題寫錯"]},
+   {st:"IPO 表",t:"Input：看板紅燈訊號\nProcess：判斷是否超標\nOutput：CO₂ 濃度讀值（ppm）",loc:["缺少 Process","Process 應寫成「量測濃度」","Input 與 Output 對調"]},
+   {st:"IPO 表",t:"判斷規則：濃度高於 100 ppm 且持續 10 分鐘，判定為異常。",loc:["濃度門檻應為高於 1000 ppm","時間門檻應為 30 分鐘","應改成「不含 10 分鐘」"]},
+   {st:"程式",code:"if ppm >= 1000 and minutes >= 10:\n    show_red(\"請開窗\")",loc:["minutes >= 10 應為 minutes > 10","show_red 應放在判斷外面","ppm >= 1000 應為 ppm > 1000（不含 1000）"]},
+   {st:"程式",t:"每間每週異常時數 = 90 分鐘 × 5 天 ÷ 60 = 7.5 小時",loc:["應乘以 7 天","應除以 100","單位應為分鐘"]},
+   {st:"簡報",t:"簡報第 4 頁：「2 間教室每週共 75 小時空氣不良。」\n（程式輸出：total_hours = 15）",loc:["應為每月而非每週","數字放大 5 倍，應為 15 小時","教室數應為 5 間"]},
+   {st:"說明",t:"資料來源：2 間教室連續 5 天、每分鐘一筆的實測紀錄。",loc:["應為 30 天","應為每小時一筆","來源不明"]},
+   {st:"結論",t:"超標時看板亮紅燈並顯示「請開窗」，由老師決定是否開窗。",loc:["應由系統自動開窗","應改用廣播提醒","不應提醒老師"]}]}
+};
+/* 答案（輕度編碼）：每點 [是否預埋錯誤, 正確位置索引]；正確項位置不計 */
+var KEY=JSON.parse(atob("W1sxLDFdLFsxLDJdLFsxLDBdLFsxLDJdLFswLC0xXSxbMSwxXSxbMCwtMV0sWzAsLTFdXQ=="));
+
+function formOf(phase){
+  var id=(window.AEId&&AEId.get())||{}, s=String(id.sid||""), sum=0;
+  for(var i=0;i<s.length;i++) sum+=s.charCodeAt(i);
+  var first=(sum%2===0)?"A":"B";
+  return phase==="pre"?first:(first==="A"?"B":"A");
+}
+function defPhase(){ return L.week()>=16?"post":"pre"; }
+
+/* ---------- 本週任務 ---------- */
+var FORMURL={pre:"",post:""};
+(function(){ var a=document.querySelector('meta[name="ae-hootl-form-pre"]'), b=document.querySelector('meta[name="ae-hootl-form-post"]');
+  FORMURL.pre=a?a.getAttribute("content"):""; FORMURL.post=b?b.getAttribute("content"):""; })();
+function step(key,title,href,tag){ var d=done(); return '<li class="'+(d[key]?"done":"")+'"><span class="no">'+(d[key]?"✓":"")+'</span><span><a href="'+href+'">'+title+'</a><br><span class="tag">'+tag+'</span></span></li>'; }
+function renderPlan(){
+  var fa=formOf("pre"), fb=formOf("post");
+  $("w15").innerHTML=
+    step("survey-pre","① 治理素養問卷（前測）","#survey","約 5 分鐘・不計分")+
+    step("verify-pre","② 驗證任務前測（"+FORMS[fa].title.split("｜")[0]+"）","#verify","約 15 分鐘・自動計分")+
+    step("spec-brief","③ 規格單前測簡版","#spec","限時 10 分鐘")+
+    step("report-pre","④ 驗證報告前測簡版","#report","檢查題本的 3 條條件")+
+    step("spec-formal","⑤ 正式規格單（小組專題，交給 AI 彙整前）","#spec","s_R 以正式版評分");
+  $("w16").innerHTML=
+    step("report-post","① 正式驗證報告（AI 彙整完成後）","#report","對照小組規格單逐條檢查")+
+    step("verify-post","② 驗證任務後測（"+FORMS[fb].title.split("｜")[0]+"）","#verify","約 15 分鐘・自動計分")+
+    step("survey-post","③ 治理素養問卷（後測）","#survey","約 5 分鐘・不計分");
+  Array.prototype.forEach.call(document.querySelectorAll(".steps a"),function(a){
+    a.addEventListener("click",function(){ var h=a.getAttribute("href").slice(1), b=document.querySelector('.tabs [data-tab="'+h+'"]'); if(b)b.click(); window.scrollTo(0,0);
+      if(h==="verify"){ $("vfPhase").value=/後測/.test(a.textContent)?"post":"pre"; renderVerify(); }
+      if(h==="report"){ $("rpPhase").value=/正式/.test(a.textContent)?"post":"pre"; renderReport(); }
+      if(h==="spec"){ $("spVer").value=/正式/.test(a.textContent)?"formal":"brief"; renderScene(); } });
+  });
+  $("formNote").textContent=(window.AEId&&AEId.get())?("你的題本：前測 "+fa+"、後測 "+fb+"（依學號自動分配，一半同學順序相反，用來抵銷題本難度差異）。"):"填好身分小卡後，會自動分配你的前測與後測題本。";
+}
+
+/* ---------- 規格單 ---------- */
+function listed(boxId,min,ph){
+  var box=$(boxId);
+  function add(v){ var d=document.createElement("div"); d.className="ln";
+    d.innerHTML='<input type="text" maxlength="200" placeholder="'+esc(ph)+'"><button type="button" aria-label="刪除這一條">✕</button>';
+    d.querySelector("input").value=v||""; d.querySelector("button").addEventListener("click",function(){ if(box.children.length>1){ d.remove(); selfCheck(); } });
+    d.querySelector("input").addEventListener("input",selfCheck); box.appendChild(d); }
+  for(var i=0;i<min;i++) add("");
+  var more=document.createElement("button"); more.type="button"; more.className="btn btn-ghost"; more.textContent="＋ 再加一條"; more.style.justifySelf="start";
+  more.addEventListener("click",function(){ add(""); }); box.parentNode.appendChild(more);
+  return { vals:function(){ return Array.prototype.map.call(box.querySelectorAll("input"),function(i){return i.value.trim();}).filter(Boolean); },
+           set:function(arr){ box.innerHTML=""; (arr&&arr.length?arr:new Array(min).join(".").split(".")).forEach(function(v){add(v);}); } };
+}
+var BAN=listed("spBan",2,"例如：不可改動程式的判斷邏輯"), ACC=listed("spAcc",3,"例如：簡報中的每個數字都要與程式輸出一致");
+var SPEC_DRAFT="ae.hootl.spec";
+function renderScene(){
+  var brief=$("spVer").value==="brief";
+  $("spScene").innerHTML=brief
+    ?'<h3>前測簡版情境</h3>你們小組已完成心智圖、IPO 表與程式。現在要請 AI 把它們彙整成 <b>5 頁專題簡報</b>與一段 <b>3 分鐘講稿</b>。請在 10 分鐘內寫下給 AI 的規則。'
+    :'<h3>正式版</h3>針對<b>你們小組的專題</b>，在交給 AI 彙整之前填寫。驗收條件會帶到第 16 週的正式驗證報告，請寫成可以逐條檢查的句子。';
+  var dr=(L.local(SPEC_DRAFT)||{})[$("spVer").value];
+  dr=dr||{}; $("spProj").value=dr.project||""; $("spScope").value=dr.scope||""; BAN.set(dr.ban); ACC.set(dr.accept); $("spThr").value=dr.threshold||""; $("spAno").value=dr.anomaly||"";
+  selfCheck(); timer();
+}
+var tmr=null, tmrOn=false;
+function timer(){ clearInterval(tmr); tmrOn=false; var el=$("spTimer"); if($("spVer").value!=="brief"){ el.innerHTML=""; return; }
+  el.innerHTML='<span class="timer">10:00・開始作答就計時</span>'; }
+function startTimer(){ if(tmrOn||$("spVer").value!=="brief")return; tmrOn=true; var el=$("spTimer"), end=Date.now()+600000;
+  tmr=setInterval(function(){ var s=Math.max(0,Math.round((end-Date.now())/1000)); el.firstChild.textContent=Math.floor(s/60)+":"+("0"+s%60).slice(-2); if(!s){clearInterval(tmr); el.firstChild.textContent="時間到，請送出";} },1000); }
+$("specForm").addEventListener("input",startTimer);
+function specData(){ return {ver:$("spVer").value,project:$("spProj").value.trim(),scope:$("spScope").value.trim(),ban:BAN.vals(),accept:ACC.vals(),threshold:$("spThr").value.trim(),anomaly:$("spAno").value.trim()}; }
+function selfCheck(){
+  var d=specData(), c=[
+    [d.scope.length>=10,"① 範圍寫出 AI 要整合什麼、產出什麼"],
+    [d.ban.length>=2,"② 至少 2 項禁止事項"],
+    [d.accept.length>=3,"③ 至少 3 條驗收條件"],
+    [d.accept.length>0&&d.accept.every(function(a){return !/^(正確|完整|合理|好)[。！]?$/.test(a)&&a.length>=6;}),"③ 每條條件都能檢查（不只寫「正確」「完整」）"],
+    [/\d/.test(d.threshold)&&/(依據|因為|根據|參考)/.test(d.threshold),"④ 門檻有數字，也說明依據"],
+    [/(退回|重做)/.test(d.anomaly)&&/(修正|修改)/.test(d.anomaly)&&/(人工|手動|接手|組員|自己)/.test(d.anomaly),"⑤ 寫出退回、修正與人工接手"]];
+  $("spChk").innerHTML=c.map(function(x){return '<li class="'+(x[0]?"ok":"")+'">'+x[1]+'</li>';}).join("");
+  var all=L.local(SPEC_DRAFT)||{}; all[d.ver]=d; L.local(SPEC_DRAFT,all);
+  return c.map(function(x){return x[0]?1:0;});
+}
+["spScope","spThr","spAno","spProj"].forEach(function(id){ $(id).addEventListener("input",selfCheck); });
+$("spVer").addEventListener("change",renderScene);
+$("specForm").addEventListener("submit",function(e){
+  e.preventDefault(); var m=$("spMsg"), id=ident(m); if(!id)return;
+  var d=specData();
+  if(d.ver==="formal"&&!d.project){ say(m,"正式版請填專題名稱。","warn"); return; }
+  if(!d.scope||!d.accept.length){ say(m,"至少寫出彙整範圍與一條驗收條件再送出。","warn"); return; }
+  var rec={app:"hootl",kind:"hootl-spec",sid:id.sid,cls:id.cls,score:"",max:"",
+    detail:{unit:"hootl",layer:"HOOTL",part:"R",phase:d.ver==="brief"?"pre":"post",ver:d.ver,project:d.project,scope:d.scope,ban:d.ban,accept:d.accept,threshold:d.threshold,anomaly:d.anomaly,selfcheck:selfCheck(),graded:false}};
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send(rec).then(function(r){ done(d.ver==="brief"?"spec-brief":"spec-formal"); say(m,"✅ "+r.msg+(d.ver==="formal"?" 驗收條件已帶入第 16 週的驗證報告。":""),r.queued?"warn":"ok"); })
+   .then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+
+/* ---------- 驗證任務 ---------- */
+var VF_DRAFT="ae.hootl.verify";
+function renderVerify(){
+  var ph=$("vfPhase").value, fk=formOf(ph), F=FORMS[fk], dr=(L.local(VF_DRAFT)||{})[ph+fk]||{};
+  $("vfForm2").textContent=F.title;
+  $("vfSpec").innerHTML='<h3>專題規格（小組事前訂的規則）</h3><ul>'+F.spec.map(function(s){return "<li>"+s+"</li>";}).join("")+'</ul>';
+  $("vfItems").innerHTML=F.items.map(function(it,i){
+    var n=i+1, v=dr[n]||{};
+    return '<div class="cp'+(v.j==="reject"?" rej":"")+'" data-n="'+n+'"><div class="hd">檢核點 '+n+' <span class="st">'+esc(it.st)+'</span></div>'+
+      '<div class="ai">'+(it.code?'AI 寫的程式：<pre>'+esc(it.code)+'</pre>':esc(it.t))+'</div>'+
+      '<div class="chips" role="radiogroup" aria-label="檢核點 '+n+' 判斷"><label><input type="radio" name="j'+n+'" value="accept"'+(v.j==="accept"?" checked":"")+'>✅ 採納</label><label><input type="radio" name="j'+n+'" value="reject"'+(v.j==="reject"?" checked":"")+'>⛔ 退回</label></div>'+
+      '<div class="why"><div class="fq"><label for="loc'+n+'">錯在哪裡？</label><select id="loc'+n+'"><option value="">請選擇</option>'+
+        it.loc.map(function(o,k){return '<option value="'+k+'"'+(String(v.loc)===String(k)?" selected":"")+'>'+esc(o)+'</option>';}).join("")+'</select></div>'+
+        '<div class="fq"><label for="fix'+n+'">修正成什麼？</label><input type="text" id="fix'+n+'" maxlength="200" value="'+esc(v.fix||"")+'"></div></div>'+
+      '<div class="fq" style="margin-bottom:0"><span class="lb">我有多確定？</span><div class="chips">'+[1,2,3,4,5].map(function(c){return '<label><input type="radio" name="c'+n+'" value="'+c+'"'+(Number(v.c)===c?" checked":"")+'>'+c+(c===1?" 用猜的":c===5?" 非常確定":"")+'</label>';}).join("")+'</div></div>'+
+      '<div class="keyslot"></div></div>';
+  }).join("");
+  Array.prototype.forEach.call($("vfItems").querySelectorAll(".cp"),function(cp){
+    cp.addEventListener("change",function(){ var j=cp.querySelector('input[name^="j"]:checked'); cp.classList.toggle("rej",!!j&&j.value==="reject"); saveVerify(); });
+    cp.addEventListener("input",saveVerify);
+  });
+  $("vfRes").className="result";
+}
+function readVerify(){
+  var out={};
+  Array.prototype.forEach.call($("vfItems").querySelectorAll(".cp"),function(cp){
+    var n=cp.getAttribute("data-n"), j=cp.querySelector('input[name="j'+n+'"]:checked'), c=cp.querySelector('input[name="c'+n+'"]:checked');
+    out[n]={j:j?j.value:"",loc:$("loc"+n).value,fix:$("fix"+n).value.trim(),c:c?Number(c.value):0};
+  });
+  return out;
+}
+function saveVerify(){ var ph=$("vfPhase").value, all=L.local(VF_DRAFT)||{}; all[ph+formOf(ph)]=readVerify(); L.local(VF_DRAFT,all); }
+$("vfPhase").addEventListener("change",renderVerify);
+$("vfForm").addEventListener("submit",function(e){
+  e.preventDefault(); var m=$("vfMsg"), id=ident(m); if(!id)return;
+  var ph=$("vfPhase").value, fk=formOf(ph), a=readVerify(), miss=[];
+  for(var n=1;n<=8;n++){ var x=a[n]; if(!x.j||!x.c||(x.j==="reject"&&(x.loc===""||!x.fix))) miss.push(n); }
+  if(miss.length){ say(m,"還沒完成的檢核點："+miss.join("、")+"（每題要判斷、選確定程度；退回的題目要選錯在哪裡並寫修正）。","warn"); return; }
+  var pts=0, right=0, conf=0, items=[], recs=[];
+  for(n=1;n<=8;n++){
+    var k=KEY[n-1], seeded=k[0]===1, x2=a[n], judgeOK=seeded?(x2.j==="reject"):(x2.j==="accept"), p=0;
+    if(judgeOK){ p=1; if(!seeded) p=2; else if(Number(x2.loc)===k[1]) p=2; }
+    pts+=p; right+=judgeOK?1:0; conf+=(x2.c-1)/4;
+    items.push({cp:n,planted:seeded,judge:x2.j,correct:judgeOK,loc:x2.loc===""?null:Number(x2.loc),locOK:seeded&&x2.j==="reject"?Number(x2.loc)===k[1]:null,fix:x2.fix,conf:x2.c,pts:p});
+    recs.push({app:"hootl",kind:"calcheck",sid:id.sid,cls:id.cls,score:judgeOK?1:0,max:1,detail:{seeded:true,correct:judgeOK,planted:seeded,unit:"hootl",layer:"HOOTL",phase:ph,form:fk,cp:n}});
+  }
+  var T=Math.round(pts/16*1000)/10, CAL=right/8, over=Math.round((conf/8-CAL)*100)/100;
+  recs.unshift({app:"hootl",kind:"hootl-verify",sid:id.sid,cls:id.cls,score:T,max:100,
+    detail:{unit:"hootl",layer:"HOOTL",part:"E",phase:ph,form:fk,T:T,cal:CAL,overconf:over,items:items,graded:true,auto:true}});
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send(recs).then(function(r){
+    done("verify-"+ph);
+    say(m,"✅ "+r.msg,r.queued?"warn":"ok");
+    $("vfRes").innerHTML="驗證任務得分 <b>T = "+T+"</b>（滿分 100）；判斷正確 <b>"+right+"／8</b>（CAL = "+CAL.toFixed(2)+"）。"+
+      (over>0.15?"<br>⚠ 你的信心比實際判斷力高（過度自信 "+over.toFixed(2)+"）：遇到 AI 看起來很合理的地方，多找一個證據再採納。":over<-0.15?"<br>你其實比自己以為的更會判斷，可以更有自信一點。":"<br>你的信心和判斷力大致相符。")+
+      (ph==="post"?"<br>後測已完成，下方顯示每一題的解答。":"<br>前測不公布解答，第 16 週後測完成後會一起顯示。");
+    $("vfRes").className="result show";
+    if(ph==="post") Array.prototype.forEach.call($("vfItems").querySelectorAll(".cp"),function(cp,i){
+      var k2=KEY[i], it=FORMS[fk].items[i], ok=items[i].pts===2;
+      cp.querySelector(".keyslot").innerHTML='<div class="key '+(ok?"ok":"bad")+'">'+(k2[0]?"⛔ 應退回："+esc(it.loc[k2[1]]):"✅ 應採納：內容與規格一致")+'（本題 '+items[i].pts+'／2 分）</div>'; });
+  }).then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+
+/* ---------- 驗證報告 ---------- */
+function rowHTML(c,res,ev){ return '<tr><td><input type="text" maxlength="200" value="'+esc(c||"")+'"></td><td><select><option value="">—</option><option value="pass"'+(res==="pass"?" selected":"")+'>通過</option><option value="fail"'+(res==="fail"?" selected":"")+'>未通過</option></select></td><td><input type="text" maxlength="300" value="'+esc(ev||"")+'"></td></tr>'; }
+function renderReport(){
+  var ph=$("rpPhase").value, conds=[];
+  if(ph==="pre") conds=FORMS[formOf("pre")].accept;
+  else { var sp=(L.local(SPEC_DRAFT)||{}).formal; conds=sp&&sp.accept&&sp.accept.length?sp.accept:["","",""]; if(sp&&sp.project&&!$("rpProj").value)$("rpProj").value=sp.project; }
+  $("rpRows").innerHTML=conds.map(function(c){return rowHTML(c,"","");}).join("");
+}
+$("rpPhase").addEventListener("change",renderReport);
+$("rpAdd").addEventListener("click",function(){ $("rpRows").insertAdjacentHTML("beforeend",rowHTML("","","")); });
+$("rpForm").addEventListener("submit",function(e){
+  e.preventDefault(); var m=$("rpMsg"), id=ident(m); if(!id)return;
+  var rows=Array.prototype.map.call($("rpRows").querySelectorAll("tr"),function(tr){ var i=tr.querySelectorAll("input"); return {cond:i[0].value.trim(),result:tr.querySelector("select").value,evidence:i[1].value.trim()}; }).filter(function(r){return r.cond;});
+  if(!rows.length||rows.some(function(r){return !r.result;})){ say(m,"每一條驗收條件都要標示通過或未通過。","warn"); return; }
+  var ph=$("rpPhase").value;
+  var rec={app:"hootl",kind:"hootl-report",sid:id.sid,cls:id.cls,score:"",max:"",
+    detail:{unit:"hootl",layer:"HOOTL",part:"E",phase:ph,form:ph==="pre"?formOf("pre"):"",project:$("rpProj").value.trim(),rows:rows,
+      fix:$("rpFix").value.trim(),retest:$("rpRetest").checked,retestNote:$("rpRetestNote").value.trim(),
+      ai:$("rpAI").value.trim(),human:$("rpHuman").value.trim(),edited:$("rpEdit").value.trim(),graded:false}};
+  var f=this; f.querySelector("button[type=submit]").disabled=true;
+  L.send(rec).then(function(r){ done("report-"+ph); say(m,"✅ "+r.msg,r.queued?"warn":"ok"); })
+   .then(function(){ f.querySelector("button[type=submit]").disabled=false; });
+});
+
+/* ---------- 問卷 ---------- */
+function renderForms(){
+  function card(k,t,u){ return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener" data-k="'+k+'">'+t+'<small>開啟 Google 表單 ↗</small></a>':'<div class="off">'+t+'<small>表單建立中，請先從 Moodle 的連結進入</small></div>'; }
+  $("formCards").innerHTML=card("survey-pre","📝 前測（第 15 週）",FORMURL.pre)+card("survey-post","📝 後測（第 16 週）",FORMURL.post);
+  Array.prototype.forEach.call($("formCards").querySelectorAll("a[data-k]"),function(a){ a.addEventListener("click",function(){ done(a.getAttribute("data-k")); }); });
+}
+
+/* ---------- 啟動 ---------- */
+$("vfPhase").value=defPhase(); $("rpPhase").value=defPhase();
+if(defPhase()==="post") $("spVer").value="formal";
+renderScene(); renderVerify(); renderReport(); renderForms(); renderPlan();
+document.addEventListener("ae:identity",function(){ renderPlan(); renderVerify(); renderReport(); });
+})();
+</script>
+</body>
+</html>
