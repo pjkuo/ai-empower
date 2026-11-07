@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>CRISP 提示急診室｜ai-empower</title>
+<meta name="description" content="生成式 AI 提示工程課前練習：三關闖關（抓漏挑戰、逐步改造、組裝＋驗收），學會用 C R I S P 交代 AI 做事，並抓出 AI 的錯。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/crisp-game.html">
+<meta name="theme-color" content="#0B2545">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* standalone base (the artifact viewer supplied these) */
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+.hub{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+.hub a{color:var(--muted);font-weight:700;text-decoration:none;border-bottom:1px dashed var(--line)}
+.hub a:hover{color:var(--ink)}
+</style>
+<style>
+/* Layout: one phone-width chat column; sticky scoreboard; one level on screen at a time */
+:root{
+  --bg:#EEF3F8; --surface:#FFFFFF; --ink:#0E1E36; --muted:#56677E; --line:#D3DDE9;
+  --navy:#0B2545; --onnavy:#FFFFFF; --accent:#F2A81D; --accentink:#3A2600;
+  --ok:#17875A; --okbg:#E1F4EA; --bad:#C93E28; --badbg:#FBE7E2;
+  --c:#0C8FAD; --r:#6E4FD0; --i:#C9651A; --s:#17875A; --p:#B23280; --tileink:#FFFFFF;
+  --display:"Bungee","Noto Sans TC",system-ui,sans-serif;
+  --body:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A1422; --surface:#132238; --ink:#E7EEF7; --muted:#9DB0C8; --line:#25395A;
+  --navy:#1D3D69; --onnavy:#FFFFFF; --accent:#F5B83D; --accentink:#2A1B00;
+  --ok:#43C78C; --okbg:#123527; --bad:#F2725B; --badbg:#3A1C17;
+  --c:#40C4E2; --r:#A790F2; --i:#F39D4E; --s:#43C78C; --p:#E866B5; --tileink:#0A1422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1422; --surface:#132238; --ink:#E7EEF7; --muted:#9DB0C8; --line:#25395A;
+  --navy:#1D3D69; --onnavy:#FFFFFF; --accent:#F5B83D; --accentink:#2A1B00;
+  --ok:#43C78C; --okbg:#123527; --bad:#F2725B; --badbg:#3A1C17;
+  --c:#40C4E2; --r:#A790F2; --i:#F39D4E; --s:#43C78C; --p:#E866B5; --tileink:#0A1422; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:var(--onnavy);
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--display);font-size:15px;letter-spacing:.02em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:6px}
+.dots i{width:28px;height:6px;border-radius:3px;background:rgba(255,255,255,.25)}
+.dots i.on{background:var(--accent)}.dots i.done{background:#7ED9B0}
+.score{font-family:var(--display);font-size:15px;background:rgba(255,255,255,.12);border-radius:999px;padding:2px 12px;font-variant-numeric:tabular-nums}
+.score.bump{animation:bump .4s}
+main{max-width:760px;margin:0 auto;padding-block:22px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{text-wrap:balance;line-height:1.3;margin:0}
+h2{font-size:24px;font-weight:900}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--muted)}
+.lead{color:var(--muted);margin:6px 0 0}
+section{display:flex;flex-direction:column;gap:16px}
+/* start */
+.hero{display:flex;flex-direction:column;gap:14px;padding:8px 0 6px}
+.tiles{display:flex;gap:10px;flex-wrap:wrap}
+.tile{width:62px;height:62px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tileink);font-family:var(--display);font-size:28px;line-height:1;animation:pop .5s backwards}
+.tile small{font-family:var(--body);font-size:11px;font-weight:700;margin-top:4px}
+.tile:nth-child(2){animation-delay:.08s}.tile:nth-child(3){animation-delay:.16s}.tile:nth-child(4){animation-delay:.24s}.tile:nth-child(5){animation-delay:.32s}
+.hero h1{font-size:34px;font-weight:900}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lv{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.lv b{display:block;font-size:16px}.lv span{font-size:14px;color:var(--muted)}
+.lv .n{font-family:var(--display);color:var(--accent);font-size:14px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 22px;cursor:pointer;background:var(--accent);color:var(--accentink);font-size:17px}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.letter:focus-visible,.opt:focus-visible,.chip:focus-visible,.pick button:focus-visible,.row:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+/* chat */
+.chat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:10px;align-items:flex-end}
+.msg.me{justify-content:flex-end}
+.bubble{max-width:82%;padding:10px 14px;border-radius:16px;min-width:0}
+.me .bubble{background:var(--navy);color:var(--onnavy);border-bottom-right-radius:4px}
+.ai .bubble{background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px}
+.av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accentink);font-family:var(--display);font-size:12px;display:flex;align-items:center;justify-content:center}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:4px;animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+.q{font-weight:700;font-size:18px}
+.letters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.letter{font:inherit;border:0;border-radius:14px;padding:10px 4px;cursor:pointer;color:var(--tileink);display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
+.letter b{font-family:var(--display);font-size:26px;line-height:1.1;font-weight:400}
+.letter span{font-size:12px;font-weight:700}
+.letter:hover{transform:translateY(-2px)}
+.letter.wrong{animation:shake .4s;opacity:.35}
+.letter.right{box-shadow:0 0 0 4px var(--ok)}
+.fb{border-radius:14px;padding:12px 16px}
+.fb.ok{background:var(--okbg)}.fb.no{background:var(--badbg)}
+.fb .fix{display:block;margin-top:6px;padding:8px 12px;border-radius:10px;background:var(--surface);border:1px dashed var(--ok)}
+.streak{font-weight:700;color:var(--accent)}
+.prog{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+/* level 2 */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font:inherit;font-weight:700;border-radius:999px;padding:8px 14px;cursor:pointer;border:2px solid var(--line);background:var(--surface);color:var(--ink);display:flex;gap:6px;align-items:center}
+.chip b{font-family:var(--display);font-weight:400}
+.chip.on{color:var(--tileink);border-color:transparent}
+.promptbox{background:var(--navy);color:var(--onnavy);border-radius:16px;padding:12px 16px;font-size:15px;display:flex;flex-direction:column;gap:6px}
+.promptbox .ln{display:flex;gap:8px;align-items:flex-start;animation:slide .35s}
+.promptbox .k{flex:none;font-family:var(--display);font-size:13px;border-radius:6px;padding:0 6px;color:var(--tileink)}
+.meter{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--bad),var(--accent),var(--ok));transition:width .5s}
+.note{font-size:15px;color:var(--muted)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--surface)}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--navy);color:var(--onnavy);font-weight:700}
+.check{margin-top:8px;font-size:14px;padding:8px 10px;border-radius:10px;background:var(--okbg)}
+/* level 3 */
+.step{display:flex;flex-direction:column;gap:8px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{font:inherit;text-align:left;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);animation:shake .4s}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.built{display:flex;flex-direction:column;gap:6px}
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:90px 1fr;gap:6px 12px;align-items:center}
+.row .v{font-family:var(--display);font-size:18px;font-variant-numeric:tabular-nums}
+.row .t{font-size:12px;color:var(--muted);display:block;font-family:var(--body)}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.pick button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer}
+.pick button.sel{background:var(--navy);color:var(--onnavy);border-color:var(--navy)}
+.airow{grid-column:2;font-size:14px}
+.row.clickable{cursor:pointer}.row.clickable:hover{border-color:var(--accent)}
+.row.caught{border-color:var(--ok);background:var(--okbg)}.row.miss{animation:shake .4s;border-color:var(--bad)}
+.tagok{color:var(--ok);font-weight:700}.tagno{color:var(--bad);font-weight:700}
+/* end */
+.result{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.big{font-family:var(--display);font-size:56px;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.stars{font-size:34px;letter-spacing:6px;color:var(--accent)}
+.stars .off{color:var(--line)}
+.break{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.break div{background:var(--bg);border-radius:12px;padding:8px}
+.break b{display:block;font-family:var(--display);font-size:20px}
+.motto{font-weight:900;font-size:20px}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:20;width:100%;height:100%}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes bump{50%{transform:scale(1.18)}}
+@keyframes slide{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:560px){
+  .levels,.break{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+  .letter b{font-size:22px}.letter span{font-size:11px}
+  .row{grid-template-columns:1fr}.airow{grid-column:1}
+  .dots i{width:18px}
+}
+</style>
+
+</head>
+<body>
+<div class="top"><div class="in">
+  <div class="brand">CRISP 提示急診室</div>
+  <div class="dots" aria-label="關卡進度"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
+  <div class="score" id="score" aria-live="polite">0 分</div>
+</div></div>
+
+<main>
+<!-- START -->
+<section id="start">
+  <div class="hero">
+    <div class="tiles" aria-hidden="true">
+      <div class="tile" style="background:var(--c)">C<small>背景</small></div>
+      <div class="tile" style="background:var(--r)">R<small>角色</small></div>
+      <div class="tile" style="background:var(--i)">I<small>指令</small></div>
+      <div class="tile" style="background:var(--s)">S<small>規格</small></div>
+      <div class="tile" style="background:var(--p)">P<small>驗證</small></div>
+    </div>
+    <h1>AI 答非所問？多半是你的提示少了一格。</h1>
+    <p class="lead">三關闖完，你就會用 C、R、I、S、P 交代 AI 做事，還能抓出 AI 的錯。滿分 250 分。</p>
+  </div>
+  <div class="levels">
+    <div class="lv"><span class="n">關卡 1</span><b>抓漏挑戰</b><span>5 句爛提示，點出缺了哪一格</span></div>
+    <div class="lv"><span class="n">關卡 2</span><b>逐步改造</b><span>一格一格加上去，看 AI 越答越好</span></div>
+    <div class="lv"><span class="n">關卡 3</span><b>組裝＋驗收</b><span>組出 CO₂ 提示，再抓 AI 判錯的那題</span></div>
+  </div>
+  <div class="actions"><button class="btn" id="go">開始挑戰</button></div>
+  <nav class="hub" aria-label="平台連結"><a href="./">← AI 賦能教學 Hub</a><a href="crisp.html">上課實習：CRISP 提示工坊</a></nav>
+</section>
+
+<!-- LEVEL 1 -->
+<section id="l1" hidden>
+  <div><div class="eyebrow">關卡 1｜抓漏挑戰</div><h2>這句提示少了哪一格？</h2><p class="lead">第一次就答對 20 分，第二次 10 分，之後 5 分。</p></div>
+  <div class="prog" id="l1prog"></div>
+  <div class="chat" id="l1chat"></div>
+  <div class="letters" id="l1letters"></div>
+  <div class="fb" id="l1fb" hidden></div>
+  <div class="actions"><button class="btn" id="l1next" hidden>下一題</button></div>
+</section>
+
+<!-- LEVEL 2 -->
+<section id="l2" hidden>
+  <div><div class="eyebrow">關卡 2｜逐步改造</div><h2>把爛提示一格一格補好</h2><p class="lead">點下面的字母，把那一格加進提示，看 AI 的回答怎麼變。每加一格 10 分。</p></div>
+  <div class="chips" id="l2chips"></div>
+  <div class="promptbox" id="l2prompt"></div>
+  <div><div class="note" id="l2meterLabel">答案可用度 0%</div><div class="meter"><i id="l2meter"></i></div></div>
+  <div class="chat" id="l2chat"></div>
+  <div class="fb ok" id="l2fb" hidden></div>
+  <div class="actions"><button class="btn" id="l2next" disabled>前往關卡 3</button></div>
+</section>
+
+<!-- LEVEL 3 -->
+<section id="l3" hidden>
+  <div><div class="eyebrow">關卡 3｜組裝＋驗收</div><h2>教室 CO₂ 提醒：組出正確提示</h2><p class="lead">規則：超過 1000 ppm 開窗、超過 1500 ppm 發警示。每一格選最好的一句，第一次選對 10 分。</p></div>
+  <div class="step" id="l3step"></div>
+  <div class="promptbox built" id="l3built" hidden></div>
+  <div id="l3verify" hidden>
+    <div class="eyebrow">驗收帳</div>
+    <p class="lead" style="margin-bottom:10px">先寫你的預測（每題答對 6 分），再按「請 AI 判定」。</p>
+    <div class="rows" id="l3rows"></div>
+    <div class="actions" style="margin-top:12px"><button class="btn" id="l3ask" disabled>請 AI 判定</button></div>
+    <div class="fb no" id="l3catch" hidden style="margin-top:12px"></div>
+  </div>
+  <div class="actions"><button class="btn" id="l3next" hidden>看成績</button></div>
+</section>
+
+<!-- END -->
+<section id="end" hidden>
+  <div class="result">
+    <div class="eyebrow">闖關完成</div>
+    <div class="big" id="endScore">0</div>
+    <div class="stars" id="stars"></div>
+    <div class="motto" id="badge"></div>
+    <div class="break"><div>關卡 1<b id="b1">0</b><span class="note">/ 100</span></div><div>關卡 2<b id="b2">0</b><span class="note">/ 50</span></div><div>關卡 3<b id="b3">0</b><span class="note">/ 100</span></div></div>
+    <p class="motto">先思考，後驗證。</p>
+    <p class="note">交代清楚（CRISP），AI 才做得對；親手驗證（P），成果才算你的。</p>
+    <div class="actions" style="justify-content:center"><button class="btn" id="copy">複製成績</button><button class="btn ghost" id="again">再玩一次</button></div>
+    <div class="note" id="copied" aria-live="polite"></div>
+    <nav class="hub" aria-label="平台連結" style="justify-content:center"><a href="crisp.html">下一步：CRISP 提示工坊</a><a href="./">AI 賦能教學 Hub</a></nav>
+  </div>
+</section>
+</main>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+const $=id=>document.getElementById(id);
+const L={C:{n:'背景',v:'--c'},R:{n:'角色',v:'--r'},I:{n:'指令',v:'--i'},S:{n:'規格',v:'--s'},P:{n:'驗證',v:'--p'}};
+const ORDER=['C','R','I','S','P'];
+const S={l1:0,l2:0,l3:0};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function total(){return S.l1+S.l2+S.l3}
+function addScore(k,n){S[k]+=n;const el=$('score');el.textContent=total()+' 分';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
+function show(id){['start','l1','l2','l3','end'].forEach(s=>$(s).hidden=s!==id);window.scrollTo(0,0);
+  const lv={l1:1,l2:2,l3:3,end:4}[id]||0;[1,2,3].forEach(i=>{const d=$('d'+i);d.className=i<lv?'done':(i===lv?'on':'')})}
+function bubble(chat,who,html){const m=document.createElement('div');m.className='msg '+who;
+  m.innerHTML=(who==='ai'?'<div class="av">AI</div>':'')+'<div class="bubble">'+html+'</div>';chat.appendChild(m);return m.querySelector('.bubble')}
+function aiSay(chat,html,ms){const b=bubble(chat,'ai','<span class="typing"><span></span><span></span><span></span></span>');
+  return new Promise(res=>setTimeout(()=>{b.innerHTML=html;res(b)},reduce?0:(ms||700)))}
+
+/* ---------- LEVEL 1 ---------- */
+const Q1=[
+ {p:'幫我排週末一日遊',a:'推薦台北一日遊：早上 101、下午九份老街，開車走國道 5 號，晚上饒河夜市！',k:'C',hint:'AI 為什麼會排台北、還要開車？它知道你在哪裡嗎？',why:'沒給背景，AI 只好自己猜你在哪裡、怎麼去、有多少錢。',fix:'我在屏東、沒有車、預算 500 元。'},
+ {p:'幫我寫請假訊息',a:'欸～我明天不去喔，幫我跟大家說一下哈哈',k:'R',hint:'訊息內容沒錯，錯的是語氣：這封訊息要傳給誰？',why:'沒說誰來寫、要傳給誰，AI 用了跟朋友聊天的語氣。',fix:'你是懂禮貌的學長，這封訊息要傳給教授。'},
+ {p:'明天報告怎麼辦？',a:'別緊張！深呼吸，多練習幾次，你一定可以的！',k:'I',hint:'你是在問問題，還是在交代 AI 做一件事？',why:'用「問」的，AI 只會安慰你；要用「請幫我」交代它做事。',fix:'請幫我把講稿縮成 3 分鐘，列出 5 個重點。'},
+ {p:'幫我整理這學期的課表',a:'你週一早上有計算機概論，在資管系館，然後下午有微積分，週二早上是英文，接著中午之後……（還有一大段）',k:'S',hint:'內容都對，但這一大段能直接放進行事曆嗎？',why:'沒指定格式，回你一大段文字，放不進手機行事曆。',fix:'用表格輸出：星期｜時間｜課名｜教室。'},
+ {p:'5 人聚餐 2,350 元，阿明沒喝 150 元的飲料，幫我分帳',a:'每人 2,350 ÷ 5 = 470 元！',k:'P',hint:'資料都給了，AI 卻算錯；你有要它自己檢查嗎？',why:'AI 忘了扣飲料，沒要求它檢查，你就照轉了。正確是阿明 440 元、其他人各 477.5 元。',fix:'列出每人金額，再加總確認等於 2,350 元。'}];
+let i1=0,tries=0,streak=0,locked=false;
+function l1load(){const q=Q1[i1];tries=0;locked=false;$('l1prog').innerHTML='第 '+(i1+1)+' / 5 題'+(streak>1?'　<span class="streak">連對 ×'+streak+'</span>':'');
+  const chat=$('l1chat');chat.innerHTML='';bubble(chat,'me','「'+q.p+'」');aiSay(chat,q.a,800);
+  $('l1fb').hidden=true;$('l1next').hidden=true;
+  $('l1letters').innerHTML=ORDER.map(k=>'<button class="letter" data-k="'+k+'" style="background:var('+L[k].v+')"><b>'+k+'</b><span>'+L[k].n+'</span></button>').join('');
+  $('l1letters').querySelectorAll('.letter').forEach(b=>b.onclick=()=>l1pick(b))}
+function l1pick(b){if(locked||b.classList.contains('wrong'))return;const q=Q1[i1];tries++;const fb=$('l1fb');
+  if(b.dataset.k===q.k){locked=true;b.classList.add('right');const pts=tries===1?20:tries===2?10:5;addScore('l1',pts);streak=tries===1?streak+1:0;
+    fb.className='fb ok';fb.hidden=false;fb.innerHTML='<b>答對！少了 '+q.k+' '+L[q.k].n+'，+'+pts+' 分</b><br>'+q.why+'<span class="fix">補上這句：「'+q.fix+'」</span>';
+    if(tries===1)burst(b);$('l1next').hidden=false;$('l1next').textContent=i1<4?'下一題':'前往關卡 2';$('l1next').focus()}
+  else{b.classList.add('wrong');streak=0;fb.className='fb no';fb.hidden=false;fb.innerHTML='<b>不是 '+b.dataset.k+'。</b>提示：'+q.hint}}
+$('l1next').onclick=()=>{if(i1<4){i1++;l1load()}else{l2start()}};
+
+/* ---------- LEVEL 2 ---------- */
+const L2LINES={C:'我是資管系大一。下週一考計概、週三考微積分、週五考英文；平日晚上 19–22 點有空，週末全天有空。',
+ R:'請你扮演會帶學弟妹讀書的學長，對象是第一次考期中考的新生，語氣簡單直接。',
+ I:'請幫我排從這週六到下週四每天的讀書計畫：先分配各科時數，再排進每天。',
+ S:'用表格輸出：日期｜科目｜時段｜內容。平日每天不超過 3 小時；每科考前一天只排複習。',
+ P:'排完請自己檢查：每天時數有沒有超過我的空檔？考前一天是不是都是複習？不確定的地方列出來。'};
+const L2NOTE={C:'加了 C：AI 知道你考哪三科、什麼時候有空了。',R:'加了 R：語氣變成學長帶學弟妹，好讀多了。',I:'加了 I：AI 開始真的排每天要讀什麼。',S:'加了 S：變成表格，可以直接照著做、貼進行事曆。',P:'加了 P：AI 自己檢查時數，還列出不確定的地方。'};
+const F={};
+function l2start(){show('l2');ORDER.forEach(k=>F[k]=false);
+  $('l2chips').innerHTML=ORDER.map(k=>'<button class="chip" data-k="'+k+'"><b>'+k+'</b>'+L[k].n+'</button>').join('');
+  $('l2chips').querySelectorAll('.chip').forEach(b=>b.onclick=()=>l2add(b));l2render(null)}
+function l2add(b){const k=b.dataset.k;if(F[k])return;F[k]=true;b.classList.add('on');b.style.background='var('+L[k].v+')';addScore('l2',10);l2render(k)}
+function l2reply(){const n=ORDER.filter(k=>F[k]).length;let h='';
+  if(F.R)h+='學弟妹，聽學長的，照下面走就好：<br>';
+  const rowsC=[['週六','計概｜微積分','09–12｜14–17','計概第 1–4 章｜微積分第 1 章'],['週日','計概','09–12','計概複習＋考古題（考前一天）'],['週一','微積分','19–21','微積分第 2–3 章'],['週二','微積分','19–22','微積分複習＋考古題（考前一天）'],['週三','英文','19–21','單字＋閱讀'],['週四','英文','19–22','英文複習＋考古題（考前一天）']];
+  const rowsG=[['第 1 天','科目 A','？','？'],['第 2 天','科目 B','？','？'],['第 3 天','科目 C','？','？']];
+  if(F.S&&F.I){const rows=F.C?rowsC:rowsG;h+='<div class="tbl"><table><tr><th>日期</th><th>科目</th><th>時段</th><th>內容</th></tr>'+rows.map(r=>'<tr><td>'+r.join('</td><td>')+'</td></tr>').join('')+'</table></div>'+(F.C?'':'<span class="note">（不知道你考哪幾科、什麼時候有空，只能留問號）</span>')}
+  else if(F.S){h+='<div class="tbl"><table><tr><th>日期</th><th>科目</th><th>時段</th><th>內容</th></tr><tr><td>每天</td><td>全部科目</td><td>有空就讀</td><td>多做考古題</td></tr></table></div><span class="note">（有表格，但沒交代要排計畫，只有一行）</span>'}
+  else if(F.I){h+=F.C?'週六讀計概 3 小時、微積分 3 小時；週日讀計概 3 小時、微積分 2 小時；週一晚上讀微積分……（一大段，還要自己整理）':'第 1 天讀第一科，第 2 天讀第二科，第 3 天讀第三科……（不知道你考什麼）'}
+  else{h+=F.C?'你週一考計概、週三考微積分、週五考英文，每科都要讀喔，晚上有空就讀，加油！':'每天讀 2 小時、早睡早起、多做考古題，加油！'}
+  if(F.P)h+='<div class="check">自我檢查：✔ 平日每天沒超過 3 小時　✔ 每科考前一天都是複習<br>不確定：英文考試範圍，建議先跟老師確認。</div>';
+  return{h,n}}
+function l2render(k){const box=$('l2prompt');
+  box.innerHTML='<div class="ln"><span>「幫我做期中考讀書計畫。」</span></div>'+ORDER.filter(x=>F[x]).map(x=>'<div class="ln"><span class="k" style="background:var('+L[x].v+')">'+x+'</span><span>'+L2LINES[x]+'</span></div>').join('');
+  const r=l2reply();$('l2meter').style.width=(r.n*20)+'%';$('l2meterLabel').textContent='答案可用度 '+(r.n*20)+'%';
+  const chat=$('l2chat');chat.innerHTML='';aiSay(chat,r.h,k?600:300);
+  const fb=$('l2fb');if(k){fb.hidden=false;fb.innerHTML=L2NOTE[k]}
+  if(r.n===5){fb.innerHTML='<b>五格都補齊了！+50 分。</b>同一個問題，從「加油」變成一張能照著做、還自己檢查過的計畫表。';$('l2next').disabled=false;burst($('l2next'))}}
+$('l2next').onclick=()=>l3start();
+
+/* ---------- LEVEL 3 ---------- */
+const Q3=[
+ {k:'C',o:['我想知道教室空氣好不好。','我是環安社社員，教室有 CO₂ 感測器（單位 ppm），規則：超過 1000 開窗、超過 1500 發警示。','CO₂ 很重要，請幫我注意一下。'],a:1,no:'少了數字、單位和門檻，AI 只能自己編。'},
+ {k:'R',o:['你是全世界最強的 AI。','請用最專業的術語回答。','請你扮演環境安全老師，對象是大一新生，用簡單的話說明。'],a:2,no:'沒說要說給誰聽，或對象不對，答案會太難或太空泛。'},
+ {k:'I',o:['請幫我判定下面 5 個數值，各該怎麼處理。','CO₂ 是什麼？','你覺得教室空氣怎麼樣？'],a:0,no:'這是在「問」，AI 只會介紹一下或聊天；要用「請幫我」交代任務。'},
+ {k:'S',o:['回答詳細一點。','用表格輸出就好。','用表格：數值｜判定；判定只能填正常／開窗／警示／資料異常；剛好 1000 算正常、剛好 1500 算開窗。'],a:2,no:'少了等號規則和固定的答案選項，剛好卡線的數值一定吵架。'},
+ {k:'P',o:['我相信你，不用檢查。','請一筆一筆說明你怎麼判斷，不確定就說不確定。','快點給答案就好。'],a:1,no:'不要求說明理由，AI 錯了你也看不出來。'}];
+let s3=0,t3=0;
+function l3start(){show('l3');s3=0;$('l3built').innerHTML='';$('l3built').hidden=true;$('l3verify').hidden=true;$('l3next').hidden=true;l3step()}
+function l3step(){const q=Q3[s3];t3=0;
+  $('l3step').innerHTML='<div class="prog">第 '+(s3+1)+' / 5 格</div><div class="q"><span class="k" style="display:inline-block;font-family:var(--display);font-weight:400;color:var(--tileink);background:var('+L[q.k].v+');border-radius:8px;padding:0 8px;margin-right:6px">'+q.k+'</span>'+L[q.k].n+'：選最好的一句</div><div class="opts">'+q.o.map((t,j)=>'<button class="opt" data-j="'+j+'">'+t+'</button>').join('')+'</div><div class="fb" id="l3fb" hidden></div>';
+  $('l3step').querySelectorAll('.opt').forEach(b=>b.onclick=()=>l3pick(b))}
+function l3pick(b){const q=Q3[s3];if(b.classList.contains('wrong')||b.classList.contains('right'))return;t3++;const fb=$('l3fb');
+  if(+b.dataset.j===q.a){b.classList.add('right');const pts=t3===1?10:0;if(pts)addScore('l3',pts);
+    const box=$('l3built');box.hidden=false;const ln=document.createElement('div');ln.className='ln';ln.innerHTML='<span class="k" style="background:var('+L[q.k].v+')">'+q.k+'</span><span>'+q.o[q.a]+'</span>';box.appendChild(ln);
+    fb.className='fb ok';fb.hidden=false;fb.innerHTML='<b>選對了'+(pts?'，+10 分':'')+'！</b>';
+    setTimeout(()=>{s3++;if(s3<5)l3step();else{$('l3step').innerHTML='<div class="fb ok"><b>提示組好了！</b>接下來驗收 AI 的答案。</div>';l3verify()}},reduce?200:900)}
+  else{b.classList.add('wrong');fb.className='fb no';fb.hidden=false;fb.innerHTML='<b>這句不夠好。</b>'+q.no}}
+const V=[{v:'1230',t:'一般值',ans:'開窗',ai:'開窗'},{v:'1000',t:'剛好卡線',ans:'正常',ai:'正常'},{v:'1500',t:'剛好卡線',ans:'開窗',ai:'開窗'},{v:'-80',t:'怪資料',ans:'資料異常',ai:'資料異常'},{v:'12OO',t:'怪資料（字母 O）',ans:'資料異常',ai:'開窗'}];
+const CH=['正常','開窗','警示','資料異常'];const pred={};let asked=false,caught=false;
+function l3verify(){$('l3verify').hidden=false;asked=false;caught=false;$('l3catch').hidden=true;
+  $('l3rows').innerHTML=V.map((r,i)=>'<div class="row" id="vr'+i+'"><div class="v">'+r.v+'<span class="t">'+r.t+'</span></div><div class="pick">'+CH.map(c=>'<button data-i="'+i+'" data-c="'+c+'">'+c+'</button>').join('')+'</div><div class="airow" id="ai'+i+'"></div></div>').join('');
+  $('l3rows').querySelectorAll('.pick button').forEach(b=>b.onclick=()=>{if(asked)return;const i=b.dataset.i;pred[i]=b.dataset.c;
+    b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));$('l3ask').disabled=Object.keys(pred).length<5})}
+$('l3ask').onclick=()=>{if(asked)return;asked=true;$('l3ask').disabled=true;let got=0;
+  V.forEach((r,i)=>{const ok=pred[i]===r.ans;if(ok)got+=6;
+    setTimeout(()=>{$('ai'+i).innerHTML='AI 判定：<b>'+r.ai+'</b>　'+(pred[i]===r.ai?'<span class="tagok">✔ 跟你一致</span>':'<span class="tagno">✘ 不一致</span>')+(ok?'':'　<span class="note">（依規則應為'+r.ans+'）</span>')},reduce?0:i*350)});
+  if(got)addScore('l3',got);
+  setTimeout(()=>{const c=$('l3catch');c.hidden=false;c.innerHTML='<b>預測得 '+got+' / 30 分。</b>最後一題：AI 其實判錯了一題。<b>點那一列抓出它</b>（+20 分）。';
+    document.querySelectorAll('#l3rows .row').forEach((row,i)=>{row.classList.add('clickable');row.tabIndex=0;row.onclick=row.onkeydown=e=>{if(e.type==='keydown'&&e.key!=='Enter')return;l3catch(i,row)}})},reduce?0:1900)};
+let catchTries=0;
+function l3catch(i,row){if(caught)return;catchTries++;const c=$('l3catch');
+  if(i===4){caught=true;row.classList.add('caught');const pts=catchTries===1?20:catchTries===2?10:5;addScore('l3',pts);burst(row);
+    c.className='fb ok';c.innerHTML='<b>抓到了！+'+pts+' 分。</b>「12OO」的 O 是英文字母，AI 卻當成 1200 判成開窗，正確是「資料異常」。這就是 P 的用處：先自己預測，再逐題對答案，AI 錯了才看得出來。';
+    $('l3next').hidden=false;$('l3next').focus()}
+  else{row.classList.remove('miss');void row.offsetWidth;row.classList.add('miss');c.className='fb no';c.innerHTML='<b>這題 AI 是對的。</b>提示：看看「怪資料」那兩題，數字裡是不是藏了別的東西？'}}
+$('l3next').onclick=()=>finish();
+
+/* ---------- END ---------- */
+function finish(){show('end');const t=total();$('endScore').textContent=t;$('b1').textContent=S.l1;$('b2').textContent=S.l2;$('b3').textContent=S.l3;
+  const st=t>=225?3:t>=175?2:1;$('stars').innerHTML='★'.repeat(st)+'<span class="off">'+'★'.repeat(3-st)+'</span>';
+  $('badge').textContent=st===3?'提示工程大師':st===2?'提示工程師':'提示工程見習生';
+  try{const best=+(localStorage.getItem('crispBest')||0);if(t>best)localStorage.setItem('crispBest',t)}catch(e){}
+  for(let k=0;k<3;k++)setTimeout(()=>burst($('endScore')),k*250)}
+$('copy').onclick=()=>{const txt='CRISP 提示急診室｜總分 '+total()+' / 250（關卡1 '+S.l1+'/100、關卡2 '+S.l2+'/50、關卡3 '+S.l3+'/100）｜'+$('badge').textContent;
+  const done=()=>{$('copied').textContent='已複製：'+txt};
+  try{navigator.clipboard.writeText(txt).then(done,()=>{$('copied').textContent=txt})}catch(e){$('copied').textContent=txt}};
+$('again').onclick=()=>{S.l1=S.l2=S.l3=0;i1=0;streak=0;$('score').textContent='0 分';$('copied').textContent='';show('l1');l1load()};
+$('go').onclick=()=>{show('l1');l1load()};
+
+/* ---------- confetti ---------- */
+const cv=$('fx'),cx=cv.getContext('2d');let parts=[],raf=0;
+function burst(el){if(reduce||!el)return;const r=el.getBoundingClientRect();cv.width=innerWidth;cv.height=innerHeight;
+  const cs=getComputedStyle(document.documentElement);const cols=['--c','--r','--i','--s','--p','--accent'].map(v=>cs.getPropertyValue(v).trim());
+  for(let n=0;n<36;n++)parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:(Math.random()-.5)*9,vy:-Math.random()*8-2,life:60,c:cols[n%cols.length],s:4+Math.random()*4});
+  if(!raf)tick()}
+function tick(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.life--;cx.fillStyle=p.c;cx.globalAlpha=Math.max(p.life/60,0);cx.fillRect(p.x,p.y,p.s,p.s)});
+  parts=parts.filter(p=>p.life>0);cx.globalAlpha=1;raf=parts.length?requestAnimationFrame(tick):(cx.clearRect(0,0,cv.width,cv.height),0)}
+show('start');
+</script>
+</body>
+</html>

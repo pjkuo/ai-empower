@@ -30,6 +30,7 @@
 | `stats.html` | 統計分析：匯入 4C 評量 JSON／運算思維 JSON／CSV → 配對 t、Cohen's dz（Hedges gz）、95% CI、Cronbach's α、前後測比較圖、CSV 匯出 |
 | `paper.html` | HOTL 論文生成：數據 → Methods／Results／Discussion／Abstract 中英雙語草稿 → 逐段「採納／修改後採納／退回重生」→ 最終稿（Markdown／Word）＋監督日誌（CSV／JSON）＋自動人機協作聲明 |
 | `crisp.html` | CRISP 提示工坊（2026-10-30，獨立版面）：生成式 AI 提示工程 100 分鐘課的學生工具。① 寫提示：C 背景（含附檔）／R 角色／I 指令（IPO、分步驟、先問我、比較方案）／S 規格（表格、圖表、網頁、流程圖、Python、條列＋條件）／P 驗證（程式模擬、邊界自查、迭代、影音驗證、驗收清單）五張填空卡，5 張任務卡範例；② 抓幻覺；③ CO₂ 驗收帳 8 題（先寫預測才能問 AI）；④ 提示卡與交件檢查。**Google Apps Script 互動**：`<meta name="ae-ai-proxy">` 接老師代管 Gemini 代理（AI-empower-platform `gas/ai-proxy.gs`，班級碼）在頁內直接問 AI、驗收帳自動帶入 AI 判定；「☁ 交件上傳」以 `AECloud.push` 送 `kind=prompt`（`score`＝繳交完整度、`detail.graded=false`、`detail.unit=prompt`）。身分與 `identity.js` 同步（學號後 4 碼＋班級）；資料存 `localStorage`（`crisp-workshop-v1`）；零 CDN |
+| `crisp-game.html` | CRISP 提示急診室（2026-11-07）：第 10 週生成式 AI 提示工程**課前練習**，手機可玩的三關闖關——① 抓漏挑戰（5 句日常爛提示，點出缺 C／R／I／S／P 哪一格，答對揭曉「補上這句」）② 逐步改造（讀書計畫一格一格補，AI 回答即時變好、可用度 0→100%）③ 組裝＋驗收（教室 CO₂ 每格選最佳句，預測 5 個數值後「請 AI 判定」，抓出 AI 把 12OO 誤判的那題）。滿分 250、星等與「複製成績」；不需班級碼、不連雲端；QR：`assets/img/crisp-game-qr.png`／`.svg` |
 | `kpi.html` | AI-empower-KPI：以 HITL／HOTL／HOOTL 為參數的三層評量指標（10 項 KPI、閘門加權綜合指標，屬過程治理指標），加上能力 KPI（TG = AG + CR 增益分解、IR、SY、CAL、AG×CR 象限）、協作配置（組成資料 ilr 座標、探索性 M1 與等協作替代）與 KAF-7 適切性檢核，並與論文成效基線（M1–M9）對照；另有「📝 HOOTL 教師評分」分頁（`kpi.html#grade`）替規格單 R1–R4、驗證報告 V1–V4 打分並算出 θ_HOOTL；教師工作台「🎯 AI-empower-KPI」分頁 |
 | `hootl.html` | HOOTL 治理任務（2026-11-04，W15–W16）：AEE 指標 HOOTL 層的學生端。① 📐 規格單（前測簡版限時 10 分鐘＋正式版；範圍、禁止事項、驗收條件、判斷門檻、異常處理五欄＋自我檢查，`kind=hootl-spec`，教師以 R1–R4 評 s_R）；② 🔍 錯誤注入驗證任務（題本 A 宿舍待機耗電／B 教室 CO₂，各 8 檢核點＝5 錯 3 對，依學號自動輪換 A/B；採納／退回＋錯誤位置＋修正＋信心，自動計 T、CAL、過度自信，`kind=hootl-verify`＋8 筆 `kind=calcheck`（`detail.seeded=true`，`kpi.html` 直接讀 CAL）；前測不公布解答）；③ 🧾 驗證報告（逐條核對＋證據、修正重測、責任聲明，`kind=hootl-report`，教師以 V1–V4 評）；④ 📝 問卷（Google 表單前測／後測，`<meta name="ae-hootl-form-pre|post">`）。`?embed=1` 供 Moodle SCORM 內嵌。θ_HOOTL = √(s_R × s_E)，s_E = (T + V)/2 |
 
@@ -109,6 +110,11 @@ GitHub 建新 repo `ai-empower` → 推上這些檔案 → Settings → Pages �
 - 學生送出後：依填空組好 CRISP 提示（留白欄位用任務卡範例補上並標示）→ 選「要」時由老師代管 Gemini 先回答 → 推送 `kind=prompt`（`app=crisp-form`、`score`＝五面向完成度、`graded=false`）到「ai-empower 評量資料庫」→ 有填 Email 就寄給學生。
 - 已部署：學生填答 https://forms.gle/gE7LyjTX9HMxNqXcA；`crisp.html` 頁首與入口卡片加上「表單版」連結。
 - v1.1 取件頁（沒填 Email 也能直接複製）：表單加必填「取件碼（自己設 4 位數字）」；同一專案部署為網頁應用程式（`doGet`，存取權＝所有人）https://script.google.com/macros/s/AKfycbxsKFJwD9sTM4eVyaRWiz6Zot0YwQLVGZ4qVcGJJtfX3QwELPL1jdp94O8J5GDXDKDH/exec ——輸入學號＋取件碼即顯示組好的提示（與 AI 回答），一鍵複製並開啟 Claude／ChatGPT／Gemini；送出後的確認訊息與表單說明都附此網址。取件比對最新一筆、每學號 10 分鐘最多 20 次嘗試。範例：TEST0000／2468。
+
+## 2026-11-07 更新（CRISP 提示急診室：課前闖關）
+- 新增 `crisp-game.html`：CRISP 提示工程課前練習（抓漏挑戰／逐步改造／組裝＋驗收），先錯誤示範、再正確提示；即時回饋、計分與星等，零後端。
+- 入口 `index.html` CRISP 卡片加「🎮 課前闖關」；`crisp.html` 頁首加連結；`_headers` 加 `crisp-game.html` 不快取規則。
+- QR Code：`assets/img/crisp-game-qr.png`（Moodle 第 10 週提醒用）、`assets/img/crisp-game-qr.svg`，內容為 https://pjkuo.github.io/ai-empower/crisp-game.html。
 
 ## 2026-11-02 更新（AI-empower-KPI v2：能力 KPI＋KAF-7）
 - `kpi.html` 新增三張卡片：**能力 KPI**（TG = Yᴴᴬ − Yᴴ₀ = AG + CR；AG＝撤除 AI 就消失的外借增益、CR＝撤除 AI 仍保留的能力內化增益；IR＝CR ÷ TG；SY＝Yᴴᴬ − max(Yᴴ₁, Yᴬ)；CAL＝錯誤注入題判斷正確率；AG×CR 象限圖與依賴型優先名單；個人增益 CSV）、**協作配置**（各生 AI 呼叫層級比例→ilr 座標 z₁、z₂，班級中心配置，探索性 M1：Y = β₀ + β₁z₁ + β₂z₂，HOOTL→HITL 10 個百分點的等協作替代 Δ）、**KPI 適切性檢核 KAF-7**（能力歸屬、抗解耦代理 r、敏感度 SRM 自動判定，其餘待研究一施測）。
