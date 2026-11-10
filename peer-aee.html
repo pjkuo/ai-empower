@@ -141,6 +141,8 @@ svg .mut{fill:var(--muted)}
         <label class="small muted" for="clsSel">班級</label>
         <select id="clsSel"></select>
         <span class="chip" id="srcChip">線上名單：未連線</span>
+        <span class="chip" id="dlChip"></span>
+        <span class="chip" id="liveChip" hidden></span>
         <span class="chip" id="modeChip">本機模式</span>
         <span class="chip" id="roleChip">學生</span>
         <button class="btn" id="roleBtn" type="button">切換為教師</button>
@@ -222,7 +224,7 @@ svg .mut{fill:var(--muted)}
 
   <section class="view" id="v-results">
     <h2>AEE 對應結果</h2>
-    <p class="lead">每位學生取所屬組別的最終 AEE（教師決定優先）；互評平時分依評分人品質 Q 換算。</p>
+    <p class="lead">每位學生取所屬組別的 AEE（教師決定優先），隨互評即時更新；W18 截止（1/10 23:59）時的值即為最終成績。互評平時分依評分人品質 Q 換算。</p>
     <div class="row noprint" style="margin-bottom:10px">
       <button class="btn pri" type="button" id="resMoodle">下載 Moodle 匯入 CSV</button>
       <button class="btn" type="button" id="resMoodleCopy">複製 Moodle CSV</button>
@@ -253,7 +255,7 @@ svg .mut{fill:var(--muted)}
 
   <section class="view" id="v-decide">
     <h2>教師決定</h2>
-    <p class="lead">每組選「保留互評」「修正」或「退回重評」。修正只填要改的題目並寫理由；留空的題目沿用互評分。勾選發布後，組員在「我的報告」看得到結果。</p>
+    <p class="lead">每組選「保留互評」「修正」或「退回重評」。修正只填要改的題目並寫理由；留空的題目沿用互評分。各組暫定結果隨互評即時同步給組員；勾選「教師確認」後標示為確認。W18 截止（1/10 23:59）時的結果即為最終成績。</p>
     <div class="grid" style="grid-template-columns:minmax(220px,300px) 1fr">
       <div class="card"><div id="decList"></div></div>
       <div class="card" id="decEditor"></div>
@@ -310,6 +312,13 @@ svg .mut{fill:var(--muted)}
           <label class="f">T HOOTL<input type="number" step="0.5" min="1" max="4" id="sTX" style="width:80px"></label>
           <label class="f">Moodle 項目：AEE<input type="text" id="sMiA" style="width:150px"></label>
           <label class="f">Moodle 項目：平時<input type="text" id="sMiQ" style="width:150px"></label>
+        </div>
+        <h3 style="margin-top:12px">即時同步與截止</h3>
+        <div class="row">
+          <label class="f">成績截止（W18）<input type="text" id="sDl" style="width:230px"></label>
+          <label class="f">自動同步<select id="sLive"><option value="1">開</option><option value="0">關</option></select></label>
+          <label class="f">同步間隔（秒）<input type="number" id="sEvery" min="30" style="width:90px"></label>
+          <label class="f">即時發布暫定結果<select id="sPub"><option value="1">是</option><option value="0">否</option></select></label>
         </div>
         <div class="row" style="margin-top:12px">
           <button class="btn pri" type="button" id="sSave">儲存設定</button>
@@ -405,10 +414,10 @@ const RULES=[
   ["能作才能管","連鎖閘門：HITL 未達 τ₁，HOTL 按比例折減；HOTL 未達 τ₂，HOOTL 再折減。折減量 G 直接列在報告。"],
   ["證據先於印象","組員上傳四站、轉換與規則證據；評語須指向題目。"],
   ["評分人也要校準","記名評分、隨機分派、無效規則（全同分、過快、非分派、逾時），並以 Q 值與 rwg、ICC 檢查評分品質。"],
-  ["決策歸人","系統與同儕只提供分數；每組由教師保留、修正或退回，修正需寫理由並留紀錄，發布後組員才看得到。"]];
+  ["即時同步、決策歸人","互評一進資料庫，各組 AEE 與組員的「我的報告」即時更新（暫定）；教師在 W18 截止前逐組保留、修正或退回並留紀錄，截止時的結果即為最終成績。"]];
 const DEF_CFG={v:2,title:"期末專題報告互評",unit:"group",groups:[],roster:[],alloc:{mode:"4x4",seed:20261228,map:null},
   w:{HITL:.5,HOTL:.3,HOOTL:.2},tau1:60,tau2:60,T:{HITL:3,HOTL:3,HOOTL:3},cut:60,minRaters:3,trim:true,bias:false,minSec:30,qw:5,
-  win:{from:"2026-12-28",to:"2027-01-10"},moodle:{aee:"專題互評 AEE",q:"互評參與（平時）"},released:{},sync:null};
+  win:{from:"2026-12-28",to:"2027-01-10"},moodle:{aee:"專題互評 AEE",q:"互評參與（平時）"},deadline:"2027-01-10T23:59:59+08:00",live:{auto:true,every:60,publish:true},pub:{},released:{},sync:null};
 
 /* ================= 狀態（每班一份） ================= */
 const KEY="ae.peerAEE.v2";
@@ -419,7 +428,7 @@ const PREVIEW=!!DB_SHEET;  /* claude.ai 教師預覽版 */
 function freshCls(){return {cfg:clone(DEF_CFG),ratings:[],uploads:[],decisions:{},declog:[],demo:false};}
 function freshState(){const st={v:2,cls:"mis",sheets:{},byCls:{},me:{},role:PREVIEW?"teacher":"student",tcode:""};CLASSES.forEach(c=>{st.byCls[c.key]=freshCls();st.sheets[c.key]=c.sheet||"";});return st;}
 function bindCls(){if(!S.byCls[S.cls])S.byCls[S.cls]=freshCls();const b=S.byCls[S.cls];
-  b.cfg=Object.assign(clone(DEF_CFG),b.cfg||{});["alloc","win","T","w","moodle"].forEach(k=>b.cfg[k]=Object.assign(clone(DEF_CFG[k]),b.cfg[k]||{}));b.cfg.released=b.cfg.released||{};
+  b.cfg=Object.assign(clone(DEF_CFG),b.cfg||{});["alloc","win","T","w","moodle","live"].forEach(k=>b.cfg[k]=Object.assign(clone(DEF_CFG[k]),b.cfg[k]||{}));b.cfg.released=b.cfg.released||{};b.cfg.pub=b.cfg.pub||{};
   ["ratings","uploads","declog"].forEach(k=>{if(!Array.isArray(b[k]))b[k]=[];}); if(!b.decisions)b.decisions={};
   S.cfg=b.cfg;S.ratings=b.ratings;S.uploads=b.uploads;S.decisions=b.decisions;S.declog=b.declog;S.demo=!!b.demo;}
 function save(){const b=S.byCls[S.cls];b.cfg=S.cfg;b.ratings=S.ratings;b.uploads=S.uploads;b.decisions=S.decisions;b.declog=S.declog;b.demo=S.demo;
@@ -429,7 +438,7 @@ function push(kind,sid,name,detail,score,max){
   return AECloud.push({app:"peer-aee",kind:kind,sid:sid,name:name,cls:clsOf(S.cls).label,score:score==null?"":score,max:max==null?"":max,detail:detail}).catch(()=>({error:true}));
 }
 const modeKM=m=>m==="3x3"?{k:3,m:3}:{k:4,m:4};
-const normW=w=>{const s=(+w.HITL||0)+(+w.HOTL||0)+(+w.HOOTL||0);return s>0?{HITL:w.HITL/s,HOTL:w.HOTL/s,HOOTL:w.HOOTL/s}:{HITL:.5,HOTL:.3,HOOTL:.2};};
+const normW=w=>{const s=(+w.HITL||0)+(+w.HOTL||0)+(+w.HOOTL||0);return s>0?{HITL:w.HOTL!=null?w.HITL/s:.5,HOTL:w.HOTL/s,HOOTL:w.HOOTL/s}:{HITL:.5,HOTL:.3,HOOTL:.2};};
 
 /* ================= 線上名單讀取 ================= */
 let MCP; function mcp(){if(MCP!==undefined)return Promise.resolve(MCP);if(!(window.claude&&typeof window.claude.use==="function"))return Promise.resolve(MCP=null);return window.claude.use("mcp").then(m=>(MCP=m||null),()=>(MCP=null));}
@@ -447,12 +456,12 @@ function parseOnline(groupRows,rosterRows){
   rosterRows.slice(hr+1).forEach(r=>{const sid=String(r[0]||"").trim().toUpperCase();if(SID.test(sid)&&!seen[sid]){seen[sid]=1;roster.push({sid,name:String(r[1]||"").trim(),group:""});}});
   const hg=groupRows.findIndex(r=>String(r[0]||"").trim()==="題目"); let row=0;
   groupRows.slice(hg+1).forEach(r=>{const title=String(r[0]||"").trim();row++;
-    const mem=[1,3,5].map(c=>({sid:String(r[c]||"").trim().toUpperCase(),name:String(r[c+1]||"").trim()})).filter(x=>SID.test(x.sid));
-    if(!title||/^（範例）|^\(範例\)/.test(title)||!mem.length)return;
-    const order=parseInt(String(r[7]||"").trim(),10);
-    const g={id:gidOf(mem[0].sid),name:title,order:isNaN(order)?null:order,row,leader:mem[0].sid,sids:[]};
-    mem.forEach(x=>{let s=roster.find(y=>y.sid===x.sid);if(!s){s={sid:x.sid,name:x.name,group:""};roster.push(s);}
-      if(s.group){dup.push(x.sid);return;} s.group=g.id; g.sids.push(x.sid);});
+    const sids=[1,3,5].map(c=>String(r[c]||"").trim().toUpperCase()).filter(x=>SID.test(x));
+    if(!title||/^（範例）|^\(範例\)/.test(title)||!sids.length)return;
+    const names=[2,4,6].map(c=>String(r[c]||"").trim()), order=parseInt(String(r[7]||"").trim(),10);
+    const g={id:gidOf(sids[0]),name:title,order:isNaN(order)?null:order,row,leader:sids[0],sids:[]};
+    sids.forEach((sid,i)=>{let s=roster.find(x=>x.sid===sid);if(!s){s={sid,name:names[[1,3,5].indexOf([1,3,5][i])]||"",group:""};roster.push(s);}
+      if(s.group){dup.push(sid);return;} s.group=g.id; g.sids.push(sid);});
     if(g.sids.length)groups.push(g);});
   groups.sort((a,b)=>(a.order==null?999:a.order)-(b.order==null?999:b.order)||a.row-b.row);
   groups.forEach((g,i)=>{g.sub=`第 ${g.order!=null?g.order:i+1} 組`;});
@@ -641,6 +650,8 @@ function render(id){
   $("#modeChip").textContent=cloud()?"評量資料庫：已連線":(PREVIEW?"教師預覽":"本機模式"); $("#modeChip").className="chip "+(cloud()?"ok":"");
   $("#roleChip").textContent=S.role==="teacher"?"教師":"學生"; $("#roleBtn").textContent=S.role==="teacher"?"切換為學生":"切換為教師";
   $("#demoBanner").hidden=!(S.demo&&S.role==="teacher");
+  const dl=Date.parse(S.cfg.deadline), left=dl-Date.now(), dlc=$("#dlChip");
+  dlc.textContent=isNaN(dl)?"":(left>0?`W18 截止 ${fmtTs(S.cfg.deadline)}｜剩 ${Math.ceil(left/864e5)} 天`:"已截止，成績為最終"); dlc.className="chip "+(left>0?(left<3*864e5?"warn":""):"bad"); liveView();
   const sb=$("#srcBanner"), sy=S.cfg.sync;
   if(!S.demo&&sy&&sy.g===0){sb.hidden=false;sb.innerHTML=`<span>線上分組名單目前 <b>0 組</b>（全班 ${sy.n} 人）。學生在分組名單填好題目與組員後，按「同步線上名單」即自動建立組別與分派。</span><button class="btn" type="button" id="sbSync">再同步一次</button>`;$("#sbSync").onclick=()=>syncOnline(false);}
   else if(!S.demo&&!sy&&!S.sheets[S.cls]){sb.hidden=false;sb.innerHTML=`<span>尚未連上${esc(c.short)}的線上分組名單。請從 Moodle 課程頁的「專題報告互評」連結開啟本頁。</span>`;}
@@ -665,11 +676,11 @@ function rPrinciples(){
   $("#pFlow").innerHTML=`<tr><th>階段</th><th>誰</th><th>做什麼</th><th>週次</th></tr>
     <tr><td>分組</td><td>學生</td><td>在線上分組名單填題目與組員（每組 2–3 人）</td><td>W10 起</td></tr>
     <tr><td>事前規則</td><td>教師</td><td>同步線上名單、設定參數、產生隨機分派；Moodle 放入口連結</td><td>W16 前</td></tr>
-    <tr><td>上傳證據</td><td>組員</td><td>四站、轉換紀錄、選題規則單、驗證校準紀錄的連結與檔案</td><td>W16</td></tr>
+    <tr><td>上傳證據</td><td>組員</td><td>四站、轉換紀錄、選題規則單、驗證校準紀錄的連結與檔案</td><td>W16–W18（報告截止 1/10）</td></tr>
     <tr><td>記名評分</td><td>學生</td><td>只評分派到的組別，12 題 0–4，附亮點與建議</td><td>W17–W18 持續</td></tr>
-    <tr><td>即時報告</td><td>系統</td><td>每組的 AEE、閘門、G、題目剖面與文字回饋；班級統計與敏感度</td><td>即時</td></tr>
-    <tr><td>事後校準</td><td>教師</td><td>看旗標與分歧，逐組保留、修正或退回；勾選發布</td><td>W17–W18 滾動</td></tr>
-    <tr><td>成績</td><td>教師</td><td>下載 Moodle 匯入 CSV（AEE、互評平時分）</td><td>W18 後</td></tr>`;
+    <tr><td>即時報告</td><td>系統</td><td>每 60 秒從評量資料庫同步；各組 AEE、閘門、G、題目剖面與文字回饋即時更新，組員「我的報告」同步顯示暫定 AEE</td><td>W17–W18 即時</td></tr>
+    <tr><td>事後校準</td><td>教師</td><td>看旗標與分歧，逐組保留、修正或退回；勾選教師確認</td><td>W17–W18 滾動，W18 截止前</td></tr>
+    <tr><td>成績</td><td>教師</td><td>截止時的 AEE 即為最終成績；下載 Moodle 匯入 CSV（AEE、互評平時分）</td><td>W18 截止（1/10 23:59）</td></tr>`;
 }
 
 /* ================= 記名評分 ================= */
@@ -786,11 +797,11 @@ function rMyReport(){
   if(!me){box.innerHTML='<div class="card muted">先到「記名評分」確認身分。</div>';return;}
   const g=C.targets.find(x=>x.id===me.group), mine=S.ratings.filter(r=>r.sid===me.sid);
   const mineHTML=`<div class="card" style="margin-top:14px"><h2>我送出的評分</h2>${mine.length?`<table class="t"><tr><th>組別</th><th>時間</th><th>秒數</th><th>AEE（我的評分換算）</th></tr>${mine.map(r=>{const t=groupOf(S.cfg,r.target);return `<tr><td>${esc(t?t.sub+"｜"+t.name:r.target)}</td><td>${fmtTs(r.ts)}</td><td class="n">${r.sec}</td><td class="n">${f1(aee(r.r,S.cfg).A)}</td></tr>`;}).join("")}</table>`:'<p class="muted">還沒有。</p>'}</div>`;
-  if(g&&g.released&&(S.demo||!cloud())){box.innerHTML=reportHTML(g,true)+mineHTML;return;}
-  box.innerHTML='<div class="card muted" id="myRes">讀取老師發布的結果中…</div>'+mineHTML;
+  if(g&&g.usable&&(S.demo||!cloud())){box.innerHTML=reportHTML(g,true)+mineHTML;return;}
+  box.innerHTML='<div class="card muted" id="myRes">讀取本組即時結果中…</div>'+mineHTML;
   fetchMyResult(me).then(x=>{const el=$("#myRes");if(!el)return;
-    if(!x){el.innerHTML="老師還沒發布你這組的結果。W17–W18 期間老師會陸續發布。";return;}
-    const d=x.detail||{};el.className="card";el.innerHTML=`<h2>${esc(d.t||"")}</h2><p>AEE <b class="num" style="font-size:1.6rem">${f1(+x.score)}</b>（${esc(d.v||"")}）｜HITL ${f1(d.H)}｜HOTL ${f1(d.O)}｜HOOTL ${f1(d.X)}｜閘門折減 ${f1(d.G)}</p>${d.w?`<p><b>補強：</b>${esc(d.w)}</p>`:""}${d.n?`<p class="small"><b>教師備註：</b>${esc(d.n)}</p>`:""}<p class="small muted">發布時間 ${fmtTs(x.ts)}</p>`;});
+    if(!x){el.innerHTML="你這組的有效互評還不到 3 人。互評進來後，這裡會即時顯示暫定 AEE（每分鐘更新）。";return;}
+    const d=x.detail||{};el.className="card";const stc={"教師確認":"good","最終":"good","暫定":"warn","退回重評":"crit"}[d.st||"暫定"]||"warn";el.innerHTML=`<div class="row" style="justify-content:space-between"><h2>${esc(d.t||"")}</h2><span class="pill ${stc}">${esc(d.st||"暫定")}</span></div><p>AEE <b class="num" style="font-size:1.6rem">${f1(+x.score)}</b>（${esc(d.v||"")}）｜HITL ${f1(d.H)}｜HOTL ${f1(d.O)}｜HOOTL ${f1(d.X)}｜閘門折減 ${f1(d.G)}</p>${d.w?`<p><b>補強：</b>${esc(d.w)}</p>`:""}${d.n?`<p class="small"><b>教師備註：</b>${esc(d.n)}</p>`:""}<p class="small muted">更新時間 ${fmtTs(x.ts)}｜W18 截止（${esc(fmtTs(S.cfg.deadline))}）時的結果即為最終成績</p>`;});
 }
 function fetchMyResult(me){
   const u=cloudUrl(); if(!cloud()||!/^https?:/.test(u))return Promise.resolve(null);
@@ -866,7 +877,7 @@ function rDecide(){
   if(!decDraft||decDraft.id!==g.id){const d=S.decisions[g.id];decDraft={id:g.id,action:d?d.action:"keep",items:d?clone(d.items||{}):{},note:d?d.note||"":"",released:d?!!d.released:false};}
   const prev=previewDecision(g);
   ed.innerHTML=`<div class="row" style="justify-content:space-between"><h2>${esc(g.sub)}｜${esc(g.name)}</h2><div class="small muted">有效 ${g.nValid}｜目前 AEE ${f1(g.A)} → 套用後 <b>${f1(prev.A)}</b></div></div>
-    <div class="row" style="margin:8px 0" role="radiogroup" aria-label="教師決定">${[["keep","保留互評"],["modify","修正"],["redo","退回重評"]].map(([k,t])=>`<label class="chip" style="cursor:pointer"><input type="radio" name="dact" value="${k}" ${decDraft.action===k?"checked":""}> ${t}</label>`).join("")}<label class="chip" style="cursor:pointer"><input type="checkbox" id="dRel" ${decDraft.released?"checked":""}> 發布給組員</label></div>
+    <div class="row" style="margin:8px 0" role="radiogroup" aria-label="教師決定">${[["keep","保留互評"],["modify","修正"],["redo","退回重評"]].map(([k,t])=>`<label class="chip" style="cursor:pointer"><input type="radio" name="dact" value="${k}" ${decDraft.action===k?"checked":""}> ${t}</label>`).join("")}<label class="chip" style="cursor:pointer"><input type="checkbox" id="dRel" ${decDraft.released?"checked":""}> 教師確認</label></div>
     <div class="scroll"><table class="t"><tr><th>題</th><th class="n">互評 r̄</th><th class="n">n</th><th class="n">SD</th><th class="n">rwg</th><th>教師值（0–4，留空＝保留）</th><th>理由</th></tr>
     ${ITEMS.map(it=>{const x=g.items[it.id],di=decDraft.items[it.id]||{};return `<tr><td><span class="chip L-${it.L}">${it.id}</span> ${it.name}</td><td class="n">${f2(x.peer)}</td><td class="n">${x.n}</td><td class="n">${f2(x.sd)}</td><td class="n" style="${x.rwg!=null&&x.rwg<.5?"color:var(--crit);font-weight:700":""}">${f2(x.rwg)}</td>
       <td><input type="number" min="0" max="4" step="0.5" data-dv="${it.id}" value="${di.v==null?"":di.v}" style="width:80px" ${decDraft.action!=="modify"?"disabled":""}></td><td><input type="text" data-dr="${it.id}" value="${esc(di.reason||"")}" placeholder="修正理由" ${decDraft.action!=="modify"?"disabled":""}></td></tr>`;}).join("")}</table></div>
@@ -889,12 +900,37 @@ function saveDecision(){
   S.decisions[d.id]=rec; S.declog.push({ts:rec.ts,target:d.id,action:d.action,changes:Object.keys(items).map(k=>k+"→"+items[k].v).join("；"),note:rec.note,released:rec.released});
   recompute(); const g=C.targets.find(x=>x.id===d.id);
   save(); push("peer-aee-decision","0000","教師",Object.assign({target:d.id},rec),g&&g.A!=null?+g.A.toFixed(1):"",100);
-  if(rec.released&&g&&g.usable){  /* 發布：每位組員一筆 peer-aee-result（學號後 4 碼＋雜湊），學生以 action=me 讀回 */
-    const weak=ITEMS.map(it=>({it,v:g.fin[it.id]})).filter(x=>x.v!=null).sort((a,b)=>a.v-b.v).slice(0,2).map(x=>`${x.it.id} ${x.it.name}（${f1(x.v)}）`).join("、");
-    g.members.forEach(s=>push("peer-aee-result",last4(s.sid),s.name,{sh:shOf(s.sid),gid:g.id,t:`${g.sub}｜${g.name}`.slice(0,40),v:verdict(S.cfg,g.A).t,H:+f1(g.th.HITL),O:+f1(g.hot),X:+f1(g.hoot),G:+f1(g.G),w:weak,n:rec.note.slice(0,80)},+g.A.toFixed(1),100));
-  }
-  decDraft=null; toast(rec.released?"已儲存並發布":"已儲存決定"); rDecide();
+  if(g){publishGroup(g,rec.action==="redo"?"退回重評":(rec.released?"教師確認":"暫定"),rec.note);S.cfg.pub[g.id]={sig:pubSig(g),at:Date.now()};save();}
+  decDraft=null; toast(rec.released?"已儲存並標為教師確認":"已儲存決定"); rDecide();
 }
+
+/* ================= 即時同步：發布組員結果 ================= */
+function pubStatus(g){if(g.action==="redo")return "退回重評";if(g.released)return "教師確認";return Date.now()>Date.parse(S.cfg.deadline)?"最終":"暫定";}
+function pubSig(g){return [g.A==null?"":g.A.toFixed(1),pubStatus(g),g.nValid].join("|");}
+function publishGroup(g,st,note){  /* 每位組員一筆 peer-aee-result（學號後 4 碼＋雜湊），學生以 action=me 讀回 */
+  if(!cloud()||S.demo)return 0;
+  const base={gid:g.id,t:`${g.sub}｜${g.name}`.slice(0,40),st};
+  if(st!=="退回重評"&&(!g.usable||g.A==null))return 0;
+  const weak=st==="退回重評"?"":ITEMS.map(it=>({it,v:g.fin[it.id]})).filter(x=>x.v!=null).sort((a,b)=>a.v-b.v).slice(0,2).map(x=>`${x.it.id} ${x.it.name}（${f1(x.v)}）`).join("、");
+  const nt=String(note!=null?note:(g.dec&&g.dec.note)||"").slice(0,80);
+  g.members.forEach(s=>push("peer-aee-result",last4(s.sid),s.name,Object.assign({sh:shOf(s.sid)},base,st==="退回重評"?{n:nt}:{v:verdict(S.cfg,g.A).t,H:+f1(g.th.HITL),O:+f1(g.hot),X:+f1(g.hoot),G:+f1(g.G),w:weak,n:nt}),st==="退回重評"?"":+g.A.toFixed(1),100));
+  return g.members.length;
+}
+function autoPublish(){
+  if(!cloud()||S.demo||!S.cfg.live.publish)return 0;
+  const now=Date.now(); let n=0;
+  C.targets.forEach(g=>{if(!(g.usable&&g.A!=null)&&g.action!=="redo")return;const sig=pubSig(g),p=S.cfg.pub[g.id];
+    if(p&&p.sig===sig)return; if(p&&now-p.at<120000&&pubStatus(g)==="暫定")return;
+    n+=publishGroup(g,pubStatus(g)); S.cfg.pub[g.id]={sig,at:now};});
+  if(n)save(); return n;
+}
+let liveT=null, liveAt=null;
+function liveStart(){clearInterval(liveT);liveT=null;
+  if(S.role!=="teacher"||S.demo||!S.cfg.live.auto||!(cloud()||DB_SHEET)){liveView();return;}
+  liveT=setInterval(()=>{if(!document.hidden)loadDb(true);},Math.max(30,+S.cfg.live.every||60)*1000); liveView();}
+function liveView(){const el=$("#liveChip");if(S.role!=="teacher"){el.hidden=true;return;}el.hidden=false;
+  el.textContent=liveT?("即時同步"+(liveAt?"："+new Date(liveAt).toLocaleTimeString("zh-TW",{hour12:false}):"中")):"即時同步：關閉";el.className="chip"+(liveT?" ok":"");}
+let myT=null; function myStart(){clearInterval(myT);myT=setInterval(()=>{if(!document.hidden&&current()==="my-report"&&S.role==="student")rMyReport();},60000);}
 
 /* ================= 設定 ================= */
 function rSetup(){
@@ -909,6 +945,7 @@ function rSetup(){
   $("#sMin").value=c.minRaters; $("#sSec").value=c.minSec; $("#sQw").value=String(c.qw); $("#sTrim").value=c.trim?"1":"0"; $("#sBias").value=c.bias?"1":"0";
   $("#sW1").value=c.w.HITL; $("#sW2").value=c.w.HOTL; $("#sW3").value=c.w.HOOTL; $("#sT1").value=c.tau1; $("#sT2").value=c.tau2; $("#sCut").value=c.cut;
   $("#sTH").value=c.T.HITL; $("#sTO").value=c.T.HOTL; $("#sTX").value=c.T.HOOTL; $("#sMiA").value=c.moodle.aee; $("#sMiQ").value=c.moodle.q;
+  $("#sDl").value=c.deadline; $("#sLive").value=c.live.auto?"1":"0"; $("#sEvery").value=c.live.every; $("#sPub").value=c.live.publish?"1":"0";
   allocView(); linksView();
 }
 function linksView(){$("#sLinks").innerHTML=`<p>每班在 Moodle 第 17 週主題加入「URL」資源，網址如下（含試算表 ID，只放在需登入的 Moodle 課程內，不放公開網頁）：</p>`+CLASSES.map(k=>{const id=S.sheets[k.key];const u=id?`${PAGE_URL}?c=${k.key}&s=${id}`:"";return `<p><b>${esc(k.label)}</b>（Moodle ${k.moodle}）<br>${u?`<code style="word-break:break-all">${esc(u)}</code> <button class="btn" type="button" data-cp="${esc(u)}">複製</button>`:'<span class="muted">尚未設定試算表 ID</span>'}</p>`;}).join("");
@@ -929,6 +966,8 @@ function readSetup(){
   c.w={HITL:num("#sW1",.5),HOTL:num("#sW2",.3),HOOTL:num("#sW3",.2)}; c.tau1=num("#sT1",60); c.tau2=num("#sT2",60); c.cut=num("#sCut",60);
   c.T={HITL:clamp(num("#sTH",3),1,4),HOTL:clamp(num("#sTO",3),1,4),HOOTL:clamp(num("#sTX",3),1,4)};
   c.moodle={aee:$("#sMiA").value.trim()||"專題互評 AEE",q:$("#sMiQ").value.trim()||"互評參與（平時）"};
+  const dl=$("#sDl").value.trim(); if(dl&&!isNaN(Date.parse(dl)))c.deadline=dl;
+  c.live={auto:$("#sLive").value==="1",every:Math.max(30,num("#sEvery",60)),publish:$("#sPub").value==="1"};
 }
 
 /* ================= 模態、角色、雲端 ================= */
@@ -936,10 +975,10 @@ let modalOk=null;
 function openModal(title,body,ok){$("#mTitle").textContent=title;$("#mBody").innerHTML=body;modalOk=ok;$("#modal").classList.add("on");setTimeout(()=>{const f=$("#mBody input,#mBody textarea");if(f)f.focus();},30);}
 function closeModal(){$("#modal").classList.remove("on");modalOk=null;}
 function toggleRole(){
-  if(S.role==="teacher"){S.role="student";save();renderTabs();go("rate");return;}
+  if(S.role==="teacher"){S.role="student";save();liveStart();renderTabs();go("rate");return;}
   openModal("切換為教師",`<label class="f">教師碼<input type="text" id="mCode" autocomplete="off"></label><p class="small muted">${cloud()?"以 ai-empower 教師碼驗證後，可從評量資料庫載入全班評分。":"這個環境沒有連上評量資料庫，只切換畫面。"}</p><div id="mErr" class="small"></div>`,()=>{
     const code=($("#mCode").value||"").trim(); if(code.length<4){$("#mErr").innerHTML='<span style="color:var(--crit)">至少 4 個字元。</span>';return false;}
-    const fin=()=>{S.role="teacher";S.tcode=code;save();closeModal();renderTabs();go("report");};
+    const fin=()=>{S.role="teacher";S.tcode=code;save();closeModal();renderTabs();go("report");if(!S.demo&&(cloud()||DB_SHEET))loadDb(true);liveStart();};
     if(cloud()&&AECloud.verify){AECloud.verify(code).then(()=>{try{AECloud.teacherCode(code);}catch(e){}fin();},()=>{$("#mErr").innerHTML='<span style="color:var(--crit)">教師碼不正確。</span>';});return false;}
     fin(); return false;});
 }
@@ -950,25 +989,31 @@ function readDbKind(kind){  /* claude.ai 教師預覽：經 Google Sheets 連接
     return v.slice(1).map(row=>{const o={};h.forEach((k,i)=>o[k]=row[i]==null?"":row[i]);try{o.detail=JSON.parse(o.detail||"{}");}catch(e){o.detail={};}return o;});
   },e=>{if(e&&e.code==="tool_error")return [];throw e;});});
 }
-function loadDb(){
+let dbSig="";
+function loadDb(quiet){
   const m=$("#sSyncMsg"), label=clsOf(S.cls).label;
   let p;
-  if(cloud())p=Promise.all(KINDS.map(k=>AECloud.pull(k,S.tcode)));
+  if(cloud())p=Promise.all(KINDS.map(k=>AECloud.pull(k,S.tcode,{incremental:true})));
   else if(DB_SHEET)p=Promise.all(KINDS.map(readDbKind));
-  else{m.innerHTML='<span style="color:var(--warn)">這個環境沒有連上評量資料庫（部署版需載入 assets/cloud.js）。</span>';return;}
-  m.textContent="讀取評量資料庫中…";
-  p.then(([ra,up,de])=>{
+  else{if(!quiet)m.innerHTML='<span style="color:var(--warn)">這個環境沒有連上評量資料庫（部署版需載入 assets/cloud.js）。</span>';return Promise.resolve();}
+  if(!quiet)m.textContent="讀取評量資料庫中…";
+  return p.then(([ra,up,de])=>{
     const mine=a=>a.filter(r=>String(r.cls||"")===label), det=r=>r.detail||{};
     const bySh={}; S.cfg.roster.forEach(s=>bySh[shOf(s.sid)]=s.sid);
     if(S.demo){S.demo=false;S.cfg.groups=[];S.cfg.roster=[];}
     S.ratings.length=0; mine(ra).sort((x,y)=>String(x.ts).localeCompare(String(y.ts))).forEach(r=>{const d=det(r);S.ratings.push({id:d.rid||r.id,ts:r.ts,sid:bySh[d.sh]||"",sh:d.sh,name:r.name,target:d.target,r:d.r||{},good:d.good||"",tip:d.tip||"",sec:+d.sec||0});});
     S.uploads.length=0; mine(up).forEach(r=>{const d=det(r);S.uploads.push({id:r.id,ts:r.ts,sid:bySh[d.sh]||"",name:r.name,target:d.target,title:d.title,links:d.links||{},files:d.files||[],note:d.note||""});});
     const ds=mine(de).sort((x,y)=>String(x.ts).localeCompare(String(y.ts)));
-    ds.forEach(r=>{const d=det(r);if(d.target)S.decisions[d.target]={action:d.action,items:d.items||{},note:d.note||"",released:!!d.released,ts:r.ts};});
-    save(); m.innerHTML=`<span style="color:var(--good)">${esc(clsOf(S.cls).short)}：評分 ${S.ratings.length}、證據 ${S.uploads.length}、決定 ${ds.length} 筆。</span>`; render(current());
-  },e=>{m.innerHTML='<span style="color:var(--crit)">讀取失敗：'+esc(e&&(e.message||e.code)||e)+'</span>';});
+    ds.forEach(r=>{const d=det(r),cur=S.decisions[d.target];if(d.target&&(!cur||String(cur.ts)<=String(d.ts||r.ts)))S.decisions[d.target]={action:d.action,items:d.items||{},note:d.note||"",released:!!d.released,ts:d.ts||r.ts};});
+    save(); liveAt=Date.now(); liveView();
+    const sig=[S.ratings.length,(S.ratings.slice(-1)[0]||{}).ts,S.uploads.length,ds.length].join("|"), changed=sig!==dbSig; dbSig=sig;
+    recompute(); const np=autoPublish();
+    if(!quiet)m.innerHTML=`<span style="color:var(--good)">${esc(clsOf(S.cls).short)}：評分 ${S.ratings.length}、證據 ${S.uploads.length}、決定 ${ds.length} 筆${np?`；已即時發布 ${np} 位組員的結果`:""}。</span>`;
+    const ae=document.activeElement, editing=ae&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName)&&ae.closest("#decEditor,#ratePanel,#v-setup");
+    if((changed||!quiet)&&!editing)render(current());
+  },e=>{if(!quiet)m.innerHTML='<span style="color:var(--crit)">讀取失敗：'+esc(e&&(e.message||e.code)||e)+'</span>';});
 }
-function switchCls(key){S.cls=key;bindCls();panel=null;decSel=null;decDraft=null;save();render(current());if(S.sheets[key]&&!S.demo)syncOnline(true);}
+function switchCls(key){S.cls=key;bindCls();panel=null;decSel=null;decDraft=null;dbSig="";save();render(current());const go2=()=>{if(S.role==="teacher"&&!S.demo&&(cloud()||DB_SHEET))loadDb(true);liveStart();};if(S.sheets[key]&&!S.demo)syncOnline(true).then(go2);else go2();}
 
 /* ================= 事件 ================= */
 function bind(){
@@ -989,9 +1034,9 @@ function bind(){
   $("#resRawCsv").addEventListener("click",()=>download(`AEE_${clsOf(S.cls).short}_原始評分.csv`,rawCSV(),"text/csv;charset=utf-8"));
   $("#anCopy").addEventListener("click",()=>copyText(analysisMD())); $("#anDl").addEventListener("click",()=>download(`AEE_${clsOf(S.cls).short}_統計分析報告.md`,analysisMD(),"text/markdown;charset=utf-8"));
   $("#decCsv").addEventListener("click",()=>download(`AEE_${clsOf(S.cls).short}_教師決策紀錄.csv`,csv([["時間","組別ID","決定","修正","備註","發布"]].concat(S.declog.map(l=>[l.ts,l.target,l.action,l.changes,l.note,l.released?1:0]))),"text/csv;charset=utf-8"));
-  $("#sSync").addEventListener("click",()=>syncOnline(false)); $("#sCloud").addEventListener("click",loadDb);
+  $("#sSync").addEventListener("click",()=>syncOnline(false)); $("#sCloud").addEventListener("click",()=>loadDb(false));
   $("#sManual").addEventListener("click",()=>{const p=parseManual($("#sGroups").value,$("#sRoster").value);if(!p.roster.length){toast("名冊是空的");return;}S.cfg.groups=p.groups;S.cfg.roster=p.roster;S.cfg.alloc.map=allocate(S.cfg);S.demo=false;save();render("setup");toast("已套用手動名冊");});
-  $("#sSave").addEventListener("click",()=>{readSetup();save();$("#sMsg").innerHTML='<span style="color:var(--good)">已儲存。</span>';render("setup");});
+  $("#sSave").addEventListener("click",()=>{readSetup();save();liveStart();$("#sMsg").innerHTML='<span style="color:var(--good)">已儲存。</span>';render("setup");});
   $("#sDemo").addEventListener("click",()=>{const d=demoData();Object.assign(S.byCls[S.cls],d);bindCls();save();go("report");toast("已載入示範資料（只影響本班）");});
   let armed=false; $("#sClear").addEventListener("click",e=>{if(!armed){armed=true;e.target.textContent="再按一次確認清除";setTimeout(()=>{armed=false;e.target.textContent="清除本班資料";},4000);return;}
     S.byCls[S.cls]=freshCls(); bindCls(); save(); armed=false; e.target.textContent="清除本班資料"; toast("已清除本班評分、證據與決定"); render("setup");});
@@ -1008,7 +1053,8 @@ function boot(){
   if(qs&&/^[A-Za-z0-9_-]{20,}$/.test(qs))S.sheets[S.cls]=qs;
   bindCls(); if(qseed&&/^\d+$/.test(qseed)&&+qseed!==S.cfg.alloc.seed){S.cfg.alloc.seed=+qseed;S.cfg.alloc.map=allocate(S.cfg);}
   save(); bind(); renderTabs(); go(current()); dlCap();
-  if(S.sheets[S.cls]&&!S.demo)syncOnline(true); else setSrc(S.demo?"示範資料":"未設定",S.demo?"warn":null);
+  const after=()=>{if(S.role==="teacher"&&!S.demo&&(cloud()||DB_SHEET))loadDb(true);liveStart();myStart();};
+  if(S.sheets[S.cls]&&!S.demo)syncOnline(true).then(after); else {setSrc(S.demo?"示範資料":"未設定",S.demo?"warn":null);after();}
 }
 window.__peerAEE={compute:()=>C,analysis:()=>AN,aee,state:()=>S,parseOnline,shOf,gidOf};
 boot();
