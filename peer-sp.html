@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>期末報告互評表（3×4 SP）</title>
+<meta name="description" content="期末報告互評基礎問卷：3 階段（HITL／HOTL／HOOTL）× 4 步驟（心智圖／IPO 表／演算法／模擬驗證）＝12 格 SP，勾選檢核點自動計分、三層閘門與 AI 賦能 KPI，寫入 ai-empower 評量資料庫（kind=peer-sp）。">
+<meta name="cc-cloud-url" content="https://script.google.com/macros/s/AKfycbz7wHWbc7go-OVR0Q_g_NBzDqwzV9-leqL1CRe1S9wGkLLjvJIAm-KrZj80s1KJ_VdGVg/exec">
+<style>
+:root{
+  /* 版面：左欄逐格評分（3 階段 × 4 步驟），右欄固定 3×4 矩陣、閘門與總分；手機改為矩陣置頂＋底部摘要列 */
+  --ink:#0E1A3A; --paper:#F2F5F9; --card:#FFFFFF; --line:#D4DCE7; --muted:#55617B;
+  --accent:#0E8FA8; --accent-ink:#065E6E; --amber:#F6B82A;
+  --s1:#F07C22; --s2:#1E9FB0; --s3:#F6B82A; --s4:#3B8EDB;
+  --p1:#0E1A3A; --p2:#1A6E7E; --p3:#2B3FA8; --gold:#F9C930;
+  --ok:#1D7343; --ok-bg:#E2F2E6; --warn:#7E5300; --warn-bg:#FBEFD3; --bad:#A3241A; --bad-bg:#FBE8E5; --none:#7A869E; --none-bg:#ECEFF4;
+  --font-body:"Noto Sans TC","Microsoft JhengHei","PingFang TC","Heiti TC",sans-serif;
+  --font-num:"Segoe UI","Roboto","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--font-body)}
+h1,h2,h3{text-wrap:balance;margin:0}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+
+/* 頁首 */
+.top{background:var(--ink);color:#fff;padding:20px 16px 18px}
+.top-in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.top h1{font-size:1.6rem;letter-spacing:.04em}
+.top p{margin:4px 0 0;color:#C9D3E6;font-size:.92rem}
+.top .home{color:#C9D3E6;font-size:.84rem;text-decoration:none;display:inline-block;margin-bottom:4px}
+.top .home:hover{color:#fff;text-decoration:underline}
+.loop{display:flex;gap:6px;flex-wrap:wrap;font-size:.8rem}
+.loop span{border:1px solid rgba(255,255,255,.28);border-radius:4px;padding:2px 8px;color:#E6ECF7}
+.loop span b{color:var(--gold);font-weight:700}
+
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 96px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media (min-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr) 352px;align-items:start}
+  .sum{grid-column:2;grid-row:1 / span 2;position:sticky;top:14px}
+  .who,.rest{grid-column:1}
+  .wrap{padding-bottom:40px}
+}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.card h2{font-size:1.05rem}
+.lead{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+
+/* 模式切換 */
+.mode{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:12px}
+.mode button{border:0;background:#fff;padding:8px 16px;cursor:pointer;font-weight:600;color:var(--muted)}
+.mode button[aria-checked="true"]{background:var(--accent);color:#fff}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 12px;margin-top:14px}
+.f label{display:block;font-size:.84rem;font-weight:600;margin-bottom:3px}
+.f label i{font-style:normal;color:var(--bad)}
+.f input,.f textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 10px;background:#fff}
+.f input:disabled{background:var(--none-bg);color:var(--muted)}
+.f input[aria-invalid="true"],.f textarea[aria-invalid="true"]{border-color:var(--bad);background:var(--bad-bg)}
+.sep{grid-column:1 / -1;border-top:1px dashed var(--line);margin:4px 0 0;padding-top:8px;font-size:.84rem;font-weight:700;color:var(--accent-ink)}
+.tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.9rem}
+.btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;padding:11px 22px;font-size:1rem}
+.btn.primary:hover{background:var(--accent-ink);color:#fff}
+.btn.danger{color:var(--bad)}
+.chip{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.chip.pass{background:var(--ok-bg);color:var(--ok)}
+.chip.fix{background:var(--bad-bg);color:var(--bad)}
+.chip.pending{background:var(--none-bg);color:var(--none)}
+.chip.info{background:#E1F2F5;color:var(--accent-ink)}
+
+/* 摘要：3×4 矩陣 */
+.sum h2{font-size:1rem}
+.mx{width:100%;border-collapse:separate;border-spacing:4px;margin:8px -4px 0;table-layout:fixed}
+.mx th{font-size:.72rem;font-weight:700;color:var(--muted);text-align:center;line-height:1.25;padding:0 0 2px}
+.mx th.st{border-bottom:3px solid var(--c)}
+.mx th.ph{text-align:left;color:#fff;background:var(--c);border-radius:6px;padding:6px;width:58px}
+.mx th.ph small{display:block;font-weight:500;opacity:.85;font-size:.66rem}
+.mx td{padding:0}
+.cell{width:100%;min-height:58px;border:1px solid transparent;border-radius:6px;background:var(--none-bg);cursor:pointer;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.cell .ml{font-size:.62rem;line-height:1.2;color:var(--muted);text-align:center}
+.cell .mv{font:700 1.15rem/1 var(--font-num)}
+.cell[data-score="none"] .mv{color:var(--none)}
+.cell[data-score="0"]{background:var(--bad-bg);border-color:#EDB8B1}
+.cell[data-score="0"] .mv{color:var(--bad)}
+.cell[data-score="1"]{background:var(--warn-bg);border-color:#EED399}
+.cell[data-score="1"] .mv{color:var(--warn)}
+.cell[data-score="2"]{background:var(--ok-bg);border-color:#A9D8B6}
+.cell[data-score="2"] .mv{color:var(--ok)}
+.sub{text-align:center;font-size:.72rem}
+.sub b{display:block;font:700 .98rem/1.2 var(--font-num)}
+.total{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.total .big{font:800 2rem/1 var(--font-num)}
+.total .big small{font-size:1rem;color:var(--muted);font-weight:600}
+.prog{height:6px;background:var(--none-bg);border-radius:3px;margin-top:10px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.rule{font-size:.78rem;color:var(--muted);margin:8px 0 0}
+
+/* 階段與題卡 */
+.phase{margin-top:18px}
+.phase:first-child{margin-top:0}
+.phase-head{display:flex;gap:12px;align-items:center;background:var(--ph);color:#fff;border-radius:10px 10px 0 0;padding:10px 14px}
+.ph-code{font:800 1.25rem/1 var(--font-num);border:2px solid rgba(255,255,255,.55);border-radius:6px;padding:4px 7px}
+.phase-head h2{font-size:1.04rem}
+.ph-lit{margin:1px 0 0;font-size:.8rem;opacity:.85}
+.ph-sum{margin-left:auto;text-align:right;font-size:.8rem;white-space:nowrap}
+.ph-sum b{font:800 1.1rem var(--font-num)}
+.items{display:grid;gap:10px;background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:12px}
+.item{border:1px solid var(--line);border-left:6px solid var(--step);border-radius:8px;padding:12px 14px;background:#fff}
+.item[data-score="none"]{background:#FBFCFE}
+.item-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
+.code{font:700 .8rem var(--font-num);background:var(--ink);color:#fff;border-radius:4px;padding:1px 7px}
+.step{font-size:.8rem;font-weight:700;color:var(--muted)}
+.item h3{font-size:1.02rem}
+.checks{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
+.checks label{display:flex;gap:9px;align-items:flex-start;padding:4px 6px;border-radius:6px;cursor:pointer}
+.checks label:hover{background:#F1F6FA}
+.checks input{width:18px;height:18px;margin:3px 0 0;flex:none;accent-color:var(--accent)}
+.evi{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
+.evi span{font-weight:700}
+.scoreline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px}
+.score{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.score button{border:0;border-left:1px solid var(--line);background:#fff;padding:6px 12px;cursor:pointer;display:flex;align-items:baseline;gap:5px;font-size:.84rem;color:var(--muted)}
+.score button:first-child{border-left:0}
+.score button b{font:800 1.05rem var(--font-num)}
+.score button[aria-checked="true"][data-v="0"]{background:var(--bad);color:#fff}
+.score button[aria-checked="true"][data-v="1"]{background:var(--amber);color:#3A2A00}
+.score button[aria-checked="true"][data-v="2"]{background:var(--ok);color:#fff}
+.hint{font-size:.8rem;color:var(--muted)}
+.hint.manual{color:var(--warn);font-weight:600}
+.item.flash{animation:flash 1.2s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 4px var(--amber)}100%{box-shadow:0 0 0 0 transparent}}
+
+/* 文字回饋與送出 */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.notes textarea{min-height:88px;resize:vertical}
+.count{font-size:.74rem;color:var(--muted);text-align:right}
+.errors{margin:12px 0 0;padding:10px 14px 10px 30px;border-radius:8px;background:var(--bad-bg);color:var(--bad);font-size:.9rem}
+.errors:empty{display:none}
+.errors button{border:0;background:none;color:inherit;text-decoration:underline;cursor:pointer;padding:0;text-align:left}
+.submit{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.receipt{border-left:6px solid var(--ok);background:var(--ok-bg)}
+.receipt[hidden]{display:none}
+.receipt p{margin:4px 0 0}
+
+/* 本機紀錄 */
+.tbl{overflow-x:auto;margin-top:10px}
+.tbl table{border-collapse:collapse;width:100%;font-size:.84rem;min-width:620px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;white-space:nowrap}
+.tbl th{font-size:.76rem;color:var(--muted)}
+.tbl td.n{font-family:var(--font-num);font-variant-numeric:tabular-nums;text-align:right}
+.export{width:100%;min-height:120px;margin-top:10px;border:1px solid var(--line);border-radius:7px;padding:8px;font:12px/1.4 ui-monospace,Consolas,monospace}
+.export[hidden]{display:none}
+.empty{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+
+/* 手機底部摘要列 */
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.88rem;z-index:5;box-shadow:0 -4px 14px rgba(14,26,58,.25)}
+.bar b{font-family:var(--font-num)}
+.bar .btn{margin-left:auto;background:transparent;color:#fff;border-color:rgba(255,255,255,.4);padding:5px 12px}
+@media (min-width:980px){.bar{display:none}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  .bar,.tools,.submit,.mode,#recordsCard,.errors{display:none!important}
+  body{background:#fff}
+  .sum{position:static}
+  .item{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div>
+      <a class="home" href="index.html">← AI 賦能教學 Hub</a>
+      <h1>期末報告互評表</h1>
+      <p>AI 賦能 KPI｜3 階段 × 4 步驟＝12 格 SP｜由操作而監管，先思考後驗證</p>
+    </div>
+    <div class="loop" aria-label="專題四站">
+      <span><b>S1</b> 心智圖</span><span><b>S2</b> IPO 表</span><span><b>S3</b> 演算法</span><span><b>S4</b> 模擬驗證</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<form id="pf" novalidate>
+<div class="layout">
+
+  <section class="card who" aria-labelledby="whoTitle">
+    <h2 id="whoTitle">評分者與受評組</h2>
+    <p class="lead" id="modeLead">依受評組的報告與發表中「看得到的證據」勾選，看不到就不勾。勾選會帶出建議分數，可再手動調整。</p>
+    <div class="mode" role="radiogroup" aria-label="評分模式">
+      <button type="button" role="radio" id="mode-peer" data-mode="peer" aria-checked="true">互評（評別組）</button>
+      <button type="button" role="radio" id="mode-self" data-mode="self" aria-checked="false">自評（本組）</button>
+    </div>
+    <div class="fields">
+      <div class="f"><label for="r-cls">班級 <i>*</i></label><input id="r-cls" list="clsList" autocomplete="off" placeholder="例：資管一A 計算機概論"></div>
+      <div class="f"><label for="r-sid">學號 <i>*</i></label><input id="r-sid" autocomplete="off" inputmode="text" placeholder="例：B11556001"></div>
+      <div class="f"><label for="r-name">姓名</label><input id="r-name" autocomplete="off"></div>
+      <div class="f"><label for="r-group">我的組別 <i>*</i></label><input id="r-group" type="number" min="1" max="99" inputmode="numeric"></div>
+      <div class="sep" id="targetSep">受評組</div>
+      <div class="f"><label for="t-group">受評組別 <i>*</i></label><input id="t-group" type="number" min="1" max="99" inputmode="numeric"></div>
+      <div class="f" style="grid-column:span 2"><label for="t-topic">專題名稱</label><input id="t-topic" autocomplete="off" placeholder="例：宿舍洗衣機空機提醒"></div>
+    </div>
+    <datalist id="clsList">
+      <option value="資管一A 計算機概論"></option><option value="機械一A 數位科技與AI應用"></option><option value="車輛一A 數位科技與AI應用"></option>
+    </datalist>
+    <div class="tools">
+      <button type="button" class="btn" id="demoBtn">填入示範資料</button>
+      <button type="button" class="btn" id="clearBtn">清空本次評分</button>
+      <span class="chip info" id="cloudChip"></span>
+    </div>
+  </section>
+
+  <aside class="card sum" aria-labelledby="sumTitle">
+    <h2 id="sumTitle">3×4 SP 矩陣</h2>
+    <table class="mx" id="matrix" aria-describedby="ruleText"></table>
+    <div class="total">
+      <div>
+        <div style="font-size:.8rem;color:var(--muted);font-weight:700">AI 賦能 KPI 總分</div>
+        <div class="big"><span id="totalNum" class="num">0</span><small> / 24</small></div>
+      </div>
+      <span class="chip pending" id="kpiChip">評分中</span>
+    </div>
+    <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+    <p class="rule" id="ruleText">已評 <b id="scoredNum" class="num">0</b>／12 格。各階段 ≥6 分且無 0 分＝閘門通過；總分 ≥18 且三閘門通過＝KPI 達標。</p>
+  </aside>
+
+  <div class="rest">
+    <div id="phases"></div>
+
+    <section class="card" style="margin-top:18px" aria-labelledby="notesTitle">
+      <h2 id="notesTitle">文字回饋：1 亮點、1 風險、1 提問</h2>
+      <div class="notes">
+        <div class="f"><label for="n-highlight">亮點 <i>*</i>（做得最好的一格與理由）</label><textarea id="n-highlight" maxlength="300"></textarea><div class="count" id="cnt-highlight">0／至少 5 字</div></div>
+        <div class="f"><label for="n-risk">風險 <i>*</i>（最可能出錯的地方）</label><textarea id="n-risk" maxlength="300"></textarea><div class="count" id="cnt-risk">0／至少 5 字</div></div>
+        <div class="f"><label for="n-question">提問 <i>*</i>（想問這組的一個問題）</label><textarea id="n-question" maxlength="300"></textarea><div class="count" id="cnt-question">0／至少 5 字</div></div>
+      </div>
+      <ul class="errors" id="errors" role="alert"></ul>
+      <div class="submit">
+        <button type="submit" class="btn primary" id="submitBtn">送出評分</button>
+        <span class="hint" id="submitHint">送出後保留評分者資料，可直接評下一組。</span>
+      </div>
+    </section>
+
+    <section class="card receipt" id="receipt" style="margin-top:18px" hidden aria-live="polite">
+      <h2 id="receiptTitle">已送出</h2>
+      <p id="receiptText"></p>
+    </section>
+
+    <section class="card" id="recordsCard" style="margin-top:18px" aria-labelledby="recTitle">
+      <h2 id="recTitle">本機已送出紀錄</h2>
+      <p class="lead">送出時同步寫入評量資料庫（學號只傳後 4 碼）；這裡是這台裝置的備份，可「複製 CSV」貼到 Excel 或「下載 CSV」。</p>
+      <div class="tools">
+        <button type="button" class="btn" id="copyCsv">複製 CSV</button>
+        <button type="button" class="btn" id="dlCsv">下載 CSV</button>
+        <button type="button" class="btn" id="copyJson">複製 JSON</button>
+        <button type="button" class="btn" id="resend" hidden>重送未上傳</button>
+        <button type="button" class="btn danger" id="wipe">清除本機紀錄</button>
+      </div>
+      <p class="hint" id="toolMsg" role="status"></p>
+      <textarea class="export" id="exportBox" readonly hidden aria-label="匯出內容"></textarea>
+      <div class="tbl" id="records"></div>
+    </section>
+  </div>
+
+</div>
+</form>
+</main>
+
+<div class="bar" id="bar" aria-hidden="true">
+  <span>已評 <b id="barScored">0</b>/12</span>
+  <span>總分 <b id="barTotal">0</b>/24</span>
+  <span class="chip pending" id="barKpi">評分中</span>
+  <button type="button" class="btn" id="barBtn" tabindex="-1">看矩陣</button>
+</div>
+
+<script src="assets/identity.js" onerror="this.remove()"></script>
+<script src="assets/cloud.js" onerror="this.remove()"></script>
+<script>
+(function(){
+'use strict';
+
+/* ===== 設定 =====
+   雲端網址只放在 <meta name="cc-cloud-url">（與 ai-empower 各頁相同）；有 assets/cloud.js 時交給 AECloud
+   （先落地佇列、退避重試、20 秒自動補送），沒有時以內建 fetch 送出。meta 留空＝只存本機。 */
+var CLOUD_KIND = 'peer-sp', CLOUD_APP = 'peer-sp';
+var KEY_DRAFT = 'peerform.draft.v1', KEY_RATER = 'peerform.rater.v1', KEY_REC = 'peerform.records.v1';
+
+/* ===== 3×4 SP 題庫（與「專題報告自我檢查表」一致） ===== */
+var STEPS = {
+  S1:{name:'心智圖', c:'var(--s1)'}, S2:{name:'IPO 表', c:'var(--s2)'},
+  S3:{name:'演算法', c:'var(--s3)'}, S4:{name:'模擬驗證', c:'var(--s4)'}
+};
+var PHASES = [
+  {id:'P1', name:'HITL 人在迴路', sub:'由操作', c:'var(--p1)', lit:'運算思維 4 技巧：拆解、模式識別、抽象化、演算法', items:[
+    {code:'P1-S1', step:'S1', kpi:'4×3 分支', short:'4×3 分支', evidence:'心智圖連結＋PNG',
+      checks:['主幹 ≥4 條','每條主幹 ≥3 個分支','含「例外／出錯」分支','節點為 1–5 字關鍵字']},
+    {code:'P1-S2', step:'S2', kpi:'分類清楚', short:'分類清楚', evidence:'IPO 表',
+      checks:['每個節點歸入 I／P／O 無誤','I 寫明型別、單位、範圍','P 門檻為具體數字','O 寫明給誰、什麼形式']},
+    {code:'P1-S3', step:'S3', kpi:'完整可行', short:'完整可行', evidence:'流程圖（.fpp／Mermaid）',
+      checks:['步驟編號、一步一動作','先擋例外再判斷','每個判斷有是／否兩出口，邊界寫明 ≥ 或 >','每條路徑都到得了結束']},
+    {code:'P1-S4', step:'S4', kpi:'預期結果', short:'預期結果', evidence:'測試結果表（Colab）',
+      checks:['執行前先填「我的預測」','測試 ≥8 筆（情境 ≥3、邊界 ≥3、例外 ≥2）','預測與實際逐筆比對','不一致者先寫自己的歸因']}
+  ]},
+  {id:'P2', name:'HOTL 人在迴路上', sub:'由監管', c:'var(--p2)', lit:'以 4C 素養監督 AI 站間轉換：輸入只限前面各站，人逐項審核', items:[
+    {code:'P2-S2', step:'S2', kpi:'S1→S2 轉換', short:'S1→S2', evidence:'提示詞＋原始輸出＋修訂後 IPO 表',
+      checks:['保留提示詞與 AI 原始輸出','每格對得回心智圖節點','AI 自行新增的內容已刪除或標「？待確認」','確認格加 ＊']},
+    {code:'P2-S3', step:'S3', kpi:'S1+S2→S3 轉換', short:'S12→S3', evidence:'步驟清單＋Mermaid 原始碼＋修改紀錄',
+      checks:['AI 只用心智圖與 IPO 表內容','門檻只用 IPO 表內數字','已核對順序（先擋例外）與邊界','標出人工修改處']},
+    {code:'P2-S4', step:'S4', kpi:'S1+S2+S3→S4 轉換', short:'S123→S4', evidence:'程式＋測試清單＋審核紀錄',
+      checks:['變數名與 IPO 表一致','每個判斷對應一個 if，無流程圖外邏輯','測試含邊界值本身與前後各一','結果由實際執行取得，非 AI 提供']},
+    {code:'P2-S1', step:'S1', kpi:'S4→S1 回饋（下一圈）', short:'S4→S1', evidence:'修正清單（採納／退回）',
+      checks:['AI 將不一致測試歸因到站別','人判斷歸因是否合理','心智圖修改由人決定採納／退回','已列入下一圈']}
+  ]},
+  {id:'P3', name:'HOOTL 人在迴路外', sub:'自主產出', c:'var(--p3)', lit:'AI 自主彙整；人以事前規則（before）與事後評量（after）治理', items:[
+    {code:'P3-S1', step:'S1', kpi:'before 題目與 AI 規則', short:'事前·題目', evidence:'規則清單',
+      checks:['一句話問題情境與使用者已定','寫明 AI 可做／不可做（站上不代寫、轉換不加料、結果不捏造、決策歸人）','指定使用的 AI 工具']},
+    {code:'P3-S2', step:'S2', kpi:'before 資料與門檻規則', short:'事前·資料', evidence:'資料流向說明',
+      checks:['資料來源、存放處、誰看得到','門檻數值由人訂定並寫入規則','隱私與安全做法']},
+    {code:'P3-S3', step:'S3', kpi:'after 彙整稽核', short:'事後·稽核', evidence:'專題創新提案＋稽核註記',
+      checks:['AI 彙整的提案與四站證據一致','無捏造數字或功能','創新點與可行性四面向（可行性、成本、安全隱私、資料流向）已審']},
+    {code:'P3-S4', step:'S4', kpi:'after 決策與下一圈', short:'事後·決策', evidence:'決策紀錄表＋下一圈計畫',
+      checks:['測試通過率以 x/y 呈現且取自實際執行','治理決策紀錄「決定、理由、決定者」由人填寫','人機分工比例對照 70／30','下一圈計畫已列出']}
+  ]}
+];
+var ITEMS = [];
+PHASES.forEach(function(p){ p.items.forEach(function(it){ it.phase = p.id; ITEMS.push(it); }); });
+var BY = {}; ITEMS.forEach(function(it){ BY[it.code] = it; });
+var GATE = {pending:'未完成', pass:'通過', fix:'補件'};
+var KPI = {pending:'評分中', pass:'KPI 達標', fix:'未達標'};
+var CLOUDL = {local:'只存本機', pending:'上傳中', sent:'已上傳', queued:'排隊補送中', unconfirmed:'已送出（未確認）', failed:'上傳失敗'};
+
+/* ===== 雲端與身分（與 peer-aee.html 同規則：學號只傳後 4 碼＋假名雜湊） ===== */
+function metaUrl(){
+  var m = document.querySelector('meta[name="cc-cloud-url"]');
+  var u = m ? (m.getAttribute('content') || '').trim() : '';
+  return /^https?:\/\//.test(u) ? u : '';
+}
+function hasCloud(){ return window.AECloud ? !!AECloud.ready() : !!metaUrl(); }
+function last4(sid){
+  var s = String(sid || '').trim(), d = s.replace(/\D/g, '');
+  return (d.length >= 4 ? d : s.toUpperCase()).slice(-4);
+}
+function fnv(str, seed){ var h = (seed >>> 0) || 0x811c9dc5; for(var i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h >>> 0; }
+function shOf(sid){ var s = String(sid || '').trim().toUpperCase(); return ('0000000' + fnv(s).toString(16)).slice(-8) + ('0000000' + fnv(s, 0x9747b28c).toString(16)).slice(-8); }
+function canonCls(c){
+  c = String(c || '').trim();
+  try{ if(window.AEId && AEId.matchClass){ var m = AEId.matchClass(c); if(m && m.name && !/自行輸入/.test(m.name)) return m.name; } }catch(e){}
+  return c;
+}
+var NOTES = [['highlight','亮點'],['risk','風險'],['question','提問']];
+
+/* ===== 儲存（失敗不影響使用） ===== */
+function lsGet(k, d){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+/* ===== 純函式：計分、閘門、驗證、紀錄、CSV ===== */
+function blankCells(){
+  var cells = {};
+  ITEMS.forEach(function(it){ cells[it.code] = {checks: it.checks.map(function(){ return false; }), score: null, manual: false}; });
+  return cells;
+}
+function blankState(){
+  return {mode:'peer', demo:false, rater:{cls:'', sid:'', name:'', group:''}, target:{group:'', topic:''},
+          cells: blankCells(), notes:{highlight:'', risk:'', question:''}};
+}
+function autoScore(checks){
+  var n = 0; checks.forEach(function(c){ if(c) n++; });
+  return n === checks.length ? 2 : (n > 0 ? 1 : 0);
+}
+function summarize(st){
+  var res = {phases:{}, total:0, scored:0};
+  PHASES.forEach(function(p){
+    var sum = 0, scored = 0, zero = false;
+    p.items.forEach(function(it){
+      var s = st.cells[it.code].score;
+      if(s === 0 || s === 1 || s === 2){ sum += s; scored++; if(s === 0) zero = true; }
+    });
+    var status = scored < p.items.length ? 'pending' : (sum >= 6 && !zero ? 'pass' : 'fix');
+    res.phases[p.id] = {sum:sum, scored:scored, zero:zero, status:status, max:p.items.length * 2};
+    res.total += sum; res.scored += scored;
+  });
+  res.complete = res.scored === ITEMS.length;
+  res.kpi = !res.complete ? 'pending'
+    : (res.total >= 18 && PHASES.every(function(p){ return res.phases[p.id].status === 'pass'; }) ? 'pass' : 'fix');
+  return res;
+}
+function targetGroup(st){ return st.mode === 'self' ? st.rater.group : st.target.group; }
+function validate(st){
+  var e = [], r = st.rater;
+  if(!String(r.cls).trim()) e.push({f:'r-cls', m:'請填班級'});
+  if(!/^[A-Za-z0-9]{4,12}$/.test(String(r.sid).trim())) e.push({f:'r-sid', m:'學號需為 4–12 位英數字'});
+  var g = parseInt(r.group, 10);
+  if(!(g >= 1 && g <= 99)) e.push({f:'r-group', m:'請填自己的組別（1–99）'});
+  if(st.mode === 'peer'){
+    var tg = parseInt(st.target.group, 10);
+    if(!(tg >= 1 && tg <= 99)) e.push({f:'t-group', m:'請填受評組別（1–99）'});
+    else if(tg === g) e.push({f:'t-group', m:'互評不能評自己這一組；評本組請切換到「自評」'});
+  }
+  var miss = ITEMS.filter(function(it){ return st.cells[it.code].score === null; }).map(function(it){ return it.code; });
+  if(miss.length) e.push({f:'item-' + miss[0], m:'還有 ' + miss.length + ' 格未評分：' + miss.join('、')});
+  NOTES.forEach(function(n){ if(String(st.notes[n[0]]).trim().length < 5) e.push({f:'n-' + n[0], m:n[1] + '至少寫 5 個字'}); });
+  return e;
+}
+function uid(){ return 'pf-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7); }
+function toRecord(st, now){
+  var s = summarize(st), cells = {}, checks = {}, manual = [];
+  ITEMS.forEach(function(it){
+    var c = st.cells[it.code];
+    cells[it.code] = c.score;
+    checks[it.code] = c.checks.map(function(x){ return x ? 1 : 0; });
+    if(c.manual) manual.push(it.code);
+  });
+  return {
+    v:2, app:CLOUD_APP, kind:CLOUD_KIND, id:uid(),
+    sid:last4(st.rater.sid), name:String(st.rater.name).trim(), cls:canonCls(st.rater.cls),
+    ts:(now || new Date()).toISOString(), score:s.total, max:24,
+    detail:{
+      sh:shOf(st.rater.sid), unit:'peer-sp', demo:!!st.demo,
+      mode:st.mode, raterGroup:parseInt(st.rater.group, 10), targetGroup:parseInt(targetGroup(st), 10),
+      topic:String(st.target.topic).trim(), cells:cells, checks:checks, manual:manual,
+      phase:{P1:s.phases.P1.sum, P2:s.phases.P2.sum, P3:s.phases.P3.sum},
+      gates:{P1:s.phases.P1.status, P2:s.phases.P2.status, P3:s.phases.P3.status}, kpi:s.kpi,
+      highlight:String(st.notes.highlight).trim(), risk:String(st.notes.risk).trim(), question:String(st.notes.question).trim()
+    },
+    cloud: (hasCloud() && !st.demo) ? 'pending' : 'local'
+  };
+}
+function recKey(r){ return [r.cls, r.sid, r.detail.mode, r.detail.targetGroup].join('|'); }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function fmtTime(iso){
+  var d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function csvCell(v){
+  v = (v === null || v === undefined) ? '' : String(v);
+  if(/^[=+\-@]/.test(v)) v = "'" + v;               // 防公式注入
+  return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+function toCSV(recs){
+  var head = ['時間','模式','班級','學號','姓名','評分者組別','受評組別','專題名稱']
+    .concat(ITEMS.map(function(i){ return i.code; }))
+    .concat(['P1小計','P2小計','P3小計','總分','P1閘門','P2閘門','P3閘門','KPI','手動調整格','亮點','風險','提問','記錄ID','上傳']);
+  var rows = recs.map(function(r){
+    var d = r.detail;
+    return [fmtTime(r.ts), d.mode === 'self' ? '自評' : '互評', r.cls, r.sid, r.name, d.raterGroup, d.targetGroup, d.topic]
+      .concat(ITEMS.map(function(i){ return d.cells[i.code]; }))
+      .concat([d.phase.P1, d.phase.P2, d.phase.P3, r.score, GATE[d.gates.P1], GATE[d.gates.P2], GATE[d.gates.P3], KPI[d.kpi],
+               (d.manual || []).join(' '), d.highlight, d.risk, d.question, r.id, CLOUDL[r.cloud] || r.cloud]);
+  });
+  return '﻿' + [head].concat(rows).map(function(a){ return a.map(csvCell).join(','); }).join('\r\n');
+}
+function normalize(d){
+  var st = blankState();
+  if(!d || typeof d !== 'object') return st;
+  if(d.mode === 'self') st.mode = 'self';
+  st.demo = !!d.demo;
+  ['cls','sid','name','group'].forEach(function(k){ if(d.rater && d.rater[k] != null) st.rater[k] = String(d.rater[k]); });
+  ['group','topic'].forEach(function(k){ if(d.target && d.target[k] != null) st.target[k] = String(d.target[k]); });
+  NOTES.forEach(function(n){ if(d.notes && d.notes[n[0]] != null) st.notes[n[0]] = String(d.notes[n[0]]); });
+  ITEMS.forEach(function(it){
+    var c = d.cells && d.cells[it.code];
+    if(!c) return;
+    if(Array.isArray(c.checks) && c.checks.length === it.checks.length) st.cells[it.code].checks = c.checks.map(Boolean);
+    if(c.score === 0 || c.score === 1 || c.score === 2) st.cells[it.code].score = c.score;
+    st.cells[it.code].manual = !!c.manual;
+  });
+  return st;
+}
+
+/* ===== 狀態 ===== */
+var state = normalize(lsGet(KEY_DRAFT, null));
+var savedRater = lsGet(KEY_RATER, null);
+if(savedRater && !state.rater.sid){ ['cls','sid','name','group'].forEach(function(k){ if(savedRater[k] != null) state.rater[k] = String(savedRater[k]); }); }
+try{   /* 平台共同身分（學號後 4 碼＋班級）補空白欄 */
+  var aeid = window.AEId && AEId.get ? AEId.get() : null;
+  if(aeid){ if(!state.rater.sid && aeid.sid) state.rater.sid = String(aeid.sid); if(!state.rater.cls && aeid.cls) state.rater.cls = String(aeid.cls); }
+}catch(e){}
+
+/* ===== DOM 工具 ===== */
+function $(id){ return document.getElementById(id); }
+function el(tag, attrs, kids){
+  var e = document.createElement(tag);
+  if(attrs) Object.keys(attrs).forEach(function(k){
+    if(k === 'text') e.textContent = attrs[k];
+    else e.setAttribute(k, attrs[k]);
+  });
+  (kids || []).forEach(function(c){ if(c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return e;
+}
+function jump(id){
+  var t = $(id); if(!t) return;
+  t.scrollIntoView({behavior:'smooth', block:'center'});
+  if(t.classList.contains('item')){ t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); var f = t.querySelector('input,button'); if(f) f.focus({preventScroll:true}); }
+  else if(t.focus) t.focus({preventScroll:true});
+}
+
+/* ===== 建立畫面 ===== */
+function buildMatrix(){
+  var mx = $('matrix');
+  var head = el('tr', null, [el('th', {scope:'col', 'aria-label':'階段'})]);
+  ['S1','S2','S3','S4'].forEach(function(s){
+    head.appendChild(el('th', {scope:'col', class:'st', style:'--c:' + STEPS[s].c}, [s, el('br'), STEPS[s].name]));
+  });
+  head.appendChild(el('th', {scope:'col'}, ['小計', el('br'), '閘門']));
+  mx.appendChild(el('thead', null, [head]));
+  var tb = el('tbody');
+  PHASES.forEach(function(p){
+    var tr = el('tr', null, [el('th', {scope:'row', class:'ph', style:'--c:' + p.c}, [p.id, el('small', {text:p.name.split(' ')[0]})])]);
+    ['S1','S2','S3','S4'].forEach(function(s){
+      var it = p.items.filter(function(i){ return i.step === s; })[0];
+      var b = el('button', {type:'button', class:'cell', id:'m-' + it.code, 'data-score':'none', 'aria-label':it.code + ' ' + it.kpi},
+        [el('span', {class:'ml', text:it.short}), el('span', {class:'mv', text:'—'})]);
+      b.addEventListener('click', function(){ jump('item-' + it.code); });
+      tr.appendChild(el('td', null, [b]));
+    });
+    tr.appendChild(el('td', {class:'sub'}, [el('b', {id:'msub-' + p.id, class:'num', text:'0/8'}), el('span', {class:'chip pending', id:'mgate-' + p.id, text:'未完成'})]));
+    tb.appendChild(tr);
+  });
+  mx.appendChild(tb);
+}
+
+function buildPhases(){
+  var box = $('phases');
+  PHASES.forEach(function(p){
+    var sec = el('section', {class:'phase', id:'phase-' + p.id, style:'--ph:' + p.c, 'aria-labelledby':'ph-t-' + p.id});
+    sec.appendChild(el('header', {class:'phase-head'}, [
+      el('span', {class:'ph-code', text:p.id}),
+      el('div', null, [el('h2', {id:'ph-t-' + p.id, text:p.name + '｜' + p.sub}), el('p', {class:'ph-lit', text:p.lit})]),
+      el('div', {class:'ph-sum'}, [el('b', {id:'phsum-' + p.id, text:'0'}), ' / 8 ', el('br'), el('span', {class:'chip pending', id:'phgate-' + p.id, text:'未完成'})])
+    ]));
+    var items = el('div', {class:'items'});
+    p.items.forEach(function(it){
+      var art = el('article', {class:'item', id:'item-' + it.code, tabindex:'-1', 'data-score':'none', style:'--step:' + STEPS[it.step].c});
+      art.appendChild(el('div', {class:'item-head'}, [
+        el('span', {class:'code', text:it.code}),
+        el('span', {class:'step', text:it.step + ' ' + STEPS[it.step].name}),
+        el('h3', {text:it.kpi})
+      ]));
+      var ul = el('ul', {class:'checks'});
+      it.checks.forEach(function(txt, i){
+        var cid = 'c-' + it.code + '-' + i;
+        var cb = el('input', {type:'checkbox', id:cid});
+        cb.addEventListener('change', function(){
+          var c = state.cells[it.code];
+          c.checks[i] = cb.checked;
+          c.score = autoScore(c.checks);
+          c.manual = false;
+          update();
+        });
+        ul.appendChild(el('li', null, [el('label', {for:cid}, [cb, el('span', {text:txt})])]));
+      });
+      art.appendChild(ul);
+      art.appendChild(el('p', {class:'evi'}, [el('span', {text:'證據：'}), it.evidence]));
+      var sg = el('div', {class:'score', role:'radiogroup', 'aria-label':it.code + ' 分數'});
+      [[0,'未做'],[1,'部分'],[2,'完成']].forEach(function(o){
+        var b = el('button', {type:'button', role:'radio', 'aria-checked':'false', 'data-v':String(o[0]), id:'s-' + it.code + '-' + o[0]},
+          [el('b', {text:String(o[0])}), el('span', {text:o[1]})]);
+        b.addEventListener('click', function(){
+          var c = state.cells[it.code];
+          c.score = o[0];
+          c.manual = o[0] !== autoScore(c.checks);
+          update();
+        });
+        sg.appendChild(b);
+      });
+      art.appendChild(el('div', {class:'scoreline'}, [sg, el('span', {class:'hint', id:'hint-' + it.code, text:'尚未評分'})]));
+      items.appendChild(art);
+    });
+    sec.appendChild(items);
+    box.appendChild(sec);
+  });
+}
+
+/* ===== 更新畫面 ===== */
+function setChip(node, cls, text){ node.className = 'chip ' + cls; node.textContent = text; }
+function update(){
+  var s = summarize(state);
+  ITEMS.forEach(function(it){
+    var c = state.cells[it.code], sc = c.score === null ? 'none' : String(c.score);
+    $('item-' + it.code).setAttribute('data-score', sc);
+    [0,1,2].forEach(function(v){ $('s-' + it.code + '-' + v).setAttribute('aria-checked', c.score === v ? 'true' : 'false'); });
+    it.checks.forEach(function(_, i){ $('c-' + it.code + '-' + i).checked = !!c.checks[i]; });
+    var n = c.checks.filter(Boolean).length, h = $('hint-' + it.code);
+    h.textContent = c.score === null ? '尚未評分'
+      : (c.manual ? '已手動調整（勾選建議 ' + autoScore(c.checks) + ' 分）' : '依勾選 ' + n + '／' + c.checks.length + ' 項');
+    h.className = 'hint' + (c.manual ? ' manual' : '');
+    var m = $('m-' + it.code);
+    m.setAttribute('data-score', sc);
+    m.querySelector('.mv').textContent = c.score === null ? '—' : String(c.score);
+  });
+  PHASES.forEach(function(p){
+    var ps = s.phases[p.id];
+    $('phsum-' + p.id).textContent = ps.sum;
+    $('msub-' + p.id).textContent = ps.sum + '/8';
+    setChip($('phgate-' + p.id), ps.status, GATE[ps.status]);
+    setChip($('mgate-' + p.id), ps.status, GATE[ps.status]);
+  });
+  $('totalNum').textContent = s.total;
+  $('scoredNum').textContent = s.scored;
+  $('progBar').style.width = (s.scored / ITEMS.length * 100) + '%';
+  setChip($('kpiChip'), s.kpi, KPI[s.kpi]);
+  $('barScored').textContent = s.scored;
+  $('barTotal').textContent = s.total;
+  setChip($('barKpi'), s.kpi, KPI[s.kpi]);
+  NOTES.forEach(function(n){
+    var len = String(state.notes[n[0]]).trim().length;
+    $('cnt-' + n[0]).textContent = len + '／至少 5 字';
+  });
+  lsSet(KEY_DRAFT, state);
+  return s;
+}
+
+function syncInputs(){
+  $('r-cls').value = state.rater.cls; $('r-sid').value = state.rater.sid;
+  $('r-name').value = state.rater.name; $('r-group').value = state.rater.group;
+  $('t-group').value = state.mode === 'self' ? state.rater.group : state.target.group;
+  $('t-topic').value = state.target.topic;
+  NOTES.forEach(function(n){ $('n-' + n[0]).value = state.notes[n[0]]; });
+  applyMode();
+}
+function applyMode(){
+  var self = state.mode === 'self';
+  $('mode-peer').setAttribute('aria-checked', self ? 'false' : 'true');
+  $('mode-self').setAttribute('aria-checked', self ? 'true' : 'false');
+  $('t-group').disabled = self;
+  if(self) $('t-group').value = state.rater.group;
+  else $('t-group').value = state.target.group;
+  $('targetSep').textContent = self ? '受評組：本組（自評）' : '受評組';
+  $('modeLead').textContent = self
+    ? '依本組實際留下的證據勾選，沒有證據就不勾。勾選會帶出建議分數，可再手動調整。'
+    : '依受評組的報告與發表中「看得到的證據」勾選，看不到就不勾。勾選會帶出建議分數，可再手動調整。';
+}
+
+/* ===== 錯誤、送出、紀錄 ===== */
+function clearInvalid(){ Array.prototype.forEach.call(document.querySelectorAll('[aria-invalid="true"]'), function(n){ n.removeAttribute('aria-invalid'); }); }
+function renderErrors(errs){
+  var ul = $('errors'); ul.innerHTML = ''; clearInvalid();
+  errs.forEach(function(er){
+    var t = $(er.f);
+    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) t.setAttribute('aria-invalid', 'true');
+    var b = el('button', {type:'button', text:er.m});
+    b.addEventListener('click', function(){ jump(er.f); });
+    ul.appendChild(el('li', null, [b]));
+  });
+}
+function loadRecs(){ var r = lsGet(KEY_REC, []); return Array.isArray(r) ? r : []; }
+function saveRecs(r){ lsSet(KEY_REC, r); }
+function markCloud(ids, status){
+  var recs = loadRecs();
+  recs.forEach(function(r){ if(ids.indexOf(r.id) >= 0) r.cloud = status; });
+  saveRecs(recs); renderRecords();
+}
+function stripLocal(r){ var o = JSON.parse(JSON.stringify(r)); delete o.cloud; return o; }
+function pushCloud(recs){
+  if(!hasCloud() || !recs.length) return Promise.resolve(false);
+  var ids = recs.map(function(r){ return r.id; });
+  if(window.AECloud){   /* 平台資料層：先入佇列、退避重試、自動補送 */
+    return AECloud.push(recs.map(stripLocal)).then(function(res){
+      var st = res && res.offline ? 'local' : (res && res.error ? 'queued' : 'sent');
+      markCloud(ids, st); return st === 'sent';
+    }, function(){ markCloud(ids, 'queued'); return false; });
+  }
+  if(typeof fetch !== 'function') return Promise.resolve(false);
+  var u = metaUrl();
+  var body = JSON.stringify({action:'push', records:recs.map(stripLocal)});
+  var opt = {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:body};
+  return fetch(u, opt).then(function(res){ return res.json(); }).then(function(j){
+    if(j && j.ok){ markCloud(ids, 'sent'); return true; }
+    throw new Error('not ok');
+  }).catch(function(){
+    opt.mode = 'no-cors';
+    return fetch(u, opt).then(function(){ markCloud(ids, 'unconfirmed'); return true; })
+      .catch(function(){ markCloud(ids, 'failed'); return false; });
+  });
+}
+/* AECloud 佇列補送後，把已離開佇列的紀錄標成已上傳 */
+function refreshCloudStatus(){
+  if(!window.AECloud || !AECloud.ready() || !AECloud.queue) return;
+  var q = AECloud.queue().map(function(r){ return r.id; }), recs = loadRecs(), changed = false;
+  recs.forEach(function(r){ if((r.cloud === 'queued' || r.cloud === 'failed') && q.indexOf(r.id) < 0){ r.cloud = 'sent'; changed = true; } });
+  if(changed){ saveRecs(recs); renderRecords(); }
+}
+function renderRecords(){
+  var box = $('records'), recs = loadRecs();
+  box.innerHTML = '';
+  $('resend').hidden = !hasCloud() || !recs.some(function(r){ return r.cloud === 'failed' || r.cloud === 'queued'; });
+  if(!recs.length){ box.appendChild(el('p', {class:'empty', text:'這台裝置還沒有送出的紀錄。'})); return; }
+  var head = el('tr', null, ['時間','模式','受評組','專題名稱','P1','P2','P3','總分','KPI','上傳'].map(function(h){ return el('th', {scope:'col', text:h}); }));
+  var tb = el('tbody');
+  recs.forEach(function(r){
+    var d = r.detail;
+    tb.appendChild(el('tr', null, [
+      el('td', {text:fmtTime(r.ts)}), el('td', {text:d.mode === 'self' ? '自評' : '互評'}),
+      el('td', {class:'n', text:'第 ' + d.targetGroup + ' 組'}), el('td', {text:d.topic || '—'}),
+      el('td', {class:'n', text:String(d.phase.P1)}), el('td', {class:'n', text:String(d.phase.P2)}), el('td', {class:'n', text:String(d.phase.P3)}),
+      el('td', {class:'n', text:r.score + '/24'}),
+      el('td', null, [el('span', {class:'chip ' + d.kpi, text:KPI[d.kpi]})]),
+      el('td', {text:CLOUDL[r.cloud] || r.cloud})
+    ]));
+  });
+  box.appendChild(el('table', null, [el('thead', null, [head]), tb]));
+}
+function showReceipt(rec, replaced){
+  var d = rec.detail;
+  $('receiptTitle').textContent = '已送出：' + (d.mode === 'self' ? '本組自評' : '第 ' + d.targetGroup + ' 組') + '　' + rec.score + '/24';
+  $('receiptText').textContent = 'P1 ' + d.phase.P1 + '（' + GATE[d.gates.P1] + '）、P2 ' + d.phase.P2 + '（' + GATE[d.gates.P2] + '）、P3 ' + d.phase.P3 + '（' + GATE[d.gates.P3] + '）；' + KPI[d.kpi] + '。'
+    + (replaced ? '已覆蓋你之前對這組的評分。' : '')
+    + (d.demo ? '示範資料只存本機，不上傳。' : (hasCloud() ? '正在寫入評量資料庫（右下角會顯示上傳狀態）。' : '紀錄存在這台裝置。')) + '記錄 ID：' + rec.id;
+  $('receipt').hidden = false;
+}
+function resetForNext(){
+  state.demo = false;
+  state.target = {group:'', topic:''};
+  state.cells = blankCells();
+  state.notes = {highlight:'', risk:'', question:''};
+  syncInputs(); update();
+}
+function toolMsg(t){ $('toolMsg').textContent = t; }
+function copyText(text, label){
+  var box = $('exportBox');
+  function fallback(){ box.hidden = false; box.value = text; box.focus(); box.select(); toolMsg('無法直接複製，已選取下方內容，請按 Ctrl+C（手機長按）複製。'); }
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ box.hidden = true; toolMsg('已複製 ' + label + '。'); }, fallback);
+    } else fallback();
+  }catch(e){ fallback(); }
+}
+
+/* ===== 事件 ===== */
+function bind(){
+  ['cls','sid','name','group'].forEach(function(k){
+    $('r-' + k).addEventListener('input', function(e){
+      state.rater[k] = e.target.value;
+      if(k === 'sid') state.demo = false;
+      if(k === 'group' && state.mode === 'self') $('t-group').value = e.target.value;
+      e.target.removeAttribute('aria-invalid');
+      lsSet(KEY_RATER, state.rater); update();
+    });
+  });
+  $('t-group').addEventListener('input', function(e){ state.target.group = e.target.value; e.target.removeAttribute('aria-invalid'); update(); });
+  $('t-topic').addEventListener('input', function(e){ state.target.topic = e.target.value; update(); });
+  NOTES.forEach(function(n){
+    $('n-' + n[0]).addEventListener('input', function(e){ state.notes[n[0]] = e.target.value; e.target.removeAttribute('aria-invalid'); update(); });
+  });
+  ['peer','self'].forEach(function(m){
+    $('mode-' + m).addEventListener('click', function(){ state.mode = m; applyMode(); update(); });
+  });
+  $('demoBtn').addEventListener('click', function(){
+    state.mode = 'peer';
+    state.demo = true;
+    state.rater = {cls:'資管一A 計算機概論', sid:'DEMO0001', name:'示範同學', group:'3'};
+    state.target = {group:'5', topic:'宿舍洗衣機空機提醒（示範）'};
+    var pattern = {'P1-S1':[1,1,1,1],'P1-S2':[1,1,1,0],'P1-S3':[1,1,1,1],'P1-S4':[1,1,1,1],
+                   'P2-S2':[1,1,1,1],'P2-S3':[1,0,1,0],'P2-S4':[1,1,0,1],'P2-S1':[1,1,0,0],
+                   'P3-S1':[1,1,1],'P3-S2':[1,0,0],'P3-S3':[1,1,1],'P3-S4':[1,1,1,0]};
+    ITEMS.forEach(function(it){
+      var c = state.cells[it.code];
+      c.checks = pattern[it.code].map(Boolean); c.score = autoScore(c.checks); c.manual = false;
+    });
+    state.notes = {highlight:'P1-S4 先寫預測再執行，10 筆測試含 0 與滿載兩個邊界。',
+                   risk:'P3-S2 沒說洗衣機狀態資料存在哪、誰看得到。',
+                   question:'感測器斷線時，App 會顯示空機還是資料異常？'};
+    syncInputs(); renderErrors([]); update();
+    toolMsg('已填入示範資料，可直接按「送出評分」試跑（示範紀錄只存本機，不上傳）。');
+  });
+  $('clearBtn').addEventListener('click', function(){ resetForNext(); renderErrors([]); toolMsg('已清空本次評分，評分者資料保留。'); });
+  $('pf').addEventListener('submit', function(e){
+    e.preventDefault();
+    var errs = validate(state);
+    renderErrors(errs);
+    if(errs.length){ jump(errs[0].f); return; }
+    var rec = toRecord(state), key = recKey(rec), replaced = false;
+    var recs = loadRecs().filter(function(r){ if(recKey(r) === key){ replaced = true; return false; } return true; });
+    recs.unshift(rec); saveRecs(recs);
+    showReceipt(rec, replaced);
+    renderRecords();
+    if(!rec.detail.demo) pushCloud([rec]);
+    resetForNext();
+    jump('receipt');
+  });
+  $('copyCsv').addEventListener('click', function(){
+    var recs = loadRecs(); if(!recs.length){ toolMsg('還沒有紀錄可以匯出。'); return; }
+    copyText(toCSV(recs).replace(/^﻿/, '').replace(/\r\n/g, '\n'), 'CSV（' + recs.length + ' 筆）');
+  });
+  $('copyJson').addEventListener('click', function(){
+    var recs = loadRecs(); if(!recs.length){ toolMsg('還沒有紀錄可以匯出。'); return; }
+    copyText(JSON.stringify(recs.map(stripLocal), null, 1), 'JSON（' + recs.length + ' 筆）');
+  });
+  $('dlCsv').addEventListener('click', function(){
+    var recs = loadRecs(); if(!recs.length){ toolMsg('還沒有紀錄可以匯出。'); return; }
+    try{
+      var url = URL.createObjectURL(new Blob([toCSV(recs)], {type:'text/csv;charset=utf-8'}));
+      var a = el('a', {href:url, download:'期末互評_' + fmtTime(new Date().toISOString()).replace(/[: ]/g, '') + '.csv'});
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      toolMsg('已下載 CSV（' + recs.length + ' 筆）；若沒有出現檔案，請改用「複製 CSV」。');
+    }catch(err){ toolMsg('這個環境不允許下載，請改用「複製 CSV」。'); }
+  });
+  $('resend').addEventListener('click', function(){
+    var recs = loadRecs().filter(function(r){ return r.cloud === 'failed' || r.cloud === 'queued'; });
+    toolMsg('重送 ' + recs.length + ' 筆…');
+    if(window.AECloud && AECloud.flush){
+      var q = AECloud.queue().map(function(r){ return r.id; });
+      var missing = recs.filter(function(r){ return q.indexOf(r.id) < 0; });   /* 佇列外的失敗紀錄重新排入 */
+      (missing.length ? pushCloud(missing) : Promise.resolve()).then(function(){ return AECloud.flush(); }).then(refreshCloudStatus);
+    } else pushCloud(recs);
+  });
+  document.addEventListener('aecloud:status', function(){ setTimeout(refreshCloudStatus, 200); });
+  setInterval(refreshCloudStatus, 20000);
+  var wipeArmed = null;
+  $('wipe').addEventListener('click', function(){
+    var b = $('wipe');
+    if(!wipeArmed){
+      b.textContent = '再按一次確認清除'; wipeArmed = setTimeout(function(){ b.textContent = '清除本機紀錄'; wipeArmed = null; }, 4000); return;
+    }
+    clearTimeout(wipeArmed); wipeArmed = null; b.textContent = '清除本機紀錄';
+    saveRecs([]); renderRecords(); $('exportBox').hidden = true; toolMsg('本機紀錄已清除。');
+  });
+  $('barBtn').addEventListener('click', function(){ $('matrix').scrollIntoView({behavior:'smooth', block:'center'}); });
+}
+
+/* ===== 啟動 ===== */
+buildMatrix();
+buildPhases();
+bind();
+syncInputs();
+update();
+renderRecords();
+$('cloudChip').textContent = hasCloud() ? '資料：評量資料庫＋本機備份' : '資料：只存本機（預覽）';
+refreshCloudStatus();
+
+window.PeerForm = {last4:last4, shOf:shOf, hasCloud:hasCloud, autoScore:autoScore, summarize:summarize, validate:validate, toRecord:toRecord, toCSV:toCSV,
+  csvCell:csvCell, normalize:normalize, blankState:blankState, ITEMS:ITEMS, PHASES:PHASES, getState:function(){ return state; }};
+})();
+</script>
+</body>
+</html>
