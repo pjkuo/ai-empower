@@ -89,8 +89,12 @@ button,input,textarea,select{font:inherit;color:inherit}
 .cell[data-score="0"] .mv{color:var(--bad)}
 .cell[data-score="1"]{background:var(--warn-bg);border-color:#EED399}
 .cell[data-score="1"] .mv{color:var(--warn)}
-.cell[data-score="2"]{background:var(--ok-bg);border-color:#A9D8B6}
-.cell[data-score="2"] .mv{color:var(--ok)}
+.cell[data-score="2"]{background:var(--warn-bg);border-color:#EED399}
+.cell[data-score="2"] .mv{color:var(--warn)}
+.cell[data-score="3"]{background:#EEF7F0;border-color:#BFE0C8}
+.cell[data-score="3"] .mv{color:var(--ok)}
+.cell[data-score="4"]{background:var(--ok-bg);border-color:#A9D8B6}
+.cell[data-score="4"] .mv{color:var(--ok)}
 .sub{text-align:center;font-size:.72rem}
 .sub b{display:block;font:700 .98rem/1.2 var(--font-num)}
 .total{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
@@ -124,12 +128,16 @@ button,input,textarea,select{font:inherit;color:inherit}
 .evi span{font-weight:700}
 .scoreline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px}
 .score{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.score button{border:0;border-left:1px solid var(--line);background:#fff;padding:6px 12px;cursor:pointer;display:flex;align-items:baseline;gap:5px;font-size:.84rem;color:var(--muted)}
+.score button{border:0;border-left:1px solid var(--line);background:#fff;padding:6px 9px;cursor:pointer;display:flex;align-items:baseline;gap:5px;font-size:.84rem;color:var(--muted)}
 .score button:first-child{border-left:0}
 .score button b{font:800 1.05rem var(--font-num)}
+.score button span{white-space:nowrap}
+@media (max-width:560px){.scoreline .score{display:flex;width:100%}.score button{flex:1;flex-direction:column;align-items:center;gap:0;padding:5px 2px}.score button span{font-size:.76rem}}
 .score button[aria-checked="true"][data-v="0"]{background:var(--bad);color:#fff}
 .score button[aria-checked="true"][data-v="1"]{background:var(--amber);color:#3A2A00}
-.score button[aria-checked="true"][data-v="2"]{background:var(--ok);color:#fff}
+.score button[aria-checked="true"][data-v="2"]{background:var(--amber);color:#3A2A00}
+.score button[aria-checked="true"][data-v="3"]{background:#4E9A66;color:#fff}
+.score button[aria-checked="true"][data-v="4"]{background:var(--ok);color:#fff}
 .hint{font-size:.8rem;color:var(--muted)}
 .hint.manual{color:var(--warn);font-weight:600}
 .item.flash{animation:flash 1.2s ease-out}
@@ -222,12 +230,12 @@ button,input,textarea,select{font:inherit;color:inherit}
     <div class="total">
       <div>
         <div style="font-size:.8rem;color:var(--muted);font-weight:700">AI 賦能 KPI 總分</div>
-        <div class="big"><span id="totalNum" class="num">0</span><small> / 24</small></div>
+        <div class="big"><span id="totalNum" class="num">0</span><small> / 48</small></div>
       </div>
       <span class="chip pending" id="kpiChip">評分中</span>
     </div>
     <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
-    <p class="rule" id="ruleText">已評 <b id="scoredNum" class="num">0</b>／12 格。各階段 ≥6 分且無 0 分＝閘門通過；總分 ≥18 且三閘門通過＝KPI 達標。</p>
+    <p class="rule" id="ruleText">已評 <b id="scoredNum" class="num">0</b>／12 格。每格 0–4 級＝4 × 勾選數／檢核點數（四捨五入）。各階段 ≥12 分且無 0 分＝閘門通過；總分 ≥36 且三閘門通過＝KPI 達標。</p>
   </aside>
 
   <div class="rest">
@@ -274,7 +282,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 
 <div class="bar" id="bar" aria-hidden="true">
   <span>已評 <b id="barScored">0</b>/12</span>
-  <span>總分 <b id="barTotal">0</b>/24</span>
+  <span>總分 <b id="barTotal">0</b>/48</span>
   <span class="chip pending" id="barKpi">評分中</span>
   <button type="button" class="btn" id="barBtn" tabindex="-1">看矩陣</button>
 </div>
@@ -289,7 +297,7 @@ button,input,textarea,select{font:inherit;color:inherit}
    雲端網址只放在 <meta name="cc-cloud-url">（與 ai-empower 各頁相同）；有 assets/cloud.js 時交給 AECloud
    （先落地佇列、退避重試、20 秒自動補送），沒有時以內建 fetch 送出。meta 留空＝只存本機。 */
 var CLOUD_KIND = 'peer-sp', CLOUD_APP = 'peer-sp';
-var KEY_DRAFT = 'peerform.draft.v1', KEY_RATER = 'peerform.rater.v1', KEY_REC = 'peerform.records.v1';
+var KEY_DRAFT = 'peerform.draft.v2', KEY_RATER = 'peerform.rater.v1', KEY_REC = 'peerform.records.v1';
 
 /* ===== 3×4 SP 題庫（與「專題報告自我檢查表」一致） ===== */
 var STEPS = {
@@ -369,9 +377,10 @@ function blankState(){
   return {mode:'peer', demo:false, rater:{cls:'', sid:'', name:'', group:''}, target:{group:'', topic:''},
           cells: blankCells(), notes:{highlight:'', risk:'', question:''}};
 }
+function isLevel(s){ return s === 0 || s === 1 || s === 2 || s === 3 || s === 4; }
 function autoScore(checks){
   var n = 0; checks.forEach(function(c){ if(c) n++; });
-  return n === checks.length ? 2 : (n > 0 ? 1 : 0);
+  return Math.round(4 * n / checks.length);
 }
 function summarize(st){
   var res = {phases:{}, total:0, scored:0};
@@ -379,15 +388,15 @@ function summarize(st){
     var sum = 0, scored = 0, zero = false;
     p.items.forEach(function(it){
       var s = st.cells[it.code].score;
-      if(s === 0 || s === 1 || s === 2){ sum += s; scored++; if(s === 0) zero = true; }
+      if(isLevel(s)){ sum += s; scored++; if(s === 0) zero = true; }
     });
-    var status = scored < p.items.length ? 'pending' : (sum >= 6 && !zero ? 'pass' : 'fix');
-    res.phases[p.id] = {sum:sum, scored:scored, zero:zero, status:status, max:p.items.length * 2};
+    var status = scored < p.items.length ? 'pending' : (sum >= 12 && !zero ? 'pass' : 'fix');
+    res.phases[p.id] = {sum:sum, scored:scored, zero:zero, status:status, max:p.items.length * 4};
     res.total += sum; res.scored += scored;
   });
   res.complete = res.scored === ITEMS.length;
   res.kpi = !res.complete ? 'pending'
-    : (res.total >= 18 && PHASES.every(function(p){ return res.phases[p.id].status === 'pass'; }) ? 'pass' : 'fix');
+    : (res.total >= 36 && PHASES.every(function(p){ return res.phases[p.id].status === 'pass'; }) ? 'pass' : 'fix');
   return res;
 }
 function targetGroup(st){ return st.mode === 'self' ? st.rater.group : st.target.group; }
@@ -419,9 +428,9 @@ function toRecord(st, now){
   return {
     v:2, app:CLOUD_APP, kind:CLOUD_KIND, id:uid(),
     sid:last4(st.rater.sid), name:String(st.rater.name).trim(), cls:canonCls(st.rater.cls),
-    ts:(now || new Date()).toISOString(), score:s.total, max:24,
+    ts:(now || new Date()).toISOString(), score:s.total, max:48,
     detail:{
-      sh:shOf(st.rater.sid), unit:'peer-sp', demo:!!st.demo,
+      sh:shOf(st.rater.sid), unit:'peer-sp', scale:'0-4', demo:!!st.demo,
       mode:st.mode, raterGroup:parseInt(st.rater.group, 10), targetGroup:parseInt(targetGroup(st), 10),
       topic:String(st.target.topic).trim(), cells:cells, checks:checks, manual:manual,
       phase:{P1:s.phases.P1.sum, P2:s.phases.P2.sum, P3:s.phases.P3.sum},
@@ -468,7 +477,7 @@ function normalize(d){
     var c = d.cells && d.cells[it.code];
     if(!c) return;
     if(Array.isArray(c.checks) && c.checks.length === it.checks.length) st.cells[it.code].checks = c.checks.map(Boolean);
-    if(c.score === 0 || c.score === 1 || c.score === 2) st.cells[it.code].score = c.score;
+    if(isLevel(c.score)) st.cells[it.code].score = c.score;
     st.cells[it.code].manual = !!c.manual;
   });
   return st;
@@ -520,7 +529,7 @@ function buildMatrix(){
       b.addEventListener('click', function(){ jump('item-' + it.code); });
       tr.appendChild(el('td', null, [b]));
     });
-    tr.appendChild(el('td', {class:'sub'}, [el('b', {id:'msub-' + p.id, class:'num', text:'0/8'}), el('span', {class:'chip pending', id:'mgate-' + p.id, text:'未完成'})]));
+    tr.appendChild(el('td', {class:'sub'}, [el('b', {id:'msub-' + p.id, class:'num', text:'0/16'}), el('span', {class:'chip pending', id:'mgate-' + p.id, text:'未完成'})]));
     tb.appendChild(tr);
   });
   mx.appendChild(tb);
@@ -533,7 +542,7 @@ function buildPhases(){
     sec.appendChild(el('header', {class:'phase-head'}, [
       el('span', {class:'ph-code', text:p.id}),
       el('div', null, [el('h2', {id:'ph-t-' + p.id, text:p.name + '｜' + p.sub}), el('p', {class:'ph-lit', text:p.lit})]),
-      el('div', {class:'ph-sum'}, [el('b', {id:'phsum-' + p.id, text:'0'}), ' / 8 ', el('br'), el('span', {class:'chip pending', id:'phgate-' + p.id, text:'未完成'})])
+      el('div', {class:'ph-sum'}, [el('b', {id:'phsum-' + p.id, text:'0'}), ' / 16 ', el('br'), el('span', {class:'chip pending', id:'phgate-' + p.id, text:'未完成'})])
     ]));
     var items = el('div', {class:'items'});
     p.items.forEach(function(it){
@@ -559,7 +568,7 @@ function buildPhases(){
       art.appendChild(ul);
       art.appendChild(el('p', {class:'evi'}, [el('span', {text:'證據：'}), it.evidence]));
       var sg = el('div', {class:'score', role:'radiogroup', 'aria-label':it.code + ' 分數'});
-      [[0,'未做'],[1,'部分'],[2,'完成']].forEach(function(o){
+      [[0,'未做'],[1,'少數'],[2,'半數'],[3,'多數'],[4,'完成']].forEach(function(o){
         var b = el('button', {type:'button', role:'radio', 'aria-checked':'false', 'data-v':String(o[0]), id:'s-' + it.code + '-' + o[0]},
           [el('b', {text:String(o[0])}), el('span', {text:o[1]})]);
         b.addEventListener('click', function(){
@@ -585,7 +594,7 @@ function update(){
   ITEMS.forEach(function(it){
     var c = state.cells[it.code], sc = c.score === null ? 'none' : String(c.score);
     $('item-' + it.code).setAttribute('data-score', sc);
-    [0,1,2].forEach(function(v){ $('s-' + it.code + '-' + v).setAttribute('aria-checked', c.score === v ? 'true' : 'false'); });
+    [0,1,2,3,4].forEach(function(v){ $('s-' + it.code + '-' + v).setAttribute('aria-checked', c.score === v ? 'true' : 'false'); });
     it.checks.forEach(function(_, i){ $('c-' + it.code + '-' + i).checked = !!c.checks[i]; });
     var n = c.checks.filter(Boolean).length, h = $('hint-' + it.code);
     h.textContent = c.score === null ? '尚未評分'
@@ -598,7 +607,7 @@ function update(){
   PHASES.forEach(function(p){
     var ps = s.phases[p.id];
     $('phsum-' + p.id).textContent = ps.sum;
-    $('msub-' + p.id).textContent = ps.sum + '/8';
+    $('msub-' + p.id).textContent = ps.sum + '/16';
     setChip($('phgate-' + p.id), ps.status, GATE[ps.status]);
     setChip($('mgate-' + p.id), ps.status, GATE[ps.status]);
   });
@@ -700,7 +709,7 @@ function renderRecords(){
       el('td', {text:fmtTime(r.ts)}), el('td', {text:d.mode === 'self' ? '自評' : '互評'}),
       el('td', {class:'n', text:'第 ' + d.targetGroup + ' 組'}), el('td', {text:d.topic || '—'}),
       el('td', {class:'n', text:String(d.phase.P1)}), el('td', {class:'n', text:String(d.phase.P2)}), el('td', {class:'n', text:String(d.phase.P3)}),
-      el('td', {class:'n', text:r.score + '/24'}),
+      el('td', {class:'n', text:r.score + '/' + (r.max || 24)}),
       el('td', null, [el('span', {class:'chip ' + d.kpi, text:KPI[d.kpi]})]),
       el('td', {text:CLOUDL[r.cloud] || r.cloud})
     ]));
@@ -709,7 +718,7 @@ function renderRecords(){
 }
 function showReceipt(rec, replaced){
   var d = rec.detail;
-  $('receiptTitle').textContent = '已送出：' + (d.mode === 'self' ? '本組自評' : '第 ' + d.targetGroup + ' 組') + '　' + rec.score + '/24';
+  $('receiptTitle').textContent = '已送出：' + (d.mode === 'self' ? '本組自評' : '第 ' + d.targetGroup + ' 組') + '　' + rec.score + '/' + rec.max;
   $('receiptText').textContent = 'P1 ' + d.phase.P1 + '（' + GATE[d.gates.P1] + '）、P2 ' + d.phase.P2 + '（' + GATE[d.gates.P2] + '）、P3 ' + d.phase.P3 + '（' + GATE[d.gates.P3] + '）；' + KPI[d.kpi] + '。'
     + (replaced ? '已覆蓋你之前對這組的評分。' : '')
     + (d.demo ? '示範資料只存本機，不上傳。' : (hasCloud() ? '正在寫入評量資料庫（右下角會顯示上傳狀態）。' : '紀錄存在這台裝置。')) + '記錄 ID：' + rec.id;
