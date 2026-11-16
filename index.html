@@ -82,7 +82,7 @@ section{margin-top:26px}
 .tzone .tz-hint{font-weight:500;font-size:12.5px;color:#64748b;margin-left:8px}
 </style>
 <script>
-/* AE Router v2 — 學號單雙號分流:進站先請學生輸入學號後 4 碼,單號→主站(Netlify)、雙號→備援站(GitHub Pages)。
+/* AE Router v2 — 學號單雙號分流:進站先請學生輸入學號後 4 碼,單號→主站(Cloudflare Pages：ai-empower-hub.pages.dev)、雙號→備援站(GitHub Pages)。
    公用電腦防護:每次載入都要求輸入學號(僅帶 ?sid= 轉址抵達的一次免輸入);略過只對當次畫面有效。
    ?stay=1 強制留在本站;?embed=1(內嵌)不分流。轉址帶 ?r=&sid=&cls=,對方站自動帶入身分不必重填。 */
 (function(){
@@ -426,7 +426,7 @@ tfetch(GH+'/route-config.json?h='+Math.floor(Date.now()/36e5),{cache:'no-store'}
   </footer>
 </main>
 <script>
-/* AE Parity — 學號單雙號分流:單號 → 主站(Netlify)、雙號 → 備援站(GitHub Pages);分流結果釘選(ae.route.v2) */
+/* AE Parity — 學號單雙號分流:單號 → 主站(Cloudflare Pages)、雙號 → 備援站(GitHub Pages);分流結果釘選(ae.route.v2) */
 (function(){
 "use strict";
 var NL='https://ai-empower-hub.pages.dev', GH='https://pjkuo.github.io/ai-empower';
