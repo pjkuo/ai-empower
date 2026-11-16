@@ -165,6 +165,10 @@ textarea{min-height:84px;resize:vertical;line-height:1.55}
 .ans.wait{color:var(--muted)}
 .ans.err{color:var(--bad);background:var(--bad-bg)}
 .ansnote{font-size:.8rem;color:var(--muted);margin-top:6px}
+.cnt{margin-top:8px;border-radius:8px;padding:8px 10px;background:#F0FDF4;border:1px solid #BBF7D0;font-size:.9rem;display:none}
+.cnt.on{display:block}
+.cnt b{color:#166534}
+.cnt .y{color:var(--ok);font-weight:800}.cnt .n{color:var(--bad);font-weight:800}
 
 /* 右欄摘要 */
 .sum .card{padding:16px}
@@ -349,7 +353,7 @@ const DIMS=[{"key": "mind", "no": "①", "name": "心智圖", "basic": "4 層 4 
 const W12=new Date('2026-11-23T00:00:00+08:00');
 const KEY='ae.selfeval.v1';
 const AI_PROXY=(document.querySelector('meta[name="ae-ai-proxy"]')||{}).content||'';
-const AI_SYSTEM='你是大一「AI 賦能專題」期末報告的自評檢核助教。規則：1) 只依使用者列出的 5 項檢核標準，逐項判定「有／沒有／看不出來」。2) 每項一行，格式固定：①｜有｜理由（指出作品中的位置，或缺了什麼），理由 30 字內。3) 不要改寫、補寫或代做作品，不要打分數，不要新增標準。4) 內容不足以判斷時寫「看不出來」，並說要補什麼證據。5) 判定層數、分支數、測試筆數時，理由要寫出你數的那條最長路徑或清單（例：中心→使用者→學生→午餐尖峰＝4 層，中心算第 1 層），讓學生能核對。6) 最後一行寫「先補：」＋最該先補的一項與一句做法。用繁體中文。';
+const AI_SYSTEM='你是大一「AI 賦能專題」期末報告的自評檢核助教。規則：1) 只依使用者列出的 5 項檢核標準，逐項判定「有／沒有／看不出來」。2) 每項一行，格式固定：①｜有｜理由（指出作品中的位置，或缺了什麼），理由 30 字內。3) 不要改寫、補寫或代做作品，不要打分數，不要新增標準。4) 內容不足以判斷時寫「看不出來」，並說要補什麼證據。5) 標準寫「至少 N」就是「≥ N」：剛好 N 也判定「有」。判定層數、分支數、測試筆數時，理由要寫出你數的那條最長路徑或清單（例：中心→使用者→學生→午餐尖峰＝4 層，中心算第 1 層），讓學生能核對。6) 最後一行寫「先補：」＋最該先補的一項與一句做法。用繁體中文。';
 
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -394,6 +398,7 @@ DIMS.map(d=>`
     <summary>🤖 請 AI 逐項檢核<small>貼上作品內容 → AI 只判定有／沒有，不代寫；勾不勾由你們決定</small></summary>
     <div class="in">
       <label class="f">貼上${esc(d.artifact)}<textarea data-paste="${d.key}" placeholder="${esc(d.placeholder)}"></textarea></label>
+      ${(d.key==='mind'||d.key==='code')?`<div class="cnt" data-count="${d.key}" aria-live="polite"></div>`:''}
       <div class="row">
         <label class="f" style="flex-direction:row;align-items:center;gap:6px;margin:0">AI 班級碼<input type="text" data-aicode style="width:130px" placeholder="老師公布" autocomplete="off"></label>
         <button class="btn ai" type="button" data-ask="${d.key}">🤖 直接問 AI</button>
@@ -401,7 +406,7 @@ DIMS.map(d=>`
       </div>
       <div class="hint" style="margin-top:6px">沒有班級碼：按「複製提示」，貼到 ChatGPT／Gemini／Claude 也可以。</div>
       <div class="ans" data-ans="${d.key}"></div>
-      <div class="ansnote" data-ansnote="${d.key}" hidden>AI 的判定只是參考：回頭看作品，同意了才勾（HITL）。AI 說「有」但你們找不到，就不要勾。</div>
+      <div class="ansnote" data-ansnote="${d.key}" hidden>AI 的判定只是參考：回頭看作品，同意了才勾（HITL）。AI 說「有」但你們找不到，就不要勾；${(d.key==='mind'||d.key==='code')?'AI 和「程式數一數」不一致時，自己再數一次——AI 也會把 ≥ 當成 >。':''}</div>
     </div>
   </details>
 </section>`).join('');
@@ -425,6 +430,7 @@ function fillInputs(){
   $$('[data-paste]').forEach(x=>x.value=st.paste[x.dataset.paste]||'');
   $$('[data-aicode]').forEach(x=>x.value=st.aiCode||'');
   $$('input[name=next]').forEach(x=>x.checked=st.next.includes(NEXT[+x.value]));
+  showCount('mind');showCount('code');
   DIMS.forEach(d=>{const a=$(`[data-ans="${d.key}"]`); if(st.ans[d.key]){a.textContent=st.ans[d.key];a.className='ans on';$(`[data-ansnote="${d.key}"]`).hidden=false;}else{a.className='ans';a.textContent='';}});
 }
 
@@ -498,6 +504,49 @@ function render(){
   $('#goForm').href=formUrl();
 }
 
+/* ===== 程式數一數（不靠 AI；與 AI 判定互相核對） ===== */
+function countOutline(text){
+  const raw=String(text||'').split(/\r?\n/).map(l=>l.replace(/\t/g,'    ')).filter(l=>l.trim());
+  if(!raw.length) return null;
+  const headRe=/^\s*(#{1,6})\s+(.*)$/, bulRe=/^(\s*)(?:[-*+•‧・]|\d+[.)、])\s+(.*)$/;
+  /* 先切區塊（每個標題一塊），各塊收集縮排寬度排名 */
+  const items=[];let block=0;const ind={};
+  raw.forEach(l=>{let m;
+    if((m=l.match(headRe))){block++;items.push({h:m[1].length,t:m[2].trim(),b:block});}
+    else if((m=l.match(bulRe))){const w=m[1].length;(ind[block]=ind[block]||new Set()).add(w);items.push({w,t:m[2].trim(),b:block});}
+    else items.push({p:true,t:l.trim(),b:block});
+  });
+  const rank={};Object.keys(ind).forEach(k=>{rank[k]=Array.from(ind[k]).sort((a,b)=>a-b);});
+  let hBase=0;const nodes=[];const plainCenter=!!(items[0]&&items[0].p);
+  items.forEach((it,i)=>{
+    if(it.h){hBase=it.h;nodes.push({d:it.h,t:it.t});}
+    else if(it.w!=null){const r=rank[it.b].indexOf(it.w);const base=hBase?hBase:(plainCenter?1:0);nodes.push({d:base+1+r,t:it.t});}
+    else if(i===0){nodes.push({d:1,t:it.t});}
+  });
+  if(!nodes.length) return null;
+  const minD=Math.min(...nodes.map(n=>n.d));nodes.forEach(n=>n.d-=minD-1);
+  if(nodes.filter(n=>n.d===1).length>1){nodes.forEach(n=>n.d+=1);nodes.unshift({d:1,t:'（中心）'});}
+  const stack=[];let best=[];
+  nodes.forEach(n=>{stack.length=n.d-1;stack[n.d-1]=n.t;if(n.d>best.length)best=stack.slice(0,n.d);});
+  return {branches:nodes.filter(n=>n.d===2).length,depth:best.length,path:best};
+}
+function countTests(text){
+  const lines=String(text||'').split(/\r?\n/);
+  let ok=0,bad=0;lines.forEach(l=>{if(/[✔✓✅]/.test(l))ok++;else if(/[✘✗❌]/.test(l))bad++;});
+  const m=String(text||'').match(/(\d+)\s*[\/／]\s*(\d+)(?![\s\S]*\d+\s*[\/／]\s*\d+)/);
+  return {n:ok+bad,ok,bad,pass:m?m[1]+'／'+m[2]:''};
+}
+function showCount(k){
+  const el=$(`[data-count="${k}"]`);if(!el)return;const txt=st.paste[k]||'';
+  if(!txt.trim()){el.className='cnt';el.innerHTML='';return;}
+  const yn=v=>v?'<span class="y">✔</span>':'<span class="n">✘</span>';
+  if(k==='mind'){const c=countOutline(txt);if(!c){el.className='cnt';return;}
+    el.innerHTML=`<b>🧮 程式數一數（不靠 AI）</b>　主分支 <b>${c.branches}</b> 條 ${yn(c.branches>=4)}｜最深 <b>${c.depth}</b> 層 ${yn(c.depth>=4)}<br><small>最長路徑：${esc(c.path.join(' → '))}（中心算第 1 層；標準是「至少 4」＝≥ 4）</small>`;}
+  else{const c=countTests(txt);
+    el.innerHTML=`<b>🧮 程式數一數（不靠 AI）</b>　測試 <b>${c.n}</b> 筆 ${yn(c.n>=8)}（✔ ${c.ok}、✘ ${c.bad}）｜結果 ${c.pass?'通過 <b>'+esc(c.pass)+'</b> '+yn(true)+'（有數字）':'<span class="n">✘ 找不到「通過 x／y」</span>'}<br><small>算法：有 ✔／✘ 的行算一筆；「通過」取最後一個 x／y。</small>`;}
+  el.className='cnt on';
+}
+
 /* ===== AI 檢核（HOTL：AI 判定，人審核） ===== */
 function promptOf(d,withRules){
   const paste=(st.paste[d.key]||'').trim();
@@ -542,7 +591,7 @@ document.addEventListener('input',e=>{
   else if(t.id==='reflect'){st.reflect=t.value;}
   else if(t.dataset.rf&&t.dataset.rf!=='lead'&&t.dataset.rf!=='role'){const i=+t.closest('tr').dataset.r;st.roster[i][t.dataset.rf]=t.value;}
   else if(t.dataset.ev){st.ev[t.dataset.ev]=t.value;}
-  else if(t.dataset.paste){st.paste[t.dataset.paste]=t.value;}
+  else if(t.dataset.paste){st.paste[t.dataset.paste]=t.value;showCount(t.dataset.paste);}
   else if('aicode' in t.dataset){st.aiCode=t.value.trim();$$('[data-aicode]').forEach(x=>{if(x!==t)x.value=t.value;});}
   else return;
   save();render();
