@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>期末報告分組自評｜AI 賦能自評單元</title>
+<meta name="description" content="AI 賦能專題期末報告分組自評（第 11–12 週）：四大面向最基本標準——心智圖 4 層 4 分支、IPO 表明確界定範圍、流程圖可模擬執行、程式驗證結果。勾選即時計分、請 AI 逐項檢核（只檢核不代寫），一鍵帶入 Google 表單送出；分組名單＋自評都送出才算完成。">
+<link rel="canonical" href="https://pjkuo.github.io/ai-empower/selfeval.html">
+<meta name="theme-color" content="#0E1A3A">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AI 賦能教學 Hub">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:url" content="https://pjkuo.github.io/ai-empower/selfeval.html">
+<meta property="og:title" content="期末報告分組自評｜AI 賦能自評單元">
+<meta property="og:description" content="四大面向最基本標準 × 勾 1 項 5 分 × AI 逐項檢核 × 一鍵帶入 Google 表單；名單＋自評都送出才算完成。">
+<meta property="og:image" content="https://pjkuo.github.io/og-cover.png">
+<!-- 老師代管 Gemini 代理（AI-empower-platform/gas/ai-proxy.gs，班級碼），與 crisp.html 共用 -->
+<meta name="ae-ai-proxy" content="https://script.google.com/macros/s/AKfycbzeZIdckk825BFGen2C2l9WYG_qYSJUDTTAzLMAmhg6fdvi_HrwZsa518PSAurleMSm/exec">
+<link rel="icon" href="https://pjkuo.github.io/favicon.svg" type="image/svg+xml">
+<script src="assets/theme.js"></script>
+<style>
+/* 期末報告分組自評 v1.0（2026-11-16）· AI 賦能自評單元 · 零 CDN（系統字型）
+   左欄：分組資料＋名單 → 四大面向（勾選／範例／AI 檢核）→ 反思 → 送出；右欄固定：分數、最基本標準、缺口、完成條件 */
+:root{
+  --ink:#0E1A3A; --paper:#F2F5F9; --card:#FFFFFF; --line:#D4DCE7; --muted:#55617B; --soft:#EEF2F8;
+  --accent:#0E8FA8; --amber:#F6B82A; --gold:#F9C930;
+  --s1:#F07C22; --s2:#1E9FB0; --s3:#D9A21B; --s4:#3B8EDB;
+  --t1:#B4530B; --t2:#0E6E7C; --t3:#8A5A00; --t4:#1F63A8;
+  --ok:#1D7343; --ok-bg:#E2F2E6; --warn:#7E5300; --warn-bg:#FBEFD3; --bad:#A3241A; --bad-bg:#FBE8E5;
+  --font-body:"Noto Sans TC","Microsoft JhengHei","PingFang TC","Heiti TC",sans-serif;
+  --font-num:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--font-body)}
+h1,h2,h3{margin:0;text-wrap:balance}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+a{color:var(--t4)}
+
+/* 頁首 */
+.top{background:var(--ink);color:#fff;padding:18px 16px 20px}
+.top-in{max-width:1180px;margin:0 auto}
+.top .home{color:#C9D3E6;font-size:.86rem;text-decoration:none}
+.top .home:hover{color:#fff;text-decoration:underline}
+.top h1{font-size:1.75rem;letter-spacing:.04em;margin-top:6px}
+.top h1 small{display:block;font-size:.9rem;font-weight:500;color:var(--gold);letter-spacing:.06em;margin-bottom:2px}
+.top p{margin:6px 0 0;color:#C9D3E6;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{border-radius:8px;padding:3px 10px;font-size:.85rem;font-weight:700;color:#fff}
+.loop{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-size:.82rem}
+.loop span{border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:2px 9px;color:#E6ECF7}
+.loop b{color:var(--gold)}
+
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 110px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (min-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr) 340px;align-items:start}
+  .sum{position:sticky;top:14px}
+  .wrap{padding-bottom:40px}
+  .mbar{display:none!important}
+}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h2{font-size:1.1rem}
+.lead{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+
+/* 三步驟 */
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
+.how div{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.9rem;color:var(--muted)}
+.how b{display:block;color:var(--ink);font-size:1rem}
+.how i{font-style:normal;display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--gold);align-items:center;justify-content:center;font-weight:800;margin-right:6px;font-size:.85rem}
+
+/* 表單欄位 */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px 12px;margin-top:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.86rem;color:var(--muted);font-weight:600}
+.f.wide{grid-column:1 / -1}
+[hidden]{display:none!important}
+input[type=text],input[type=number],input[type=url],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;font-size:1rem;color:var(--ink);font-weight:400}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{min-height:84px;resize:vertical;line-height:1.55}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700;color:var(--ink);background:#fff}
+.seg input{accent-color:var(--ink)}
+.seg label:has(input:checked){border-color:var(--ink);background:var(--soft)}
+
+/* 名單 */
+.roster{width:100%;border-collapse:collapse;margin-top:10px;font-size:.92rem}
+.roster th{text-align:left;font-size:.8rem;color:var(--muted);font-weight:600;padding:4px 4px;border-bottom:1px solid var(--line)}
+.roster td{padding:5px 4px;vertical-align:middle;border-bottom:1px dashed var(--line)}
+.roster td.c{text-align:center;width:46px}
+.roster input[type=text],.roster select{padding:6px 8px;font-size:.95rem}
+.roster .del{border:0;background:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px 6px;border-radius:6px}
+.roster .del:hover{background:var(--bad-bg);color:var(--bad)}
+.roster tr.bad td{background:#FFF8F6}
+@media (max-width:620px){
+  .roster thead{display:none}
+  .roster tr{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .roster td{border:0;padding:0}
+  .roster td:nth-child(1){grid-column:1;grid-row:1}
+  .roster td:nth-child(2){grid-column:2;grid-row:1}
+  .roster td:nth-child(3){grid-column:1;grid-row:2}
+  .roster td:nth-child(4){grid-column:2 / 4;grid-row:2}
+  .roster td:nth-child(5){grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:center}
+  .roster td.c{width:auto;text-align:left;font-size:.88rem;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .roster td.c::before{content:"組長";color:var(--muted);font-weight:600}
+}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer;text-decoration:none;font-size:.95rem}
+.btn:hover{background:var(--soft)}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.pri:hover{background:#1B2B57}
+.btn.go{background:#B45309;border-color:#B45309;color:#fff;font-size:1.05rem;padding:11px 18px}
+.btn.go:hover{background:#92400E}
+.btn.ai{border-color:#4338CA;color:#4338CA}
+.btn.ai:hover{background:#EEF0FF}
+.btn[disabled]{opacity:.5;cursor:wait}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.hint{font-size:.84rem;color:var(--muted)}
+.msg{font-size:.88rem;margin-top:8px;border-radius:8px;padding:7px 10px;display:none}
+.msg.on{display:block}
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+
+/* 四大面向 */
+.dim{border:1px solid var(--line);border-top:6px solid var(--c);border-radius:12px;background:#fff;overflow:hidden}
+.dh{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 16px 8px}
+.dh .no{font-size:1.5rem;font-weight:900;color:var(--c);line-height:1}
+.dh h2{font-size:1.2rem}
+.basic{background:var(--c);color:#fff;border-radius:999px;padding:2px 12px;font-weight:800;font-size:.92rem}
+.dim[data-k=algo] .basic{color:#2A1E00}
+.dscore{margin-left:auto;font-weight:800;font-size:1.05rem}
+.dscore .num{font-size:1.35rem}
+.db{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:0 16px 12px}
+@media (min-width:720px){ .db{grid-template-columns:minmax(0,1fr) 300px} .dim[data-k=mind] .db{grid-template-columns:minmax(0,1fr)} }
+.dim[data-k=mind] .ex svg{max-width:470px}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.items label{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;background:#fff}
+.items label:hover{border-color:var(--c)}
+.items label:has(input:checked){background:color-mix(in srgb,var(--c) 10%,#fff);border-color:var(--c)}
+.items input{width:20px;height:20px;margin-top:3px;flex:none;accent-color:var(--c)}
+.items .tx{flex:1}
+.items .core{white-space:nowrap;display:inline-block;font-size:.72rem;font-weight:800;color:var(--tc);border:1.5px solid var(--c);border-radius:5px;padding:0 5px;margin-left:6px;vertical-align:2px}
+.ait{display:inline-block;font-size:.74rem;font-weight:800;border-radius:5px;padding:0 6px;margin-left:6px;vertical-align:2px}
+.ait:empty{display:none}
+.ait.y{background:var(--ok-bg);color:var(--ok)}
+.ait.n{background:var(--bad-bg);color:var(--bad)}
+.ait.q{background:var(--warn-bg);color:var(--warn)}
+.ex{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.85rem;color:var(--ink)}
+.ex b.t{display:block;color:var(--tc);margin-bottom:4px;font-size:.88rem}
+.ex table{width:100%;border-collapse:collapse;font-size:.82rem}
+.ex td,.ex th{border:1px solid var(--line);padding:3px 5px;background:#fff;text-align:left}
+.ex th{background:#E6ECF4}
+.ex svg{width:100%;height:auto;display:block}
+.ex .case{display:flex;gap:6px;align-items:center;margin:4px 0}
+.ex .case em{font-style:normal;font-weight:800;color:#fff;border-radius:6px;padding:1px 7px;font-size:.78rem;flex:none}
+.ev{padding:0 16px 12px}
+.aibox{margin:0 16px 14px;border:1.5px dashed #A5B4FC;border-radius:10px;background:#FAFAFF}
+.aibox summary{cursor:pointer;padding:9px 12px;font-weight:800;color:#3730A3;font-size:.95rem}
+.aibox summary small{font-weight:500;color:var(--muted);margin-left:6px}
+.aibox .in{padding:0 12px 12px}
+.ans{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:.92rem;display:none}
+.ans.on{display:block}
+.ans.wait{color:var(--muted)}
+.ans.err{color:var(--bad);background:var(--bad-bg)}
+.ansnote{font-size:.8rem;color:var(--muted);margin-top:6px}
+
+/* 右欄摘要 */
+.sum .card{padding:16px}
+.total{display:flex;align-items:baseline;gap:8px}
+.total .big{font-size:3rem;font-weight:900;line-height:1}
+.total .of{color:var(--muted);font-weight:700}
+.lvl{display:inline-block;border-radius:8px;padding:2px 12px;font-weight:800;font-size:1rem;margin-left:auto}
+.lvl.l4{background:var(--ok-bg);color:var(--ok)}
+.lvl.l3{background:#E0F2FE;color:#075985}
+.lvl.l2{background:var(--warn-bg);color:var(--warn)}
+.lvl.l1{background:var(--bad-bg);color:var(--bad)}
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.bar .lab{display:flex;justify-content:space-between;font-size:.86rem;font-weight:700}
+.bar .lab span:last-child{font-family:var(--font-num)}
+.bar .tr{height:10px;background:var(--soft);border-radius:4px;overflow:hidden;margin-top:3px}
+.bar .fi{height:100%;background:var(--c);border-radius:0 4px 4px 0;transition:width .25s}
+.bar .bs{font-size:.78rem;margin-top:2px}
+.bs.y{color:var(--ok)} .bs.n{color:var(--bad)}
+.sum h3{font-size:.95rem;margin:16px 0 6px}
+.gaps{margin:0;padding-left:18px;font-size:.88rem}
+.gaps li{margin:3px 0}
+.done{list-style:none;margin:0;padding:0;font-size:.9rem;display:flex;flex-direction:column;gap:5px}
+.done li{display:flex;gap:8px;align-items:flex-start}
+.done .m{flex:none;width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem}
+.done .m.y{background:var(--ok);color:#fff}
+.done .m.n{background:#fff;border:2px solid var(--line);color:var(--muted)}
+.done .m.w{background:var(--amber);color:#2A1E00}
+.donebox{border:2px solid #C0392B;background:#FDEDEC;border-radius:10px;padding:10px 12px;margin-top:14px}
+.donebox b{color:#991B1B}
+
+/* 送出 */
+.send{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:center}
+@media (min-width:720px){ .send{grid-template-columns:minmax(0,1fr) 190px} }
+.qr{background:#fff;border:3px solid #F5A623;border-radius:14px;padding:10px;text-align:center}
+.qr svg{width:150px;height:150px;display:block;margin:0 auto}
+.qr div{font-weight:800;color:#B45309;margin-top:4px}
+.qr small{display:block;color:var(--muted);font-size:.78rem;word-break:break-all}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.dl a{font-size:.88rem}
+
+/* 手機底部摘要列 */
+.mbar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
+.mbar .big{font-size:1.5rem;font-weight:900}
+.mbar a{margin-left:auto;color:var(--gold);font-weight:800;text-decoration:none}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:10px;font-size:.92rem;z-index:99;max-width:92vw;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+
+@media print{
+  .top{background:#fff;color:#000;padding:0 0 8px}
+  .top p,.top .home,.loop{display:none}
+  .top h1 small{color:#B45309}
+  .aibox,.mbar,.toast,.noprint,.btn,.how{display:none!important}
+  .layout{grid-template-columns:1fr 260px}
+  .card,.dim{break-inside:avoid}
+  body{background:#fff;font-size:12px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="home" href="./">← AI 賦能教學 Hub</a>
+    <h1><small>AI 賦能專題製作｜AI 賦能自評單元</small>期末報告分組自評</h1>
+    <p>四大面向最基本標準，<b>勾 1 項＝5 分</b>，共 100 分。第 11 週先初評找缺口，第 12 週補完再定稿。<b>分組名單＋自評都送出，才算完成。</b></p>
+    <div class="chips">
+      <span class="chip" style="background:var(--s1)">① 心智圖｜4 層 4 分支</span>
+      <span class="chip" style="background:var(--s2)">② IPO 表｜明確界定範圍</span>
+      <span class="chip" style="background:var(--s3);color:#2A1E00">③ 流程圖｜可模擬執行</span>
+      <span class="chip" style="background:var(--s4)">④ 程式｜驗證結果</span>
+    </div>
+    <div class="loop" aria-label="人機分工">
+      <span><b>HITL</b> 你們看作品、自己勾</span><span><b>HOTL</b> AI 逐項檢核、你們審</span><span><b>決定</b> 勾不勾、回哪站修，由人決定</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="layout">
+<div class="col">
+
+  <section class="card noprint">
+    <h2>三步驟完成</h2>
+    <div class="how">
+      <div><b><i>1</i>填分組名單</b>學號、姓名、分工，勾一位組長。</div>
+      <div><b><i>2</i>四大面向逐項勾</b>做到才勾、貼證據；拿不準就請 AI 檢核。</div>
+      <div><b><i>3</i>帶入 Google 表單送出</b>每組 1 份，到表單最後一頁按「提交」。</div>
+    </div>
+    <p class="hint" style="margin-top:10px">本頁內容會自動存在這台裝置的瀏覽器；換裝置請由組長在同一台填完。</p>
+  </section>
+
+  <section class="card" id="who">
+    <h2>一、分組資料</h2>
+    <div class="grid2">
+      <div class="f wide" style="font-size:.86rem;color:var(--muted);font-weight:600">這是第幾週的自評？
+        <div class="seg" style="margin-top:4px" id="weekSeg"></div>
+      </div>
+      <label class="f">班級<select id="cls"><option value="">— 選擇 —</option></select></label>
+      <label class="f">組別（1–30）<input id="grp" type="number" min="1" max="30" inputmode="numeric" placeholder="例：7"></label>
+      <label class="f wide">專題題目（一個地點、一個問題）<input id="topic" type="text" placeholder="例：學餐排隊：現在去還是等一下？"></label>
+    </div>
+    <h2 style="margin-top:18px">二、分組名單 <span class="hint" style="font-weight:500">沒填完不算完成</span></h2>
+    <table class="roster" id="roster">
+      <thead><tr><th>學號</th><th>姓名</th><th>分工</th><th style="text-align:center">組長</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="row"><button class="btn" type="button" id="addRow">＋ 加一位組員</button><span class="hint">2–5 人；分工：操作手／查核員／計時記錄</span></div>
+  </section>
+
+  <div id="dims" class="col"></div>
+
+  <section class="card">
+    <h2>四、HITL 證據：我們請 AI 改了哪裡、為什麼？</h2>
+    <p class="lead">一兩句就好。例：AI 把 ≥ 寫成 >，我們對照 IPO 表改回 ≥，因為剛好 15 分也要算「先去別家」。</p>
+    <textarea id="reflect" style="margin-top:10px" placeholder="我們請 AI 改了…，因為…"></textarea>
+    <h3 style="font-size:.98rem;margin-top:14px">下一圈要回哪一站修？</h3>
+    <div class="seg" id="nextSeg" style="margin-top:6px"></div>
+    <div class="row"><span class="hint" id="nextHint"></span><button class="btn" type="button" id="useNext" hidden>採用建議</button></div>
+  </section>
+
+  <section class="card" id="send">
+    <h2>五、送出（每組 1 份）</h2>
+    <div class="send">
+      <div>
+        <p class="lead">按下去會開啟 Google 表單，<b>本頁填好的內容自動帶入</b>。逐頁檢查、補上空白，在最後一頁勾「送出前確認」再按<b>「提交」</b>，才算完成。</p>
+        <div class="row">
+          <a class="btn go" id="goForm" href="https://forms.gle/BcMVmgts4cCB5yjH6" target="_blank" rel="noopener">📤 帶入 Google 表單送出</a>
+        </div>
+        <div class="msg warn" id="sendMsg"></div>
+        <div class="row noprint">
+          <button class="btn" type="button" id="copySum">📋 複製本組摘要</button>
+          <button class="btn" type="button" id="printBtn">🖨 列印／存 PDF</button>
+          <button class="btn" type="button" id="resetBtn" style="border-color:var(--line);color:var(--muted)">清除重填</button>
+        </div>
+        <div class="dl noprint">
+          <a href="assets/doc/selfeval-form-w11-12.pdf" target="_blank" rel="noopener">📄 自評表（2 頁 PDF，可列印）</a>
+          <a href="assets/doc/selfeval-unit-slides.pdf" target="_blank" rel="noopener">📊 自評單元簡報（8 頁 PDF）</a>
+          <a href="https://forms.gle/BcMVmgts4cCB5yjH6" target="_blank" rel="noopener">📝 直接開空白表單</a>
+        </div>
+      </div>
+      <div class="qr">
+        <svg viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="Google 表單 QR Code"><rect width="33" height="33" fill="#fff"/><path fill="#0E1A3A" d="M2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM5,2h1v1h-1zM6,2h1v1h-1zM7,2h1v1h-1zM8,2h1v1h-1zM11,2h1v1h-1zM14,2h1v1h-1zM17,2h1v1h-1zM18,2h1v1h-1zM19,2h1v1h-1zM20,2h1v1h-1zM21,2h1v1h-1zM22,2h1v1h-1zM24,2h1v1h-1zM25,2h1v1h-1zM26,2h1v1h-1zM27,2h1v1h-1zM28,2h1v1h-1zM29,2h1v1h-1zM30,2h1v1h-1zM2,3h1v1h-1zM8,3h1v1h-1zM12,3h1v1h-1zM13,3h1v1h-1zM24,3h1v1h-1zM30,3h1v1h-1zM2,4h1v1h-1zM4,4h1v1h-1zM5,4h1v1h-1zM6,4h1v1h-1zM8,4h1v1h-1zM10,4h1v1h-1zM12,4h1v1h-1zM16,4h1v1h-1zM18,4h1v1h-1zM21,4h1v1h-1zM22,4h1v1h-1zM24,4h1v1h-1zM26,4h1v1h-1zM27,4h1v1h-1zM28,4h1v1h-1zM30,4h1v1h-1zM2,5h1v1h-1zM4,5h1v1h-1zM5,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM10,5h1v1h-1zM11,5h1v1h-1zM12,5h1v1h-1zM13,5h1v1h-1zM19,5h1v1h-1zM22,5h1v1h-1zM24,5h1v1h-1zM26,5h1v1h-1zM27,5h1v1h-1zM28,5h1v1h-1zM30,5h1v1h-1zM2,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM10,6h1v1h-1zM15,6h1v1h-1zM16,6h1v1h-1zM17,6h1v1h-1zM20,6h1v1h-1zM22,6h1v1h-1zM24,6h1v1h-1zM26,6h1v1h-1zM27,6h1v1h-1zM28,6h1v1h-1zM30,6h1v1h-1zM2,7h1v1h-1zM8,7h1v1h-1zM10,7h1v1h-1zM12,7h1v1h-1zM14,7h1v1h-1zM15,7h1v1h-1zM16,7h1v1h-1zM17,7h1v1h-1zM19,7h1v1h-1zM22,7h1v1h-1zM24,7h1v1h-1zM30,7h1v1h-1zM2,8h1v1h-1zM3,8h1v1h-1zM4,8h1v1h-1zM5,8h1v1h-1zM6,8h1v1h-1zM7,8h1v1h-1zM8,8h1v1h-1zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h1v1h-1zM16,8h1v1h-1zM18,8h1v1h-1zM20,8h1v1h-1zM22,8h1v1h-1zM24,8h1v1h-1zM25,8h1v1h-1zM26,8h1v1h-1zM27,8h1v1h-1zM28,8h1v1h-1zM29,8h1v1h-1zM30,8h1v1h-1zM10,9h1v1h-1zM11,9h1v1h-1zM13,9h1v1h-1zM15,9h1v1h-1zM18,9h1v1h-1zM22,9h1v1h-1zM2,10h1v1h-1zM4,10h1v1h-1zM5,10h1v1h-1zM6,10h1v1h-1zM7,10h1v1h-1zM8,10h1v1h-1zM12,10h1v1h-1zM14,10h1v1h-1zM16,10h1v1h-1zM17,10h1v1h-1zM18,10h1v1h-1zM19,10h1v1h-1zM21,10h1v1h-1zM24,10h1v1h-1zM25,10h1v1h-1zM26,10h1v1h-1zM27,10h1v1h-1zM28,10h1v1h-1zM3,11h1v1h-1zM4,11h1v1h-1zM5,11h1v1h-1zM6,11h1v1h-1zM7,11h1v1h-1zM9,11h1v1h-1zM11,11h1v1h-1zM13,11h1v1h-1zM14,11h1v1h-1zM22,11h1v1h-1zM24,11h1v1h-1zM25,11h1v1h-1zM26,11h1v1h-1zM30,11h1v1h-1zM2,12h1v1h-1zM3,12h1v1h-1zM8,12h1v1h-1zM11,12h1v1h-1zM12,12h1v1h-1zM14,12h1v1h-1zM17,12h1v1h-1zM22,12h1v1h-1zM23,12h1v1h-1zM25,12h1v1h-1zM26,12h1v1h-1zM3,13h1v1h-1zM4,13h1v1h-1zM7,13h1v1h-1zM9,13h1v1h-1zM10,13h1v1h-1zM12,13h1v1h-1zM14,13h1v1h-1zM16,13h1v1h-1zM17,13h1v1h-1zM20,13h1v1h-1zM21,13h1v1h-1zM24,13h1v1h-1zM25,13h1v1h-1zM27,13h1v1h-1zM29,13h1v1h-1zM2,14h1v1h-1zM4,14h1v1h-1zM5,14h1v1h-1zM7,14h1v1h-1zM8,14h1v1h-1zM12,14h1v1h-1zM19,14h1v1h-1zM23,14h1v1h-1zM27,14h1v1h-1zM28,14h1v1h-1zM3,15h1v1h-1zM4,15h1v1h-1zM9,15h1v1h-1zM10,15h1v1h-1zM11,15h1v1h-1zM12,15h1v1h-1zM15,15h1v1h-1zM16,15h1v1h-1zM17,15h1v1h-1zM18,15h1v1h-1zM21,15h1v1h-1zM22,15h1v1h-1zM23,15h1v1h-1zM24,15h1v1h-1zM25,15h1v1h-1zM26,15h1v1h-1zM30,15h1v1h-1zM3,16h1v1h-1zM6,16h1v1h-1zM8,16h1v1h-1zM9,16h1v1h-1zM10,16h1v1h-1zM13,16h1v1h-1zM15,16h1v1h-1zM16,16h1v1h-1zM17,16h1v1h-1zM19,16h1v1h-1zM20,16h1v1h-1zM24,16h1v1h-1zM27,16h1v1h-1zM28,16h1v1h-1zM4,17h1v1h-1zM15,17h1v1h-1zM21,17h1v1h-1zM23,17h1v1h-1zM24,17h1v1h-1zM26,17h1v1h-1zM29,17h1v1h-1zM4,18h1v1h-1zM6,18h1v1h-1zM7,18h1v1h-1zM8,18h1v1h-1zM14,18h1v1h-1zM16,18h1v1h-1zM19,18h1v1h-1zM20,18h1v1h-1zM25,18h1v1h-1zM27,18h1v1h-1zM28,18h1v1h-1zM2,19h1v1h-1zM4,19h1v1h-1zM5,19h1v1h-1zM9,19h1v1h-1zM11,19h1v1h-1zM12,19h1v1h-1zM18,19h1v1h-1zM22,19h1v1h-1zM23,19h1v1h-1zM24,19h1v1h-1zM25,19h1v1h-1zM26,19h1v1h-1zM28,19h1v1h-1zM30,19h1v1h-1zM2,20h1v1h-1zM5,20h1v1h-1zM6,20h1v1h-1zM7,20h1v1h-1zM8,20h1v1h-1zM9,20h1v1h-1zM10,20h1v1h-1zM13,20h1v1h-1zM14,20h1v1h-1zM17,20h1v1h-1zM18,20h1v1h-1zM22,20h1v1h-1zM25,20h1v1h-1zM28,20h1v1h-1zM2,21h1v1h-1zM4,21h1v1h-1zM7,21h1v1h-1zM9,21h1v1h-1zM12,21h1v1h-1zM16,21h1v1h-1zM17,21h1v1h-1zM20,21h1v1h-1zM21,21h1v1h-1zM22,21h1v1h-1zM24,21h1v1h-1zM25,21h1v1h-1zM29,21h1v1h-1zM2,22h1v1h-1zM4,22h1v1h-1zM6,22h1v1h-1zM8,22h1v1h-1zM9,22h1v1h-1zM11,22h1v1h-1zM18,22h1v1h-1zM19,22h1v1h-1zM21,22h1v1h-1zM22,22h1v1h-1zM23,22h1v1h-1zM24,22h1v1h-1zM25,22h1v1h-1zM26,22h1v1h-1zM28,22h1v1h-1zM29,22h1v1h-1zM30,22h1v1h-1zM10,23h1v1h-1zM11,23h1v1h-1zM12,23h1v1h-1zM14,23h1v1h-1zM15,23h1v1h-1zM16,23h1v1h-1zM18,23h1v1h-1zM20,23h1v1h-1zM22,23h1v1h-1zM26,23h1v1h-1zM27,23h1v1h-1zM28,23h1v1h-1zM29,23h1v1h-1zM30,23h1v1h-1zM2,24h1v1h-1zM3,24h1v1h-1zM4,24h1v1h-1zM5,24h1v1h-1zM6,24h1v1h-1zM7,24h1v1h-1zM8,24h1v1h-1zM11,24h1v1h-1zM12,24h1v1h-1zM13,24h1v1h-1zM15,24h1v1h-1zM16,24h1v1h-1zM17,24h1v1h-1zM18,24h1v1h-1zM19,24h1v1h-1zM20,24h1v1h-1zM21,24h1v1h-1zM22,24h1v1h-1zM24,24h1v1h-1zM26,24h1v1h-1zM27,24h1v1h-1zM28,24h1v1h-1zM2,25h1v1h-1zM8,25h1v1h-1zM10,25h1v1h-1zM11,25h1v1h-1zM13,25h1v1h-1zM14,25h1v1h-1zM15,25h1v1h-1zM17,25h1v1h-1zM18,25h1v1h-1zM22,25h1v1h-1zM26,25h1v1h-1zM30,25h1v1h-1zM2,26h1v1h-1zM4,26h1v1h-1zM5,26h1v1h-1zM6,26h1v1h-1zM8,26h1v1h-1zM10,26h1v1h-1zM11,26h1v1h-1zM12,26h1v1h-1zM13,26h1v1h-1zM16,26h1v1h-1zM17,26h1v1h-1zM18,26h1v1h-1zM22,26h1v1h-1zM23,26h1v1h-1zM24,26h1v1h-1zM25,26h1v1h-1zM26,26h1v1h-1zM28,26h1v1h-1zM29,26h1v1h-1zM2,27h1v1h-1zM4,27h1v1h-1zM5,27h1v1h-1zM6,27h1v1h-1zM8,27h1v1h-1zM10,27h1v1h-1zM11,27h1v1h-1zM14,27h1v1h-1zM20,27h1v1h-1zM21,27h1v1h-1zM27,27h1v1h-1zM28,27h1v1h-1zM29,27h1v1h-1zM30,27h1v1h-1zM2,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM8,28h1v1h-1zM10,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM15,28h1v1h-1zM17,28h1v1h-1zM19,28h1v1h-1zM20,28h1v1h-1zM21,28h1v1h-1zM23,28h1v1h-1zM24,28h1v1h-1zM25,28h1v1h-1zM26,28h1v1h-1zM27,28h1v1h-1zM28,28h1v1h-1zM29,28h1v1h-1zM2,29h1v1h-1zM8,29h1v1h-1zM11,29h1v1h-1zM12,29h1v1h-1zM13,29h1v1h-1zM16,29h1v1h-1zM22,29h1v1h-1zM24,29h1v1h-1zM27,29h1v1h-1zM29,29h1v1h-1zM2,30h1v1h-1zM3,30h1v1h-1zM4,30h1v1h-1zM5,30h1v1h-1zM6,30h1v1h-1zM7,30h1v1h-1zM8,30h1v1h-1zM10,30h1v1h-1zM12,30h1v1h-1zM16,30h1v1h-1zM17,30h1v1h-1zM21,30h1v1h-1zM23,30h1v1h-1zM25,30h1v1h-1zM26,30h1v1h-1zM28,30h1v1h-1z"/></svg>
+        <div>掃我填答</div><small>forms.gle/BcMVmgts4cCB5yjH6</small>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<aside class="sum" id="sum" aria-label="自評摘要">
+  <div class="card">
+    <div class="total"><span class="big num" id="tot">0</span><span class="of">/ 100</span><span class="lvl l1" id="lvl">待補強</span></div>
+    <div class="hint" id="wkLab"></div>
+    <div class="bars" id="bars"></div>
+    <h3>先補這幾項</h3>
+    <ol class="gaps" id="gaps"></ol>
+    <div class="donebox">
+      <b>完成條件：以下都打勾才算完成</b>
+      <ul class="done" id="done" style="margin-top:8px"></ul>
+    </div>
+    <p class="hint" style="margin:10px 0 0">等級：90↑ 優秀｜75↑ 良好｜60↑ 及格｜60 以下 待補強。沒做到就不要勾，老師依證據複評。</p>
+  </div>
+</aside>
+</div>
+</main>
+
+<div class="mbar" id="mbar"><span>自評</span><span class="big num" id="mTot">0</span><span>/100</span><span class="lvl l1" id="mLvl" style="margin-left:4px">待補強</span><a href="#sum">看缺口 ↓</a></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+/* ===== 設定：與 Google 表單（AI 賦能專題｜期末報告分組自評）完全一致，選項文字一字不差才能帶入 ===== */
+const FORM='https://docs.google.com/forms/d/e/1FAIpQLSfdhJWcyWk-PwWKdCUeJtKAPAbcejKkIdNd-4UWmxXDgcKFcw/viewform';
+const SHORT='https://forms.gle/BcMVmgts4cCB5yjH6';
+const E={week:'1281821869',cls:'512788472',grp:'811314328',topic:'1315453244',leader:'257124636',roster:'2006022099',count:'1862374131',reflect:'1601744023',next:'1280564335'};
+const WEEKS=['第 11 週（初評）','第 12 週（定稿）'];
+const CLASSES=['資管一A','車輛一A','機械一A'];
+const ROLES=['操作手','查核員','計時記錄','其他'];
+const NEXT=['心智圖','IPO 表','演算法／流程圖','程式驗證','都不用改'];
+const NONE='目前還沒做到任何一項';
+const DIMS=[{"key": "mind", "no": "①", "name": "心智圖", "basic": "4 層 4 分支", "color": "#F07C22", "items": ["① 中心題目明確：一個地點、一個問題", "② 至少 4 條主分支（四大主題）", "③ 至少 4 層：中心 → 主題 → 子題 → 葉子", "④ 有「出錯怎麼辦」例外分支", "⑤ 每片葉子都貼得上 I／P／O／例外"], "evidence": "心智圖 PNG 或 MindMap AI 分享連結", "core": [1, 2], "tc": "#B4530B", "entry": "282242813", "eventry": "221615511", "ex": "<b class=\"t\">範例：4 層 × 4 分支<\/b>\n<svg viewBox=\"0 0 320 156\" role=\"img\" aria-label=\"心智圖 4 層 4 分支示意：題目→主題→子題→葉子\" font-family=\"Noto Sans TC,Microsoft JhengHei,sans-serif\">\n<g font-size=\"9.5\" fill=\"#55617B\" text-anchor=\"middle\"><text x=\"30\" y=\"11\">第 1 層 中心<\/text><text x=\"112\" y=\"11\">第 2 層 主題<\/text><text x=\"195\" y=\"11\">第 3 層 子題<\/text><text x=\"282\" y=\"11\">第 4 層 葉子<\/text><\/g>\n<g stroke=\"#F07C22\" stroke-width=\"1.6\" fill=\"none\">\n<path d=\"M56 85 C70 85 70 34 84 34\"/><path d=\"M56 85 C70 85 70 68 84 68\"/><path d=\"M56 85 C70 85 70 102 84 102\"/><path d=\"M56 85 C70 85 70 136 84 136\"/>\n<path d=\"M140 34H168M140 68H168M140 102H168M140 136H168M222 34H250M222 68H250M222 102H250M222 136H250\"/><\/g>\n<rect x=\"4\" y=\"72\" width=\"52\" height=\"26\" rx=\"13\" fill=\"#F07C22\"/><text x=\"30\" y=\"89\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"700\" fill=\"#fff\">學餐排隊<\/text>\n<g fill=\"#fff\" stroke=\"#F07C22\" stroke-width=\"1.4\"><rect x=\"84\" y=\"24\" width=\"56\" height=\"20\" rx=\"6\"/><rect x=\"84\" y=\"58\" width=\"56\" height=\"20\" rx=\"6\"/><rect x=\"84\" y=\"92\" width=\"56\" height=\"20\" rx=\"6\"/><rect x=\"84\" y=\"126\" width=\"56\" height=\"20\" rx=\"6\"/><\/g>\n<g fill=\"#FDEBDC\"><rect x=\"168\" y=\"25\" width=\"54\" height=\"18\" rx=\"5\"/><rect x=\"168\" y=\"59\" width=\"54\" height=\"18\" rx=\"5\"/><rect x=\"168\" y=\"93\" width=\"54\" height=\"18\" rx=\"5\"/><rect x=\"168\" y=\"127\" width=\"54\" height=\"18\" rx=\"5\"/><\/g>\n<g fill=\"#F4F6FA\" stroke=\"#D4DCE7\"><rect x=\"250\" y=\"25\" width=\"66\" height=\"18\" rx=\"5\"/><rect x=\"250\" y=\"59\" width=\"66\" height=\"18\" rx=\"5\"/><rect x=\"250\" y=\"93\" width=\"66\" height=\"18\" rx=\"5\"/><rect x=\"250\" y=\"127\" width=\"66\" height=\"18\" rx=\"5\"/><\/g>\n<g font-size=\"9.5\" text-anchor=\"middle\" fill=\"#0E1A3A\"><text x=\"112\" y=\"38\">使用者<\/text><text x=\"112\" y=\"72\">資料<\/text><text x=\"112\" y=\"106\">判斷<\/text><text x=\"112\" y=\"140\" fill=\"#A3241A\" font-weight=\"700\">出錯怎麼辦<\/text>\n<text x=\"195\" y=\"38\">學生<\/text><text x=\"195\" y=\"72\">排隊人數<\/text><text x=\"195\" y=\"106\">等待分鐘<\/text><text x=\"195\" y=\"140\">出餐數 0<\/text>\n<text x=\"283\" y=\"38\">午餐尖峰<\/text><text x=\"283\" y=\"72\">人，0–120<\/text><text x=\"283\" y=\"106\">≥15 先去別家<\/text><text x=\"283\" y=\"140\">無法估算<\/text><\/g>\n<\/svg>\n<div style=\"margin-top:4px\">數法：從中心往外數到葉子＝4 層；中心長出的主題 ≥4 條＝4 分支。紅字就是「出錯怎麼辦」例外分支。<\/div>", "artifact": "心智圖大綱（MindMap AI 匯出的 Markdown，或條列）", "placeholder": "學餐排隊：現在去還是等一下？\n- 使用者\n  - 學生\n    - 午餐尖峰\n- 資料\n  - 排隊人數\n    - 人，0–120\n- 判斷\n  - 等待分鐘\n    - ≥ 15 先去別家\n- 出錯怎麼辦\n  - 出餐數 0\n    - 無法估算"}, {"key": "ipo", "no": "②", "name": "IPO 表", "basic": "明確界定範圍", "color": "#1E9FB0", "items": ["① 每個輸入都有名稱＋單位（例：排隊人數／人）", "② 每個輸入都有範圍（例：0–120 人、≥ 0）", "③ 門檻是數字，並寫清楚 ≥ 或 >", "④ 範圍外的值有處理（空白、負數、0 → 資料異常）", "⑤ 輸出說得出給誰、什麼形式；AI 推定格已標 ＊ 確認"], "evidence": "IPO 表檔名或連結", "core": [1, 2], "tc": "#0E6E7C", "entry": "1699239706", "eventry": "2137850484", "ex": "<b class=\"t\">範例：範圍寫清楚<\/b>\n<table><tr><th>輸入<\/th><th>單位<\/th><th>範圍<\/th><\/tr>\n<tr><td>排隊人數<\/td><td>人<\/td><td>0–120<\/td><\/tr>\n<tr><td>出餐速度<\/td><td>份／分<\/td><td>≥ 0<\/td><\/tr><\/table>\n<div style=\"margin-top:6px\">門檻：<b>wait ≥ 15<\/b> → 先去別家（剛好 15 也算）<br>範圍外：空白、負數、速度 0 → <b>資料異常<\/b><br>✘ 只寫「排隊人數」　✔ 排隊人數（人，0–120）<\/div>", "artifact": "IPO 表（從試算表或文件直接複製）", "placeholder": "| 模組 | I 輸入（單位、範圍） | P 處理（門檻） | O 輸出 |\n| 等待估算 | 排隊人數（人，0–120）、出餐速度（份／分，≥0） | wait＝人數÷速度；wait ≥ 15 → 先去別家；空白／負數／速度 0 → 資料異常 | 建議文字給學生 |"}, {"key": "algo", "no": "③", "name": "演算法／流程圖", "basic": "可模擬執行", "color": "#D9A21B", "items": ["① 有開始與結束", "② 每個菱形都有「是／否」兩條路", "③ 順序：先擋例外，再由重到輕判斷", "④ 能在 fChart 或 Mermaid Live 畫出且跑得通", "⑤ 用 3 組數值（一般、卡線、怪資料）走一遍都有結果"], "evidence": "流程圖 PNG／.fpp 或 Mermaid 連結", "core": [3, 4], "tc": "#8A5A00", "entry": "952464749", "eventry": "1367482926", "ex": "<b class=\"t\">範例：用 3 組數值走一遍<\/b>\n<div class=\"case\"><em style=\"background:#1D7343\">一般<\/em>8 人／4 份 → wait 2 → <b>現在去<\/b><\/div>\n<div class=\"case\"><em style=\"background:#B45309\">卡線<\/em>60 人／4 份 → wait 15 → <b>先去別家<\/b><\/div>\n<div class=\"case\"><em style=\"background:#A3241A\">怪資料<\/em>出餐 0 → <b>無法估算<\/b>（先擋例外）<\/div>\n<div style=\"margin-top:6px\">每一組都走得到「結束」，就是<b>可模擬執行<\/b>。工具：fChart 逐步執行（Windows）、mermaid.live 貼程式碼出圖（跨平台）。<\/div>", "artifact": "流程圖（Mermaid 程式碼，或把步驟一行一行寫出來）", "placeholder": "flowchart TD\n  A([開始]) --> B{資料有效？}\n  B -- 否 --> X[資料異常] --> Z([結束])\n  B -- 是 --> C{wait ≥ 15？}\n  C -- 是 --> D[先去別家] --> Z\n  C -- 否 --> E[現在去] --> Z"}, {"key": "code", "no": "④", "name": "程式驗證", "basic": "驗證結果", "color": "#3B8EDB", "items": ["① 程式在 Colab 執行沒有錯誤", "② 測試至少 8 筆：一般、剛好卡線、怪資料都有", "③ 執行前先寫好「我的預測」", "④ 有結果：通過 x／y（截圖或分享連結）", "⑤ 有 ✘ 的都有歸因與修正（回哪一站、改了什麼）"], "evidence": "Colab 分享連結（知道連結者可檢視）", "core": [1, 3], "tc": "#1F63A8", "entry": "1991365070", "eventry": "174790348", "ex": "<b class=\"t\">範例：結果要有數字<\/b>\n<table><tr><th>#<\/th><th>類型<\/th><th>我的預測<\/th><th>實際<\/th><th><\/th><\/tr>\n<tr><td>1<\/td><td>一般<\/td><td>現在去<\/td><td>現在去<\/td><td>✔<\/td><\/tr>\n<tr><td>4<\/td><td>卡線 15<\/td><td>先去別家<\/td><td>先去別家<\/td><td>✔<\/td><\/tr>\n<tr><td>9<\/td><td>怪資料<\/td><td>資料異常<\/td><td>資料異常<\/td><td>✔<\/td><\/tr><\/table>\n<div style=\"margin-top:6px\">先寫預測 → Ctrl＋F9 → <b>通過 12／12<\/b>。有 ✘ 也沒關係：寫下回哪一站、改了什麼。<\/div>", "artifact": "測試結果（Colab 輸出：預測、實際、✔／✘、通過 x／y）", "placeholder": "1 一般 (8,4) 預測=現在去 實際=現在去 ✔\n2 卡線 (60,4) 預測=先去別家 實際=先去別家 ✔\n3 怪資料 (10,0) 預測=資料異常 實際=資料異常 ✔\n…\n預測一致 12/12"}];
+const W12=new Date('2026-11-23T00:00:00+08:00');
+const KEY='ae.selfeval.v1';
+const AI_PROXY=(document.querySelector('meta[name="ae-ai-proxy"]')||{}).content||'';
+const AI_SYSTEM='你是大一「AI 賦能專題」期末報告的自評檢核助教。規則：1) 只依使用者列出的 5 項檢核標準，逐項判定「有／沒有／看不出來」。2) 每項一行，格式固定：①｜有｜理由（指出作品中的位置，或缺了什麼），理由 30 字內。3) 不要改寫、補寫或代做作品，不要打分數，不要新增標準。4) 內容不足以判斷時寫「看不出來」，並說要補什麼證據。5) 最後一行寫「先補：」＋最該先補的一項與一句做法。用繁體中文。';
+
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tidy=s=>String(s==null?'':s).replace(/\s+/g,' ').trim();
+
+/* ===== 狀態（本機保存；讀寫都包 try/catch，私密視窗也能用） ===== */
+function blank(){
+  const s={week:(Date.now()>=W12.getTime())?1:0,cls:'',grp:'',topic:'',roster:[],checks:{},ev:{},paste:{},ans:{},aiTag:{},reflect:'',next:[],aiCode:'',opened:false};
+  for(let i=0;i<3;i++) s.roster.push({sid:'',name:'',role:'',lead:i===0});
+  DIMS.forEach(d=>{s.checks[d.key]=[false,false,false,false,false];s.ev[d.key]='';s.paste[d.key]='';s.ans[d.key]='';s.aiTag[d.key]=[];});
+  return s;
+}
+let st=blank();
+try{const raw=localStorage.getItem(KEY); if(raw){const o=JSON.parse(raw); st=Object.assign(blank(),o); DIMS.forEach(d=>{ if(!Array.isArray(st.checks[d.key])) st.checks[d.key]=[false,false,false,false,false]; if(!st.aiTag[d.key]) st.aiTag[d.key]=[]; }); if(!st.roster||!st.roster.length) st.roster=blank().roster;}}catch(e){}
+let saveT=0;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}},250);}
+
+let toastT=0;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3200);}
+function copy(text){
+  if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(text).then(()=>true,()=>fallback());}
+  return Promise.resolve(fallback());
+  function fallback(){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();return ok;}
+}
+
+/* ===== 建立畫面 ===== */
+$('#weekSeg').innerHTML=WEEKS.map((w,i)=>`<label><input type="radio" name="week" value="${i}">${esc(w)}</label>`).join('');
+$('#cls').insertAdjacentHTML('beforeend',CLASSES.map(c=>`<option>${esc(c)}</option>`).join(''));
+$('#nextSeg').innerHTML=NEXT.map((n,i)=>`<label><input type="checkbox" name="next" value="${i}">${esc(n)}</label>`).join('');
+
+$('#dims').innerHTML='<div class="card" style="padding:12px 16px"><h2>三、四大面向自評</h2><p class="lead">每一項都對照自己的作品：<b>做到才勾</b>，並貼上證據連結。標「最基本」的是這個面向一定要做到的項目。</p></div>'+
+DIMS.map(d=>`
+<section class="dim" data-k="${d.key}" style="--c:${d.color};--tc:${d.tc}" id="dim-${d.key}">
+  <div class="dh"><span class="no">${d.no}</span><h2>${esc(d.name)}</h2><span class="basic">最基本：${esc(d.basic)}</span>
+    <span class="dscore"><span class="num" data-score="${d.key}">0</span> / 25</span></div>
+  <div class="db">
+    <ul class="items">${d.items.map((it,i)=>`<li><label><input type="checkbox" data-chk="${d.key}" data-i="${i}"><span class="tx">${esc(it)}${d.core.includes(i)?'<span class="core">最基本</span>':''}<span class="ait" data-ait="${d.key}-${i}"></span></span></label></li>`).join('')}</ul>
+    <div class="ex">${d.ex}</div>
+  </div>
+  <div class="ev"><label class="f">證據（${esc(d.evidence)}）<input type="url" data-ev="${d.key}" placeholder="貼上連結，或寫檔名（例：第7組_${esc(d.name.replace('／','_'))}.png）"></label></div>
+  <details class="aibox noprint" data-ai="${d.key}">
+    <summary>🤖 請 AI 逐項檢核<small>貼上作品內容 → AI 只判定有／沒有，不代寫；勾不勾由你們決定</small></summary>
+    <div class="in">
+      <label class="f">貼上${esc(d.artifact)}<textarea data-paste="${d.key}" placeholder="${esc(d.placeholder)}"></textarea></label>
+      <div class="row">
+        <label class="f" style="flex-direction:row;align-items:center;gap:6px;margin:0">AI 班級碼<input type="text" data-aicode style="width:130px" placeholder="老師公布" autocomplete="off"></label>
+        <button class="btn ai" type="button" data-ask="${d.key}">🤖 直接問 AI</button>
+        <button class="btn" type="button" data-cp="${d.key}">📋 複製提示</button>
+      </div>
+      <div class="hint" style="margin-top:6px">沒有班級碼：按「複製提示」，貼到 ChatGPT／Gemini／Claude 也可以。</div>
+      <div class="ans" data-ans="${d.key}"></div>
+      <div class="ansnote" data-ansnote="${d.key}" hidden>AI 的判定只是參考：回頭看作品，同意了才勾（HITL）。AI 說「有」但你們找不到，就不要勾。</div>
+    </div>
+  </details>
+</section>`).join('');
+
+function rosterRows(){
+  $('#roster tbody').innerHTML=st.roster.map((r,i)=>`<tr data-r="${i}">
+    <td><input type="text" data-rf="sid" value="${esc(r.sid)}" placeholder="學號" inputmode="text" autocomplete="off" aria-label="第${i+1}位學號"></td>
+    <td><input type="text" data-rf="name" value="${esc(r.name)}" placeholder="姓名" autocomplete="off" aria-label="第${i+1}位姓名"></td>
+    <td class="r"><select data-rf="role" aria-label="第${i+1}位分工"><option value="">分工</option>${ROLES.map(x=>`<option${r.role===x?' selected':''}>${x}</option>`).join('')}</select></td>
+    <td class="c"><input type="radio" name="lead" data-rf="lead" ${r.lead?'checked':''} aria-label="第${i+1}位是組長"></td>
+    <td><button class="del" type="button" data-del="${i}" title="刪除這一列" aria-label="刪除第${i+1}位">✕</button></td></tr>`).join('');
+}
+
+/* 把狀態寫回輸入框（初次載入／清除時） */
+function fillInputs(){
+  $$('input[name=week]').forEach(x=>x.checked=(+x.value===st.week));
+  $('#cls').value=st.cls; $('#grp').value=st.grp; $('#topic').value=st.topic; $('#reflect').value=st.reflect;
+  rosterRows();
+  $$('[data-chk]').forEach(x=>x.checked=!!st.checks[x.dataset.chk][+x.dataset.i]);
+  $$('[data-ev]').forEach(x=>x.value=st.ev[x.dataset.ev]||'');
+  $$('[data-paste]').forEach(x=>x.value=st.paste[x.dataset.paste]||'');
+  $$('[data-aicode]').forEach(x=>x.value=st.aiCode||'');
+  $$('input[name=next]').forEach(x=>x.checked=st.next.includes(NEXT[+x.value]));
+  DIMS.forEach(d=>{const a=$(`[data-ans="${d.key}"]`); if(st.ans[d.key]){a.textContent=st.ans[d.key];a.className='ans on';$(`[data-ansnote="${d.key}"]`).hidden=false;}else{a.className='ans';a.textContent='';}});
+}
+
+/* ===== 計算 ===== */
+const score=k=>st.checks[k].filter(Boolean).length*5;
+const total=()=>DIMS.reduce((a,d)=>a+score(d.key),0);
+function level(t){return t>=90?['優秀','l4']:t>=75?['良好','l3']:t>=60?['及格','l2']:['待補強','l1'];}
+const coreOk=d=>d.core.every(i=>st.checks[d.key][i]);
+function rowsDone(){return st.roster.filter(r=>tidy(r.sid).length>=4&&tidy(r.name)&&r.role);}
+function rowsPartial(){return st.roster.filter(r=>(tidy(r.sid)||tidy(r.name)||r.role)&&!(tidy(r.sid).length>=4&&tidy(r.name)&&r.role));}
+function infoOk(){const g=+st.grp;return (st.week===0||st.week===1)&&!!st.cls&&g>=1&&g<=30&&Number.isInteger(g)&&tidy(st.topic).length>=4;}
+function rosterOk(){const d=rowsDone();return d.length>=2&&d.length<=5&&!rowsPartial().length&&d.some(r=>r.lead);}
+function evOk(){return DIMS.every(d=>tidy(st.ev[d.key]).length>=4);}
+function reflOk(){return tidy(st.reflect).length>=8;}
+function suggestNext(){
+  const t=total(); if(t===100) return '都不用改';
+  let best=null; DIMS.forEach((d,i)=>{const s=score(d.key)+(coreOk(d)?0:-0.5); if(best===null||s<best.s) best={s,name:NEXT[i],d};});
+  return best.name;
+}
+function leaderText(){const r=st.roster.find(x=>x.lead&&tidy(x.sid));return r?tidy(r.sid)+' '+tidy(r.name):'';}
+function rosterText(){return rowsDone().map(r=>`${tidy(r.sid)} ${tidy(r.name)} ${r.role}${r.lead?'（組長）':''}`).join('\n');}
+
+function formUrl(){
+  const p=new URLSearchParams(); p.append('usp','pp_url');
+  if(st.week===0||st.week===1) p.append('entry.'+E.week,WEEKS[st.week]);
+  if(st.cls) p.append('entry.'+E.cls,st.cls);
+  if(st.grp) p.append('entry.'+E.grp,String(st.grp));
+  if(tidy(st.topic)) p.append('entry.'+E.topic,tidy(st.topic));
+  if(leaderText()) p.append('entry.'+E.leader,leaderText());
+  const rt=rosterText(); if(rt) p.append('entry.'+E.roster,rt);
+  const n=rowsDone().length; if(n>=2&&n<=5) p.append('entry.'+E.count,n+' 人');
+  DIMS.forEach(d=>{
+    const on=d.items.filter((_,i)=>st.checks[d.key][i]);
+    (on.length?on:[NONE]).forEach(v=>p.append('entry.'+d.entry,v));
+    if(tidy(st.ev[d.key])) p.append('entry.'+d.eventry,tidy(st.ev[d.key]));
+  });
+  if(tidy(st.reflect)) p.append('entry.'+E.reflect,st.reflect.trim());
+  st.next.forEach(v=>p.append('entry.'+E.next,v));
+  return FORM+'?'+p.toString();
+}
+
+/* ===== 繪製摘要 ===== */
+function render(){
+  const t=total(),[lv,lc]=level(t);
+  $('#tot').textContent=t; $('#mTot').textContent=t;
+  [$('#lvl'),$('#mLvl')].forEach(x=>{x.textContent=lv;x.className='lvl '+lc;});
+  $('#wkLab').textContent=(st.week===1?WEEKS[1]:WEEKS[0])+(st.cls?'｜'+st.cls:'')+(st.grp?'｜第 '+st.grp+' 組':'');
+  DIMS.forEach(d=>{$(`[data-score="${d.key}"]`).textContent=score(d.key);});
+  $('#bars').innerHTML=DIMS.map(d=>{const s=score(d.key),ok=coreOk(d);return `<div class="bar" style="--c:${d.color}"><div class="lab"><span>${d.no} ${esc(d.name)}</span><span>${s} / 25</span></div><div class="tr"><div class="fi" style="width:${s*4}%"></div></div><div class="bs ${ok?'y':'n'}">${ok?'✔':'✘'} 最基本：${esc(d.basic)}</div></div>`;}).join('');
+  /* 缺口：先列「最基本」沒做到的，再列其他 */
+  const g=[];
+  DIMS.forEach(d=>d.core.forEach(i=>{if(!st.checks[d.key][i]) g.push(`<b style="color:${d.tc}">${d.no} ${esc(d.name)}</b>｜${esc(d.items[i].slice(2))}<span class="core" style="--c:${d.color};--tc:${d.tc};margin-left:4px;font-size:.7rem;border:1.5px solid ${d.color};border-radius:4px;padding:0 4px;color:${d.tc}">最基本</span>`);}));
+  DIMS.forEach(d=>d.items.forEach((it,i)=>{if(!d.core.includes(i)&&!st.checks[d.key][i]) g.push(`<b style="color:${d.tc}">${d.no} ${esc(d.name)}</b>｜${esc(it.slice(2))}`);}));
+  $('#gaps').innerHTML=g.length?g.slice(0,4).map(x=>`<li>${x}</li>`).join('')+(g.length>4?`<li style="list-style:none;color:var(--muted)">…還有 ${g.length-4} 項</li>`:''):'<li style="list-style:none;color:var(--ok);font-weight:700">四大面向都做到了 🎉</li>';
+  /* 完成條件 */
+  const done=[
+    [infoOk()&&rosterOk(),'分組名單填寫完整（學號、姓名、分工、組長）', !infoOk()?'先填週次、班級、組別、題目':(!rosterOk()?(rowsPartial().length?'有一列沒填完':(rowsDone().length<2?'至少 2 位組員':'勾一位組長')):'')],
+    [evOk(),'四大面向自評都勾選並附證據', evOk()?'':'還缺證據：'+DIMS.filter(d=>tidy(st.ev[d.key]).length<4).map(d=>d.name).join('、')],
+    [reflOk(),'一句話：我們請 AI 改了哪裡、為什麼',''],
+    [st.opened?'w':false,'每組送出 1 份 Google 表單', st.opened?'已帶入表單——記得在最後一頁按「提交」':'在第五步按「帶入 Google 表單送出」']
+  ];
+  $('#done').innerHTML=done.map(([ok,t,h])=>`<li><span class="m ${ok==='w'?'w':ok?'y':'n'}">${ok==='w'?'!':ok?'✓':''}</span><span>${esc(t)}${h?`<br><small style="color:var(--muted)">${esc(h)}</small>`:''}</span></li>`).join('');
+  /* 下一圈建議 */
+  const sug=suggestNext();
+  $('#nextHint').textContent='依分數建議：'+(sug==='都不用改'?'四面向滿分，可以選「都不用改」':'回「'+sug+'」');
+  $('#useNext').hidden=st.next.length===1&&st.next[0]===sug;
+  /* 名單列提示 */
+  $$('#roster tbody tr').forEach(tr=>{const r=st.roster[+tr.dataset.r];const part=(tidy(r.sid)||tidy(r.name)||r.role)&&!(tidy(r.sid).length>=4&&tidy(r.name)&&r.role);tr.classList.toggle('bad',!!part);});
+  /* AI 判定標籤 */
+  DIMS.forEach(d=>d.items.forEach((_,i)=>{const el=$(`[data-ait="${d.key}-${i}"]`);const v=(st.aiTag[d.key]||[])[i]||'';el.textContent=v?'AI：'+v:'';el.className='ait '+(v==='有'?'y':v==='沒有'?'n':v?'q':'');}));
+  $('#goForm').href=formUrl();
+}
+
+/* ===== AI 檢核（HOTL：AI 判定，人審核） ===== */
+function promptOf(d,withRules){
+  const paste=(st.paste[d.key]||'').trim();
+  return (withRules?AI_SYSTEM+'\n\n':'')+
+    `【檢核面向】${d.no} ${d.name}（最基本標準：${d.basic}）\n【5 項檢核標準】\n${d.items.join('\n')}\n\n【我們組的作品】（${d.artifact}）\n${paste||'（還沒貼上作品內容）'}`;
+}
+function parseTags(d,text){
+  const tags=[];const marks='①②③④⑤';
+  String(text||'').split(/\n/).forEach(line=>{
+    const m=line.match(/([①②③④⑤])\s*[｜|:：\-\s]*\**\s*(看不出來|沒有|有)/);
+    if(m){const i=marks.indexOf(m[1]); if(i>=0&&!tags[i]) tags[i]=m[2];}
+  });
+  return tags;
+}
+function askAI(k,btn){
+  const d=DIMS.find(x=>x.key===k);
+  if(!tidy(st.aiCode)){toast('先填「AI 班級碼」（老師公布）；沒有的話按「複製提示」到外部 AI');const c=$(`[data-ai="${k}"] [data-aicode]`);c&&c.focus();return;}
+  if(tidy(st.paste[k]).length<10){toast('先貼上作品內容，AI 才有東西可以檢核');$(`[data-paste="${k}"]`).focus();return;}
+  if(!AI_PROXY){toast('這一頁沒有設定 AI 代理網址，請改用「複製提示」');return;}
+  const box=$(`[data-ans="${k}"]`);box.className='ans on wait';box.textContent='AI 檢核中…（約 5–30 秒）';btn.disabled=true;
+  const ctl=typeof AbortController!=='undefined'?new AbortController():null;const tm=setTimeout(()=>{ctl&&ctl.abort();},70000);
+  let sid='anon';try{const id=window.AEId&&AEId.get&&AEId.get();if(id&&id.sid)sid=String(id.sid).slice(-4);}catch(e){}
+  const lead=st.roster.find(r=>r.lead&&tidy(r.sid));if(lead)sid=tidy(lead.sid).slice(-4);
+  fetch(AI_PROXY,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},signal:ctl?ctl.signal:undefined,
+    body:JSON.stringify({action:'ai',code:tidy(st.aiCode),sid,cls:st.cls||'',system:AI_SYSTEM,user:promptOf(d,false),max:1200})})
+  .then(r=>r.json().catch(()=>({ok:false,error:'AI 代理回應不是 JSON'})))
+  .then(j=>{
+    if(!j.ok) throw new Error(j.error||'AI 呼叫失敗');
+    st.ans[k]=String(j.text||'').trim(); st.aiTag[k]=parseTags(d,st.ans[k]);
+    box.className='ans on';box.textContent=st.ans[k];$(`[data-ansnote="${k}"]`).hidden=false;save();render();
+    toast('AI 檢核好了：對照作品，同意才勾');
+  })
+  .catch(e=>{box.className='ans on err';box.textContent=(e&&e.name==='AbortError'?'等太久了（超過 70 秒）。':'沒問成：'+(e&&e.message||e)+'。')+'\n可以改按「複製提示」，貼到外部 AI。';})
+  .finally(()=>{clearTimeout(tm);btn.disabled=false;});
+}
+
+/* ===== 事件 ===== */
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='grp'){st.grp=t.value.trim();}
+  else if(t.id==='topic'){st.topic=t.value;}
+  else if(t.id==='reflect'){st.reflect=t.value;}
+  else if(t.dataset.rf&&t.dataset.rf!=='lead'&&t.dataset.rf!=='role'){const i=+t.closest('tr').dataset.r;st.roster[i][t.dataset.rf]=t.value;}
+  else if(t.dataset.ev){st.ev[t.dataset.ev]=t.value;}
+  else if(t.dataset.paste){st.paste[t.dataset.paste]=t.value;}
+  else if('aicode' in t.dataset){st.aiCode=t.value.trim();$$('[data-aicode]').forEach(x=>{if(x!==t)x.value=t.value;});}
+  else return;
+  save();render();
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.name==='week'){st.week=+t.value;}
+  else if(t.id==='cls'){st.cls=t.value;}
+  else if(t.dataset.chk){st.checks[t.dataset.chk][+t.dataset.i]=t.checked;}
+  else if(t.dataset.rf==='role'){st.roster[+t.closest('tr').dataset.r].role=t.value;}
+  else if(t.dataset.rf==='lead'){const i=+t.closest('tr').dataset.r;st.roster.forEach((r,j)=>r.lead=(j===i));}
+  else if(t.name==='next'){
+    const v=NEXT[+t.value];
+    if(t.checked){ if(v==='都不用改'){st.next=[v];} else {st.next=st.next.filter(x=>x!=='都不用改');st.next.push(v);} }
+    else st.next=st.next.filter(x=>x!==v);
+    $$('input[name=next]').forEach(x=>x.checked=st.next.includes(NEXT[+x.value]));
+  }
+  else return;
+  save();render();
+});
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button,a');if(!t)return;
+  if(t.id==='addRow'){if(st.roster.length>=5){toast('一組最多 5 人');return;}st.roster.push({sid:'',name:'',role:'',lead:false});rosterRows();save();render();const ins=$$('#roster tbody tr:last-child input');ins[0]&&ins[0].focus();}
+  else if(t.dataset.del!=null){const i=+t.dataset.del;if(st.roster.length<=2){st.roster[i]={sid:'',name:'',role:'',lead:st.roster[i].lead};}else{const wasLead=st.roster[i].lead;st.roster.splice(i,1);if(wasLead)st.roster[0].lead=true;}rosterRows();save();render();}
+  else if(t.dataset.ask){askAI(t.dataset.ask,t);}
+  else if(t.dataset.cp){const d=DIMS.find(x=>x.key===t.dataset.cp);copy(promptOf(d,true)).then(ok=>toast(ok?'已複製提示：貼到 ChatGPT／Gemini／Claude':'複製失敗，請手動選取'));}
+  else if(t.id==='useNext'){st.next=[suggestNext()];$$('input[name=next]').forEach(x=>x.checked=st.next.includes(NEXT[+x.value]));save();render();}
+  else if(t.id==='goForm'){
+    const miss=[];
+    if(!infoOk()) miss.push('分組資料');
+    if(!rosterOk()) miss.push('分組名單');
+    if(!evOk()) miss.push('證據');
+    if(!reflOk()) miss.push('AI 改了哪裡');
+    if(!st.next.length) miss.push('下一圈回哪站');
+    const m=$('#sendMsg');
+    if(miss.length){m.textContent='已開啟表單。還缺：'+miss.join('、')+'——可在表單補上，或回本頁填好再按一次。';m.className='msg warn on';}
+    else{m.textContent='已開啟表單：逐頁檢查，最後一頁勾「送出前確認」再按「提交」。';m.className='msg ok on';}
+    st.opened=true;save();setTimeout(render,0);
+  }
+  else if(t.id==='copySum'){
+    const [lv]=level(total());
+    const txt=[`【期末報告分組自評】${WEEKS[st.week]||''}｜${st.cls||'班級？'}｜第 ${st.grp||'?'} 組`,`題目：${tidy(st.topic)||'（未填）'}`,`名單：`+(rosterText().replace(/\n/g,'；')||'（未填）'),
+      ...DIMS.map(d=>`${d.no} ${d.name} ${score(d.key)}/25 ${coreOk(d)?'✔':'✘'}最基本（${d.basic}）`),`總分 ${total()}/100｜${lv}`,`AI 改了哪裡：${tidy(st.reflect)||'（未填）'}`,`下一圈：${st.next.join('、')||'（未選）'}`,`表單：${SHORT}`].join('\n');
+    copy(txt).then(ok=>toast(ok?'已複製本組摘要':'複製失敗'));
+  }
+  else if(t.id==='printBtn'){window.print();}
+  else if(t.id==='resetBtn'){
+    if(t.dataset.arm!=='1'){t.dataset.arm='1';t.textContent='再按一次確認清除';setTimeout(()=>{t.dataset.arm='';t.textContent='清除重填';},3000);return;}
+    st=blank();try{localStorage.removeItem(KEY);}catch(e){}fillInputs();render();t.dataset.arm='';t.textContent='清除重填';$('#sendMsg').className='msg';toast('已清除');
+  }
+});
+
+fillInputs();render();
+})();
+</script>
+</body>
+</html>
